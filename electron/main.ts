@@ -1,8 +1,11 @@
 import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { runMigrations } from './services/db/index'
 import { registerAllHandlers } from './ipc/index'
+import { getPlayer, resetDailyEp } from './services/db/repositories/playerRepo'
+
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
     width: 1200,
@@ -37,6 +40,17 @@ app.whenReady().then(() => {
   })
   runMigrations()
   registerAllHandlers()
+
+  const configPath = join(app.getPath('userData'), 'quest-board-config.json')
+  const config: { lastResetDate?: string } = existsSync(configPath)
+    ? JSON.parse(readFileSync(configPath, 'utf-8'))
+    : {}
+  const today = new Date().toISOString().slice(0, 10)
+  if (config.lastResetDate !== today) {
+    if (getPlayer()) resetDailyEp()
+    writeFileSync(configPath, JSON.stringify({ lastResetDate: today }))
+  }
+
   createWindow()
 
   app.on('activate', function () {
