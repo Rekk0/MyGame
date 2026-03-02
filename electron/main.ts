@@ -1,36 +1,12 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app } from 'electron'
 import { join } from 'path'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { runMigrations } from './services/db/index'
 import { registerAllHandlers } from './ipc/index'
 import { getPlayer, resetDailyEp } from './services/db/repositories/playerRepo'
-
-function createWindow(): void {
-  const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    show: false,
-    autoHideMenuBar: true,
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
-    }
-  })
-
-  mainWindow.on('ready-to-show', () => mainWindow.show())
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
-
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
-  }
-}
+import { createMainWindow } from './windows/mainWindow'
+import { createTray } from './tray'
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.questboard.app')
@@ -38,6 +14,7 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
+
   runMigrations()
   registerAllHandlers()
 
@@ -51,14 +28,15 @@ app.whenReady().then(() => {
     writeFileSync(configPath, JSON.stringify({ lastResetDate: today }))
   }
 
-  createWindow()
+  const mainWindow = createMainWindow()
+  createTray(mainWindow)
 
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  app.on('activate', () => {
+    mainWindow.show()
+    mainWindow.focus()
   })
 })
+
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  if (process.platform !== 'darwin') app.quit()
 })
