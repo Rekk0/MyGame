@@ -13,7 +13,10 @@ const questAPI = {
 
 const playerAPI = {
   get: () => ipcRenderer.invoke(IPC.PLAYER_GET),
-  create: (name: string) => ipcRenderer.invoke(IPC.PLAYER_CREATE, name),
+  getAll: () => ipcRenderer.invoke(IPC.PLAYER_GET_ALL),
+  create: (name: string, worldStyle: string) => ipcRenderer.invoke(IPC.PLAYER_CREATE, name, worldStyle),
+  switch: (id: string) => ipcRenderer.invoke(IPC.PLAYER_SWITCH, id),
+  delete: (id: string) => ipcRenderer.invoke(IPC.PLAYER_DELETE, id),
   addXp: (amount: number) => ipcRenderer.invoke(IPC.PLAYER_ADD_XP, amount),
   addGold: (amount: number) => ipcRenderer.invoke(IPC.PLAYER_ADD_GOLD, amount),
   consumeEp: (amount: number) => ipcRenderer.invoke(IPC.PLAYER_CONSUME_EP, amount),

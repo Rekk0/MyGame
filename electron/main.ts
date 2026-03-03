@@ -4,7 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { runMigrations } from './services/db/index'
 import { registerAllHandlers } from './ipc/index'
-import { getPlayer, resetDailyEp } from './services/db/repositories/playerRepo'
+import { getAllPlayers, resetDailyEp } from './services/db/repositories/playerRepo'
 import { createMainWindow } from './windows/mainWindow'
 import { createTray } from './tray'
 
@@ -24,7 +24,7 @@ app.whenReady().then(() => {
     : {}
   const today = new Date().toISOString().slice(0, 10)
   if (config.lastResetDate !== today) {
-    if (getPlayer()) resetDailyEp()
+    if (getAllPlayers().length > 0) resetDailyEp()
     writeFileSync(configPath, JSON.stringify({ lastResetDate: today }))
   }
 

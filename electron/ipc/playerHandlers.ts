@@ -2,17 +2,32 @@ import { ipcMain } from 'electron'
 import { IPC } from '../../src/types/ipc'
 import {
   getPlayer,
+  getAllPlayers,
   createPlayer,
+  switchPlayer,
+  deletePlayer,
   addXp,
   addGold,
   consumeEp,
   resetDailyEp,
 } from '../services/db/repositories/playerRepo'
+import type { WorldStyle } from '../../src/types/player'
 
 export function registerPlayerHandlers(): void {
   ipcMain.handle(IPC.PLAYER_GET, () => getPlayer())
 
-  ipcMain.handle(IPC.PLAYER_CREATE, (_e, name: string) => createPlayer(name))
+  ipcMain.handle(IPC.PLAYER_GET_ALL, () => getAllPlayers())
+
+  ipcMain.handle(IPC.PLAYER_CREATE, (_e, name: string, worldStyle: WorldStyle) =>
+    createPlayer(name, worldStyle)
+  )
+
+  ipcMain.handle(IPC.PLAYER_SWITCH, (_e, id: string) => switchPlayer(id))
+
+  ipcMain.handle(IPC.PLAYER_DELETE, (_e, id: string) => {
+    deletePlayer(id)
+    return getPlayer()
+  })
 
   ipcMain.handle(IPC.PLAYER_ADD_XP, async (_e, amount: number) => {
     const result = addXp(amount)
@@ -24,5 +39,8 @@ export function registerPlayerHandlers(): void {
 
   ipcMain.handle(IPC.PLAYER_CONSUME_EP, (_e, amount: number) => consumeEp(amount))
 
-  ipcMain.handle(IPC.PLAYER_RESET_EP, () => resetDailyEp())
+  ipcMain.handle(IPC.PLAYER_RESET_EP, () => {
+    resetDailyEp()
+    return getPlayer()
+  })
 }

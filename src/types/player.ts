@@ -1,3 +1,5 @@
+export type WorldStyle = 'wuxia' | 'xianxia' | 'realistic' | 'apocalypse' | 'scifi' | 'fantasy'
+
 export interface Player {
   id: string
   name: string
@@ -8,5 +10,6 @@ export interface Player {
   gold: number
   ep: number
   maxEp: number
+  worldStyle: WorldStyle
   createdAt: string
 }

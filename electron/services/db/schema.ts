@@ -2,6 +2,7 @@ import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 
 export const quests = sqliteTable('quests', {
   id: text('id').primaryKey(),
+  playerId: text('player_id').notNull().default(''),
   originalText: text('original_text').notNull(),
   gamifiedName: text('gamified_name'),
   narrative: text('narrative'),
@@ -22,11 +23,13 @@ export const players = sqliteTable('players', {
   gold: integer('gold').notNull().default(0),
   ep: integer('ep').notNull().default(100),
   maxEp: integer('max_ep').notNull().default(100),
+  worldStyle: text('world_style').notNull().default('realistic'),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString())
 })
 
 export const streaks = sqliteTable('streaks', {
   id: text('id').primaryKey(),
+  playerId: text('player_id').notNull().default(''),
   type: text('type').notNull().default('daily'),
   currentCount: integer('current_count').notNull().default(0),
   bestCount: integer('best_count').notNull().default(0),

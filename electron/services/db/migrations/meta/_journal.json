@@ -8,6 +8,20 @@
       "when": 1772290083567,
       "tag": "0000_fearless_spirit",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1772290100000,
+      "tag": "0001_add_world_style",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1772290200000,
+      "tag": "0002_add_player_id",
+      "breakpoints": true
     }
   ]
 }

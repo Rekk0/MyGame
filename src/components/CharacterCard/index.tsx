@@ -3,17 +3,27 @@ import { ProgressBar } from '../shared/ProgressBar'
 
 interface CharacterCardProps {
   player: Player
+  onManage: () => void
 }
 
-export function CharacterCard({ player }: CharacterCardProps): JSX.Element {
+export function CharacterCard({ player, onManage }: CharacterCardProps): JSX.Element {
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-gray-700 bg-gray-800 p-4 w-56">
-      <div>
-        <p className="text-lg font-bold text-white">{player.name}</p>
-        {player.title && (
-          <p className="text-xs text-yellow-400">{player.title}</p>
-        )}
-        <p className="text-sm text-gray-400">Lv.{player.level}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-lg font-bold text-white">{player.name}</p>
+          {player.title && (
+            <p className="text-xs text-yellow-400">{player.title}</p>
+          )}
+          <p className="text-sm text-gray-400">Lv.{player.level}</p>
+        </div>
+        <button
+          onClick={onManage}
+          className="text-gray-500 hover:text-gray-300 text-base leading-none mt-1"
+          title="角色管理"
+        >
+          ⚙
+        </button>
       </div>
 
       <div>

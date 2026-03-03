@@ -1,9 +1,14 @@
 import { randomUUID } from 'crypto'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { db } from '../index'
 import { streaks } from '../schema'
+import { getActivePlayerId } from './playerRepo'
 
 type Streak = typeof streaks.$inferSelect
+
+function pid(): string {
+  return getActivePlayerId()
+}
 
 function todayStr(): string {
   return new Date().toISOString().slice(0, 10)
@@ -16,13 +21,13 @@ function yesterdayOf(date: string): string {
 }
 
 export function getStreak(): Streak | undefined {
-  return db.select().from(streaks).get()
+  return db.select().from(streaks).where(eq(streaks.playerId, pid())).get()
 }
 
 export function initStreak(): Streak {
   const id = randomUUID()
-  db.insert(streaks).values({ id, lastActiveDate: todayStr() }).run()
-  return db.select().from(streaks).get()!
+  db.insert(streaks).values({ id, playerId: pid(), lastActiveDate: todayStr() }).run()
+  return db.select().from(streaks).where(and(eq(streaks.id, id), eq(streaks.playerId, pid()))).get()!
 }
 
 function getOrInit(): Streak {

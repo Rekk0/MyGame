@@ -3,21 +3,28 @@ import { usePlayerStore } from './stores/playerStore'
 import { useQuestStore } from './stores/questStore'
 import { useStreakStore } from './stores/streakStore'
 import { CharacterCard } from './components/CharacterCard'
+import { CharacterManager } from './components/CharacterCard/CharacterManager'
 import { QuestInput } from './components/QuestBoard/QuestInput'
 import { QuestList } from './components/QuestBoard/QuestList'
 import { CreateCharacter } from './components/CharacterCard/CreateCharacter'
 
 function App(): JSX.Element {
-  const { player, fetchPlayer } = usePlayerStore()
+  const { player, fetchPlayer, fetchAllPlayers } = usePlayerStore()
   const { quests, fetchQuests, createQuest, completeQuest, deleteQuest } = useQuestStore()
   const { streak, fetchStreak } = useStreakStore()
   const [initialized, setInitialized] = useState(false)
+  const [showManager, setShowManager] = useState(false)
+  const [showCreate, setShowCreate] = useState(false)
 
   useEffect(() => {
-    Promise.all([fetchPlayer(), fetchQuests(), fetchStreak()]).then(() => {
+    Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak()]).then(() => {
       setInitialized(true)
     })
   }, [])
+
+  const handleSwitched = async (): Promise<void> => {
+    await Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak()])
+  }
 
   if (!initialized) {
     return (
@@ -27,17 +34,30 @@ function App(): JSX.Element {
     )
   }
 
-  if (!player) {
+  if (!player || showCreate) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-900">
-        <CreateCharacter onCreated={fetchPlayer} />
+        <CreateCharacter
+          onCreated={async () => {
+            await handleSwitched()
+            setShowCreate(false)
+          }}
+        />
       </div>
     )
   }
 
   return (
     <div className="flex min-h-screen bg-gray-900 p-6 gap-6">
-      <CharacterCard player={player} />
+      {showManager && (
+        <CharacterManager
+          currentPlayer={player}
+          onClose={() => setShowManager(false)}
+          onCreateNew={() => setShowCreate(true)}
+          onSwitched={handleSwitched}
+        />
+      )}
+      <CharacterCard player={player} onManage={() => setShowManager(true)} />
       <div className="flex flex-1 flex-col gap-4">
         <QuestInput onSubmit={createQuest} />
         <QuestList quests={quests} onComplete={completeQuest} onDelete={deleteQuest} />

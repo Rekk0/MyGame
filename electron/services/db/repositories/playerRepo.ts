@@ -2,12 +2,15 @@ import { randomUUID } from 'crypto'
 import { eq } from 'drizzle-orm'
 import { db } from '../index'
 import { players } from '../schema'
+import type { WorldStyle } from '../../../../src/types/player'
 
 type PlayerRow = typeof players.$inferSelect
 
 export interface PlayerWithXp extends PlayerRow {
   xpToNextLevel: number
 }
+
+let _activePlayerId: string | null = null
 
 function xpToNextLevel(level: number): number {
   return Math.ceil(100 * level * 1.5)
@@ -17,20 +20,51 @@ function withXpToNextLevel(row: PlayerRow): PlayerWithXp {
   return { ...row, xpToNextLevel: xpToNextLevel(row.level) }
 }
 
+function ensureActive(): string {
+  if (_activePlayerId) return _activePlayerId
+  const first = db.select().from(players).get()
+  if (first) _activePlayerId = first.id
+  return _activePlayerId ?? ''
+}
+
+export function getActivePlayerId(): string {
+  return ensureActive()
+}
+
 export function getPlayer(): PlayerWithXp | undefined {
-  const row = db.select().from(players).get()
+  const id = ensureActive()
+  if (!id) return undefined
+  const row = db.select().from(players).where(eq(players.id, id)).get()
   return row ? withXpToNextLevel(row) : undefined
 }
 
-export function createPlayer(name: string): PlayerWithXp {
+export function getAllPlayers(): PlayerWithXp[] {
+  return db.select().from(players).all().map(withXpToNextLevel)
+}
+
+export function createPlayer(name: string, worldStyle: WorldStyle = 'realistic'): PlayerWithXp {
   const id = randomUUID()
-  db.insert(players).values({ id, name }).run()
+  db.insert(players).values({ id, name, worldStyle }).run()
+  _activePlayerId = id
   return getPlayer()!
 }
 
+export function switchPlayer(id: string): PlayerWithXp {
+  _activePlayerId = id
+  return getPlayer()!
+}
+
+export function deletePlayer(id: string): void {
+  db.delete(players).where(eq(players.id, id)).run()
+  if (_activePlayerId === id) {
+    _activePlayerId = null
+    ensureActive()
+  }
+}
+
 export function updatePlayer(data: Partial<PlayerRow>): PlayerWithXp {
-  const player = getPlayer()!
-  db.update(players).set(data).where(eq(players.id, player.id)).run()
+  const id = ensureActive()
+  db.update(players).set(data).where(eq(players.id, id)).run()
   return getPlayer()!
 }
 
@@ -63,8 +97,6 @@ export function consumeEp(amount: number): PlayerWithXp {
   return getPlayer()!
 }
 
-export function resetDailyEp(): PlayerWithXp {
-  const player = getPlayer()!
-  db.update(players).set({ ep: player.maxEp }).where(eq(players.id, player.id)).run()
-  return getPlayer()!
+export function resetDailyEp(): void {
+  db.update(players).set({ ep: 100 }).run()
 }
