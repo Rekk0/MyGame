@@ -4,9 +4,13 @@ import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { runMigrations } from './services/db/index'
 import { registerAllHandlers } from './ipc/index'
+import { registerWindowHandlers } from './ipc/windowHandlers'
 import { getAllPlayers, resetDailyEp } from './services/db/repositories/playerRepo'
 import { createMainWindow } from './windows/mainWindow'
+import { createHudWindow, showHud } from './windows/hudWindow'
 import { createTray } from './tray'
+
+let isQuitting = false
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.questboard.app')
@@ -29,13 +33,25 @@ app.whenReady().then(() => {
   }
 
   const mainWindow = createMainWindow()
+  createHudWindow()
   createTray(mainWindow)
+  registerWindowHandlers(mainWindow)
+
+  mainWindow.on('close', (event) => {
+    if (!isQuitting) {
+      event.preventDefault()
+      mainWindow.hide()
+    }
+  })
 
   app.on('activate', () => {
     mainWindow.show()
     mainWindow.focus()
+    showHud()
   })
 })
+
+app.on('before-quit', () => { isQuitting = true })
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()

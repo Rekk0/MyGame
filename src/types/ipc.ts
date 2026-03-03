@@ -18,4 +18,11 @@ export const IPC = {
 
   STREAK_GET: 'streak:get',
   STREAK_RECORD: 'streak:record',
+
+  WINDOW_SHOW_MAIN: 'window:show-main',
+  WINDOW_HIDE_MAIN: 'window:hide-main',
+  WINDOW_SHOW_HUD: 'window:show-hud',
+  WINDOW_HIDE_HUD: 'window:hide-hud',
+
+  DATA_UPDATED: 'data:updated',
 } as const

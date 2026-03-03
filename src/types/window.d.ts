@@ -27,5 +27,14 @@ declare global {
       get: () => Promise<Streak | undefined>
       record: () => Promise<Streak>
     }
+    windowAPI: {
+      showMain: () => Promise<void>
+      hideMain: () => Promise<void>
+      showHud: () => Promise<void>
+      hideHud: () => Promise<void>
+    }
+    dataAPI: {
+      onUpdated: (callback: () => void) => () => void
+    }
   }
 }

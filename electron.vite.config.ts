@@ -24,7 +24,10 @@ export default defineConfig({
     root: 'src',
     build: {
       rollupOptions: {
-        input: resolve(__dirname, 'src/index.html')
+        input: {
+          main: resolve(__dirname, 'src/index.html'),
+          hud: resolve(__dirname, 'src/hud.html')
+        }
       }
     },
     resolve: {

@@ -28,11 +28,28 @@ const streakAPI = {
   record: () => ipcRenderer.invoke(IPC.STREAK_RECORD),
 }
 
+const windowAPI = {
+  showMain: () => ipcRenderer.invoke(IPC.WINDOW_SHOW_MAIN),
+  hideMain: () => ipcRenderer.invoke(IPC.WINDOW_HIDE_MAIN),
+  showHud: () => ipcRenderer.invoke(IPC.WINDOW_SHOW_HUD),
+  hideHud: () => ipcRenderer.invoke(IPC.WINDOW_HIDE_HUD),
+}
+
+const dataAPI = {
+  onUpdated: (callback: () => void) => {
+    const handler = () => callback()
+    ipcRenderer.on(IPC.DATA_UPDATED, handler)
+    return () => ipcRenderer.removeListener(IPC.DATA_UPDATED, handler)
+  },
+}
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('questAPI', questAPI)
     contextBridge.exposeInMainWorld('playerAPI', playerAPI)
     contextBridge.exposeInMainWorld('streakAPI', streakAPI)
+    contextBridge.exposeInMainWorld('windowAPI', windowAPI)
+    contextBridge.exposeInMainWorld('dataAPI', dataAPI)
   } catch (error) {
     console.error(error)
   }
@@ -43,4 +60,8 @@ if (process.contextIsolated) {
   window.playerAPI = playerAPI
   // @ts-ignore
   window.streakAPI = streakAPI
+  // @ts-ignore
+  window.windowAPI = windowAPI
+  // @ts-ignore
+  window.dataAPI = dataAPI
 }

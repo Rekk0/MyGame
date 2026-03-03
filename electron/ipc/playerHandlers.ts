@@ -12,6 +12,7 @@ import {
   resetDailyEp,
 } from '../services/db/repositories/playerRepo'
 import type { WorldStyle } from '../../src/types/player'
+import { notifyHudUpdate } from '../windows/hudWindow'
 
 export function registerPlayerHandlers(): void {
   ipcMain.handle(IPC.PLAYER_GET, () => getPlayer())
@@ -22,10 +23,15 @@ export function registerPlayerHandlers(): void {
     createPlayer(name, worldStyle)
   )
 
-  ipcMain.handle(IPC.PLAYER_SWITCH, (_e, id: string) => switchPlayer(id))
+  ipcMain.handle(IPC.PLAYER_SWITCH, (_e, id: string) => {
+    const result = switchPlayer(id)
+    notifyHudUpdate()
+    return result
+  })
 
   ipcMain.handle(IPC.PLAYER_DELETE, (_e, id: string) => {
     deletePlayer(id)
+    notifyHudUpdate()
     return getPlayer()
   })
 
@@ -41,6 +47,7 @@ export function registerPlayerHandlers(): void {
 
   ipcMain.handle(IPC.PLAYER_RESET_EP, () => {
     resetDailyEp()
+    notifyHudUpdate()
     return getPlayer()
   })
 }
