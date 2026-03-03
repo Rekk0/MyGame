@@ -33,6 +33,8 @@ const windowAPI = {
   hideMain: () => ipcRenderer.invoke(IPC.WINDOW_HIDE_MAIN),
   showHud: () => ipcRenderer.invoke(IPC.WINDOW_SHOW_HUD),
   hideHud: () => ipcRenderer.invoke(IPC.WINDOW_HIDE_HUD),
+  showQuickInput: () => ipcRenderer.invoke(IPC.WINDOW_SHOW_QUICK_INPUT),
+  hideQuickInput: () => ipcRenderer.invoke(IPC.WINDOW_HIDE_QUICK_INPUT),
 }
 
 const dataAPI = {

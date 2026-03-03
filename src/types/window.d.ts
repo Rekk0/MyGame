@@ -32,6 +32,8 @@ declare global {
       hideMain: () => Promise<void>
       showHud: () => Promise<void>
       hideHud: () => Promise<void>
+      showQuickInput: () => Promise<void>
+      hideQuickInput: () => Promise<void>
     }
     dataAPI: {
       onUpdated: (callback: () => void) => () => void

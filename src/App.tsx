@@ -22,6 +22,10 @@ function App(): JSX.Element {
     })
   }, [])
 
+  useEffect(() => {
+    return window.dataAPI.onUpdated(() => { fetchQuests() })
+  }, [])
+
   const handleSwitched = async (): Promise<void> => {
     await Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak()])
   }

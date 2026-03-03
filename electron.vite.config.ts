@@ -26,7 +26,8 @@ export default defineConfig({
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'src/index.html'),
-          hud: resolve(__dirname, 'src/hud.html')
+          hud: resolve(__dirname, 'src/hud.html'),
+          quickInput: resolve(__dirname, 'src/quickInput.html')
         }
       }
     },

@@ -23,6 +23,8 @@ export const IPC = {
   WINDOW_HIDE_MAIN: 'window:hide-main',
   WINDOW_SHOW_HUD: 'window:show-hud',
   WINDOW_HIDE_HUD: 'window:hide-hud',
+  WINDOW_SHOW_QUICK_INPUT: 'window:show-quick-input',
+  WINDOW_HIDE_QUICK_INPUT: 'window:hide-quick-input',
 
   DATA_UPDATED: 'data:updated',
 } as const

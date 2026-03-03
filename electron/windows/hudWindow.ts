@@ -47,5 +47,5 @@ export function isHudVisible(): boolean {
 }
 
 export function notifyHudUpdate(): void {
-  hudWindow?.webContents.send(IPC.DATA_UPDATED)
+  BrowserWindow.getAllWindows().forEach((win) => win.webContents.send(IPC.DATA_UPDATED))
 }
