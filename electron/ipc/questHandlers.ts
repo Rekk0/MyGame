@@ -21,7 +21,11 @@ export function registerQuestHandlers(): void {
 
   ipcMain.handle(IPC.QUEST_GET_BY_ID, (_e, id: string) => getQuestById(id))
 
-  ipcMain.handle(IPC.QUEST_UPDATE, (_e, id: string, data: object) => updateQuest(id, data as never))
+  ipcMain.handle(IPC.QUEST_UPDATE, (_e, id: string, data: object) => {
+    const result = updateQuest(id, data as never)
+    notifyHudUpdate()
+    return result
+  })
 
   ipcMain.handle(IPC.QUEST_DELETE, (_e, id: string) => {
     const result = deleteQuest(id)

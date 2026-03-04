@@ -45,6 +45,17 @@ const dataAPI = {
   },
 }
 
+const aiAPI = {
+  transformQuest: (args: { originalText: string; worldStyle: string }) =>
+    ipcRenderer.invoke(IPC.AI_TRANSFORM_QUEST, args),
+}
+
+const settingsAPI = {
+  getAiConfig: () => ipcRenderer.invoke(IPC.SETTINGS_GET_AI_CONFIG),
+  setAiConfig: (config: { provider: string; apiKey: string; model: string }) =>
+    ipcRenderer.invoke(IPC.SETTINGS_SET_AI_CONFIG, config),
+}
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('questAPI', questAPI)
@@ -52,6 +63,8 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('streakAPI', streakAPI)
     contextBridge.exposeInMainWorld('windowAPI', windowAPI)
     contextBridge.exposeInMainWorld('dataAPI', dataAPI)
+    contextBridge.exposeInMainWorld('aiAPI', aiAPI)
+    contextBridge.exposeInMainWorld('settingsAPI', settingsAPI)
   } catch (error) {
     console.error(error)
   }
@@ -66,4 +79,8 @@ if (process.contextIsolated) {
   window.windowAPI = windowAPI
   // @ts-ignore
   window.dataAPI = dataAPI
+  // @ts-ignore
+  window.aiAPI = aiAPI
+  // @ts-ignore
+  window.settingsAPI = settingsAPI
 }

@@ -38,5 +38,17 @@ declare global {
     dataAPI: {
       onUpdated: (callback: () => void) => () => void
     }
+    aiAPI: {
+      transformQuest: (args: { originalText: string; worldStyle: WorldStyle }) => Promise<{
+        gamifiedName: string | null
+        narrative: string | null
+        type: string
+        xp: number
+      }>
+    }
+    settingsAPI: {
+      getAiConfig: () => Promise<{ provider: string; apiKey: string; model: string; autoTransform: boolean } | null>
+      setAiConfig: (config: { provider: string; apiKey: string; model: string; autoTransform: boolean }) => Promise<void>
+    }
   }
 }

@@ -27,4 +27,9 @@ export const IPC = {
   WINDOW_HIDE_QUICK_INPUT: 'window:hide-quick-input',
 
   DATA_UPDATED: 'data:updated',
+
+  AI_TRANSFORM_QUEST: 'ai:transform-quest',
+
+  SETTINGS_GET_AI_CONFIG: 'settings:get-ai-config',
+  SETTINGS_SET_AI_CONFIG: 'settings:set-ai-config',
 } as const

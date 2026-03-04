@@ -3,11 +3,14 @@ import { QuestCard } from './QuestCard'
 
 interface QuestListProps {
   quests: Quest[]
+  autoTransform: boolean
+  transformingIds: string[]
   onComplete: (id: string) => void
   onDelete: (id: string) => void
+  onTransform: (id: string) => void
 }
 
-export function QuestList({ quests, onComplete, onDelete }: QuestListProps): JSX.Element {
+export function QuestList({ quests, autoTransform, transformingIds, onComplete, onDelete, onTransform }: QuestListProps): JSX.Element {
   if (quests.length === 0) {
     return (
       <div className="py-12 text-center text-gray-500 text-sm">
@@ -22,8 +25,11 @@ export function QuestList({ quests, onComplete, onDelete }: QuestListProps): JSX
         <QuestCard
           key={quest.id}
           quest={quest}
+          autoTransform={autoTransform}
+          isTransforming={transformingIds.includes(quest.id)}
           onComplete={onComplete}
           onDelete={onDelete}
+          onTransform={onTransform}
         />
       ))}
     </div>
