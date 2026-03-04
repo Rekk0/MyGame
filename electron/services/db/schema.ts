@@ -38,6 +38,16 @@ export const achievements = sqliteTable('achievements', {
   isUnlocked: integer('is_unlocked').notNull().default(0),
 })
 
+export const medals = sqliteTable('medals', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  category: text('category').notNull(),
+  svgCode: text('svg_code').notNull(),
+  seed: text('seed').notNull(),
+  description: text('description').notNull(),
+  unlockedAt: text('unlocked_at').notNull(),
+})
+
 export const streaks = sqliteTable('streaks', {
   id: text('id').primaryKey(),
   playerId: text('player_id').notNull().default(''),

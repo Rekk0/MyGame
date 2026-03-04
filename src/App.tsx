@@ -3,6 +3,7 @@ import { usePlayerStore } from './stores/playerStore'
 import { useQuestStore } from './stores/questStore'
 import { useStreakStore } from './stores/streakStore'
 import { useAchievementStore } from './stores/achievementStore'
+import { useMedalStore } from './stores/medalStore'
 import { CharacterCard } from './components/CharacterCard'
 import { CharacterManager } from './components/CharacterCard/CharacterManager'
 import { QuestInput } from './components/QuestBoard/QuestInput'
@@ -10,30 +11,33 @@ import { QuestList } from './components/QuestBoard/QuestList'
 import { CreateCharacter } from './components/CharacterCard/CreateCharacter'
 import { Settings } from './components/shared/Settings'
 import { AchievementList } from './components/Achievement/AchievementList'
+import { MedalGallery } from './components/MedalGallery'
 
 function App(): JSX.Element {
   const { player, fetchPlayer, fetchAllPlayers } = usePlayerStore()
   const { quests, fetchQuests, createQuest, completeQuest, deleteQuest, transformQuest, autoTransform, transformingIds, loadSettings } = useQuestStore()
   const { streak, fetchStreak } = useStreakStore()
   const { achievements, fetchAchievements } = useAchievementStore()
+  const { medals, fetchMedals } = useMedalStore()
   const [initialized, setInitialized] = useState(false)
   const [showManager, setShowManager] = useState(false)
   const [showCreate, setShowCreate] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showAchievements, setShowAchievements] = useState(false)
+  const [showMedals, setShowMedals] = useState(false)
 
   useEffect(() => {
-    Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), loadSettings(), fetchAchievements()]).then(() => {
+    Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), loadSettings(), fetchAchievements(), fetchMedals()]).then(() => {
       setInitialized(true)
     })
   }, [])
 
   useEffect(() => {
-    return window.dataAPI.onUpdated(() => { fetchQuests(); fetchAchievements() })
+    return window.dataAPI.onUpdated(() => { fetchQuests(); fetchAchievements(); fetchMedals() })
   }, [])
 
   const handleSwitched = async (): Promise<void> => {
-    await Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), fetchAchievements()])
+    await Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), fetchAchievements(), fetchMedals()])
   }
 
   if (!initialized) {
@@ -73,6 +77,9 @@ function App(): JSX.Element {
       {showAchievements && (
         <AchievementList achievements={achievements} onClose={() => setShowAchievements(false)} />
       )}
+      {showMedals && (
+        <MedalGallery medals={medals} onClose={() => setShowMedals(false)} />
+      )}
       <CharacterCard player={player} onManage={() => setShowManager(true)} />
       <div className="flex flex-1 flex-col gap-4">
         <QuestInput onSubmit={createQuest} />
@@ -91,6 +98,13 @@ function App(): JSX.Element {
           title="成就"
         >
           🏆 {unlockedCount}
+        </button>
+        <button
+          onClick={() => setShowMedals(true)}
+          className="mt-2 text-gray-600 hover:text-yellow-300 text-lg"
+          title="勋章"
+        >
+          🎖 {medals.length}
         </button>
         <button
           onClick={() => setShowSettings(true)}

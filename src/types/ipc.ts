@@ -36,4 +36,7 @@ export const IPC = {
   ACHIEVEMENT_GET_ALL: 'achievement:get-all',
   ACHIEVEMENT_GET_UNLOCKED: 'achievement:get-unlocked',
   ACHIEVEMENT_SHOW: 'achievement:show',
+
+  MEDAL_GET_ALL: 'medal:get-all',
+  MEDAL_GENERATE: 'medal:generate',
 } as const

@@ -1,6 +1,6 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
-  "include": ["electron.vite.config.*", "electron/**/*", "drizzle.config.ts", "src/types/ipc.ts", "src/types/player.ts", "src/types/achievement.ts"],
+  "include": ["electron.vite.config.*", "electron/**/*", "drizzle.config.ts", "src/types/ipc.ts", "src/types/player.ts", "src/types/achievement.ts", "src/types/medal.ts"],
   "compilerOptions": {
     "composite": true,
     "types": ["electron-vite/node"]

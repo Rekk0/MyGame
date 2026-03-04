@@ -15,7 +15,14 @@ import { checkAchievements } from '../services/achievementChecker'
 import { callAI } from '../services/ai/client'
 import { unlockAchievement } from '../services/db/repositories/achievementRepo'
 import { buildAchievementSystemPrompt, buildAchievementPrompt } from '../services/ai/prompts/achievement'
+import { generateMedal } from './medalHandlers'
 import type { Achievement } from '../../src/types/achievement'
+
+const MEDAL_TRIGGERS: Record<string, { name: string; category: 'streak' | 'mastery' | 'adventure' | 'oath'; description: string }> = {
+  streak_7:  { name: '七日勋章',     category: 'streak',  description: '连续坚持七天的荣耀' },
+  streak_30: { name: '燃烧之魂勋章', category: 'streak',  description: '三十天不间断的火焰意志' },
+  level_10:  { name: '英雄勋章',     category: 'mastery', description: '达到10级的卓越成就' },
+}
 
 export function registerQuestHandlers(): void {
   ipcMain.handle(IPC.QUEST_CREATE, (_e, data: { originalText: string; dueDate?: string | null }) => {
@@ -61,6 +68,12 @@ export function registerQuestHandlers(): void {
           ).then((text) => {
             unlockAchievement(ach.id, text.trim())
           }).catch(() => {/* ignore AI errors */})
+        }
+        const medalDef = MEDAL_TRIGGERS[ach.triggerCondition]
+        if (medalDef) {
+          generateMedal(medalDef.name, medalDef.category, medalDef.description)
+            .then(() => notifyHudUpdate())
+            .catch(() => {/* ignore */})
         }
       }
     }

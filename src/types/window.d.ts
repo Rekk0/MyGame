@@ -2,6 +2,7 @@ import type { Quest } from './quest'
 import type { Player, WorldStyle } from './player'
 import type { Streak } from './streak'
 import type { Achievement } from './achievement'
+import type { Medal, MedalCategory } from './medal'
 
 declare global {
   interface Window {
@@ -55,6 +56,10 @@ declare global {
       getAll: () => Promise<Achievement[]>
       getUnlocked: () => Promise<Achievement[]>
       onShow: (callback: (achievement: Achievement) => void) => () => void
+    }
+    medalAPI: {
+      getAll: () => Promise<Medal[]>
+      generate: (args: { name: string; category: MedalCategory; description: string }) => Promise<Medal | null>
     }
   }
 }

@@ -4,6 +4,7 @@ import { registerStreakHandlers } from './streakHandlers'
 import { registerAiHandlers } from './aiHandlers'
 import { registerSettingsHandlers } from './settingsHandlers'
 import { registerAchievementHandlers } from './achievementHandlers'
+import { registerMedalHandlers } from './medalHandlers'
 
 export function registerAllHandlers(): void {
   registerQuestHandlers()
@@ -12,4 +13,5 @@ export function registerAllHandlers(): void {
   registerAiHandlers()
   registerSettingsHandlers()
   registerAchievementHandlers()
+  registerMedalHandlers()
 }
