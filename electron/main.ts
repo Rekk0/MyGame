@@ -6,9 +6,11 @@ import { runMigrations } from './services/db/index'
 import { registerAllHandlers } from './ipc/index'
 import { registerWindowHandlers } from './ipc/windowHandlers'
 import { getAllPlayers, resetDailyEp } from './services/db/repositories/playerRepo'
+import { initAchievements } from './services/db/repositories/achievementRepo'
 import { createMainWindow } from './windows/mainWindow'
 import { createHudWindow, showHud } from './windows/hudWindow'
 import { createQuickInputWindow, toggleQuickInput } from './windows/quickInput'
+import { createAchievementWindow } from './windows/achievementWindow'
 import { createTray } from './tray'
 
 let isQuitting = false
@@ -22,6 +24,7 @@ app.whenReady().then(() => {
 
   runMigrations()
   registerAllHandlers()
+  initAchievements()
 
   const configPath = join(app.getPath('userData'), 'quest-board-config.json')
   const config: { lastResetDate?: string } = existsSync(configPath)
@@ -36,6 +39,7 @@ app.whenReady().then(() => {
   const mainWindow = createMainWindow()
   createHudWindow()
   createQuickInputWindow()
+  createAchievementWindow()
   createTray(mainWindow)
   registerWindowHandlers(mainWindow)
   globalShortcut.register('Ctrl+Shift+Q', toggleQuickInput)

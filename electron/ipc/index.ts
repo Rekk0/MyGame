@@ -3,6 +3,7 @@ import { registerPlayerHandlers } from './playerHandlers'
 import { registerStreakHandlers } from './streakHandlers'
 import { registerAiHandlers } from './aiHandlers'
 import { registerSettingsHandlers } from './settingsHandlers'
+import { registerAchievementHandlers } from './achievementHandlers'
 
 export function registerAllHandlers(): void {
   registerQuestHandlers()
@@ -10,4 +11,5 @@ export function registerAllHandlers(): void {
   registerStreakHandlers()
   registerAiHandlers()
   registerSettingsHandlers()
+  registerAchievementHandlers()
 }

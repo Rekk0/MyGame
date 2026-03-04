@@ -27,6 +27,17 @@ export const players = sqliteTable('players', {
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString())
 })
 
+export const achievements = sqliteTable('achievements', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  tier: text('tier').notNull(),
+  triggerCondition: text('trigger_condition').notNull(),
+  unlockText: text('unlock_text'),
+  unlockedAt: text('unlocked_at'),
+  isUnlocked: integer('is_unlocked').notNull().default(0),
+})
+
 export const streaks = sqliteTable('streaks', {
   id: text('id').primaryKey(),
   playerId: text('player_id').notNull().default(''),

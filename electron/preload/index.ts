@@ -56,6 +56,16 @@ const settingsAPI = {
     ipcRenderer.invoke(IPC.SETTINGS_SET_AI_CONFIG, config),
 }
 
+const achievementAPI = {
+  getAll: () => ipcRenderer.invoke(IPC.ACHIEVEMENT_GET_ALL),
+  getUnlocked: () => ipcRenderer.invoke(IPC.ACHIEVEMENT_GET_UNLOCKED),
+  onShow: (callback: (achievement: unknown) => void) => {
+    const handler = (_e: Electron.IpcRendererEvent, achievement: unknown) => callback(achievement)
+    ipcRenderer.on(IPC.ACHIEVEMENT_SHOW, handler)
+    return () => ipcRenderer.removeListener(IPC.ACHIEVEMENT_SHOW, handler)
+  },
+}
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('questAPI', questAPI)
@@ -65,6 +75,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('dataAPI', dataAPI)
     contextBridge.exposeInMainWorld('aiAPI', aiAPI)
     contextBridge.exposeInMainWorld('settingsAPI', settingsAPI)
+    contextBridge.exposeInMainWorld('achievementAPI', achievementAPI)
   } catch (error) {
     console.error(error)
   }
@@ -83,4 +94,6 @@ if (process.contextIsolated) {
   window.aiAPI = aiAPI
   // @ts-ignore
   window.settingsAPI = settingsAPI
+  // @ts-ignore
+  window.achievementAPI = achievementAPI
 }

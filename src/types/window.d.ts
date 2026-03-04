@@ -1,6 +1,7 @@
 import type { Quest } from './quest'
 import type { Player, WorldStyle } from './player'
 import type { Streak } from './streak'
+import type { Achievement } from './achievement'
 
 declare global {
   interface Window {
@@ -49,6 +50,11 @@ declare global {
     settingsAPI: {
       getAiConfig: () => Promise<{ provider: string; apiKey: string; model: string; autoTransform: boolean } | null>
       setAiConfig: (config: { provider: string; apiKey: string; model: string; autoTransform: boolean }) => Promise<void>
+    }
+    achievementAPI: {
+      getAll: () => Promise<Achievement[]>
+      getUnlocked: () => Promise<Achievement[]>
+      onShow: (callback: (achievement: Achievement) => void) => () => void
     }
   }
 }

@@ -27,7 +27,8 @@ export default defineConfig({
         input: {
           main: resolve(__dirname, 'src/index.html'),
           hud: resolve(__dirname, 'src/hud.html'),
-          quickInput: resolve(__dirname, 'src/quickInput.html')
+          quickInput: resolve(__dirname, 'src/quickInput.html'),
+          achievement: resolve(__dirname, 'src/achievement.html')
         }
       }
     },
