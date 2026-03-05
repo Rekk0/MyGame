@@ -78,6 +78,11 @@ const skillAPI = {
   unlock: (id: string) => ipcRenderer.invoke(IPC.SKILL_UNLOCK, id),
 }
 
+const ddaAPI = {
+  getState: () => ipcRenderer.invoke(IPC.DDA_GET_STATE),
+  getSuggestion: () => ipcRenderer.invoke(IPC.DDA_GET_SUGGESTION),
+}
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('questAPI', questAPI)
@@ -90,6 +95,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('achievementAPI', achievementAPI)
     contextBridge.exposeInMainWorld('medalAPI', medalAPI)
     contextBridge.exposeInMainWorld('skillAPI', skillAPI)
+    contextBridge.exposeInMainWorld('ddaAPI', ddaAPI)
   } catch (error) {
     console.error(error)
   }
@@ -114,4 +120,6 @@ if (process.contextIsolated) {
   window.medalAPI = medalAPI
   // @ts-ignore
   window.skillAPI = skillAPI
+  // @ts-ignore
+  window.ddaAPI = ddaAPI
 }

@@ -16,6 +16,7 @@ import { callAI } from '../services/ai/client'
 import { unlockAchievement } from '../services/db/repositories/achievementRepo'
 import { buildAchievementSystemPrompt, buildAchievementPrompt } from '../services/ai/prompts/achievement'
 import { generateMedal } from './medalHandlers'
+import { analyzePlayerState, getDdaAdjustment, getStreakMultiplier } from '../services/dda'
 import type { Achievement } from '../../src/types/achievement'
 
 const MEDAL_TRIGGERS: Record<string, { name: string; category: 'streak' | 'mastery' | 'adventure' | 'oath'; description: string }> = {
@@ -49,6 +50,10 @@ export function registerQuestHandlers(): void {
 
   ipcMain.handle(IPC.QUEST_COMPLETE, async (_e, id: string) => {
     const quest = completeQuest(id)
+    const state = analyzePlayerState()
+    const { xpMultiplier: ddaMultiplier } = getDdaAdjustment(state)
+    const streakMult = getStreakMultiplier()
+    const finalXp = Math.round((quest.xp ?? 10) * ddaMultiplier * streakMult)
     notifyHudUpdate()
 
     const newAchievements = await checkAchievements()
@@ -78,6 +83,6 @@ export function registerQuestHandlers(): void {
       }
     }
 
-    return { quest, newAchievements }
+    return { quest, newAchievements, finalXp }
   })
 }

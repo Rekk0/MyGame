@@ -13,6 +13,7 @@ import { createHudWindow, showHud } from './windows/hudWindow'
 import { createQuickInputWindow, toggleQuickInput } from './windows/quickInput'
 import { createAchievementWindow } from './windows/achievementWindow'
 import { createTray } from './tray'
+import { startStreakWarningScheduler } from './services/notification'
 
 let isQuitting = false
 
@@ -44,6 +45,7 @@ app.whenReady().then(() => {
   createTray(mainWindow)
   registerWindowHandlers(mainWindow)
   globalShortcut.register('Ctrl+Shift+Q', toggleQuickInput)
+  startStreakWarningScheduler()
 
   mainWindow.on('close', (event) => {
     if (!isQuitting) {

@@ -43,4 +43,7 @@ export const IPC = {
   SKILL_GET_ALL: 'skill:get-all',
   SKILL_ADD_XP: 'skill:add-xp',
   SKILL_UNLOCK: 'skill:unlock',
+
+  DDA_GET_STATE: 'dda:get-state',
+  DDA_GET_SUGGESTION: 'dda:get-suggestion',
 } as const

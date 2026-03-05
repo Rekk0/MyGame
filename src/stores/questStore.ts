@@ -76,9 +76,9 @@ export const useQuestStore = create<QuestState>((set, get) => ({
 
   completeQuest: async (id: string) => {
     const quest = get().quests.find((q) => q.id === id)
-    const xp = quest?.xp ?? 10
     const type = quest?.type ?? 'daily'
-    await window.questAPI.complete(id)
+    const result = await window.questAPI.complete(id)
+    const xp = result.finalXp ?? quest?.xp ?? 10
     await window.playerAPI.addXp(xp)
     await window.playerAPI.addGold(5)
     await window.playerAPI.consumeEp(10)

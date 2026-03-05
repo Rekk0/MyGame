@@ -15,6 +15,14 @@ import { AchievementList } from './components/Achievement/AchievementList'
 import { MedalGallery } from './components/MedalGallery'
 import { SkillTree } from './components/SkillTree'
 
+type DdaState = 'anxious' | 'flow' | 'bored'
+interface DdaInfo { state: DdaState; xpMultiplier: number; suggestion: string }
+interface DdaSuggestion { mood: string; tips: string[]; suggestedQuestTypes: string[] }
+
+const DDA_ICONS: Record<DdaState, string> = { anxious: '😰', flow: '🌊', bored: '😴' }
+const DDA_COLORS: Record<DdaState, string> = { anxious: 'text-red-400', flow: 'text-cyan-400', bored: 'text-yellow-400' }
+const DDA_LABELS: Record<DdaState, string> = { anxious: '焦虑', flow: '心流', bored: '无聊' }
+
 function App(): JSX.Element {
   const { player, fetchPlayer, fetchAllPlayers } = usePlayerStore()
   const { quests, fetchQuests, createQuest, completeQuest, deleteQuest, transformQuest, autoTransform, transformingIds, loadSettings } = useQuestStore()
@@ -29,19 +37,41 @@ function App(): JSX.Element {
   const [showAchievements, setShowAchievements] = useState(false)
   const [showMedals, setShowMedals] = useState(false)
   const [showSkillTree, setShowSkillTree] = useState(false)
+  const [ddaInfo, setDdaInfo] = useState<DdaInfo | null>(null)
+  const [ddaSuggestion, setDdaSuggestion] = useState<DdaSuggestion | null>(null)
+  const [showSuggestion, setShowSuggestion] = useState(false)
+  const [loadingSuggestion, setLoadingSuggestion] = useState(false)
 
   useEffect(() => {
     Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), loadSettings(), fetchAchievements(), fetchMedals(), fetchSkills()]).then(() => {
       setInitialized(true)
+      window.ddaAPI.getState().then(setDdaInfo).catch(() => {})
     })
   }, [])
 
   useEffect(() => {
-    return window.dataAPI.onUpdated(() => { fetchQuests(); fetchAchievements(); fetchMedals(); fetchSkills() })
+    return window.dataAPI.onUpdated(() => {
+      fetchQuests(); fetchAchievements(); fetchMedals(); fetchSkills()
+      window.ddaAPI.getState().then(setDdaInfo).catch(() => {})
+    })
   }, [])
 
   const handleSwitched = async (): Promise<void> => {
+    setDdaSuggestion(null) // 切换角色时清空旧建议
     await Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), fetchAchievements(), fetchMedals(), fetchSkills()])
+    window.ddaAPI.getState().then(setDdaInfo).catch(() => {})
+  }
+
+  const handleShowSuggestion = async (): Promise<void> => {
+    setShowSuggestion(true)
+    if (!ddaSuggestion) {
+      setLoadingSuggestion(true)
+      try {
+        const s = await window.ddaAPI.getSuggestion()
+        setDdaSuggestion(s)
+      } catch { /* ignore */ }
+      setLoadingSuggestion(false)
+    }
   }
 
   if (!initialized) {
@@ -66,6 +96,8 @@ function App(): JSX.Element {
   }
 
   const unlockedCount = achievements.filter((a) => a.isUnlocked).length
+  const streakCount = streak?.currentCount ?? 0
+  const streakBonus = streakCount >= 30 ? 25 : streakCount >= 7 ? 10 : 0
 
   return (
     <div className="flex min-h-screen bg-gray-900 p-6 gap-6">
@@ -97,6 +129,33 @@ function App(): JSX.Element {
           </div>
         </div>
       )}
+      {showSuggestion && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setShowSuggestion(false)}>
+          <div className="bg-gray-800 rounded-xl p-5 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-white font-bold">今日建议</h3>
+              <button onClick={() => setShowSuggestion(false)} className="text-gray-400 hover:text-white">✕</button>
+            </div>
+            {loadingSuggestion ? (
+              <p className="text-gray-400 text-sm">AI 生成中...</p>
+            ) : ddaSuggestion ? (
+              <>
+                <p className="text-cyan-300 text-sm mb-2">状态：{ddaSuggestion.mood}</p>
+                <ul className="space-y-1">
+                  {ddaSuggestion.tips.map((tip, i) => (
+                    <li key={i} className="text-gray-300 text-sm">• {tip}</li>
+                  ))}
+                </ul>
+                {ddaSuggestion.suggestedQuestTypes.length > 0 && (
+                  <p className="text-gray-500 text-xs mt-3">推荐类型：{ddaSuggestion.suggestedQuestTypes.join('、')}</p>
+                )}
+              </>
+            ) : (
+              <p className="text-gray-400 text-sm">暂无建议（需配置 AI）</p>
+            )}
+          </div>
+        </div>
+      )}
       <CharacterCard player={player} onManage={() => setShowManager(true)} />
       <div className="flex flex-1 flex-col gap-4">
         <QuestInput onSubmit={createQuest} />
@@ -104,10 +163,22 @@ function App(): JSX.Element {
           onComplete={completeQuest} onDelete={deleteQuest} onTransform={transformQuest} />
       </div>
       <div className="flex w-28 flex-col items-center pt-2">
-        <p className="text-2xl font-bold text-orange-400">🔥 {streak?.currentCount ?? 0}</p>
+        <p className="text-2xl font-bold text-orange-400">🔥 {streakCount}</p>
         <p className="mt-1 text-xs text-gray-500">连胜天数</p>
         {streak && streak.bestCount > 0 && (
           <p className="mt-1 text-xs text-gray-600">最高 {streak.bestCount} 天</p>
+        )}
+        {streakBonus > 0 && (
+          <p className="mt-1 text-xs text-green-400">+{streakBonus}% XP</p>
+        )}
+        {ddaInfo && (
+          <button
+            onClick={handleShowSuggestion}
+            className={`mt-3 text-sm font-medium ${DDA_COLORS[ddaInfo.state]} hover:opacity-80`}
+            title={ddaInfo.suggestion}
+          >
+            {DDA_ICONS[ddaInfo.state]} {DDA_LABELS[ddaInfo.state]}
+          </button>
         )}
         <button
           onClick={() => setShowAchievements(true)}

@@ -13,7 +13,7 @@ declare global {
       getById: (id: string) => Promise<Quest | undefined>
       update: (id: string, data: Partial<Quest>) => Promise<Quest>
       delete: (id: string) => Promise<void>
-      complete: (id: string) => Promise<Quest>
+      complete: (id: string) => Promise<{ quest: Quest; newAchievements: Achievement[]; finalXp: number }>
     }
     playerAPI: {
       get: () => Promise<Player | undefined>
@@ -66,6 +66,10 @@ declare global {
       getAll: () => Promise<Skill[]>
       addXp: (id: string, amount: number) => Promise<{ skill: Skill; leveledUp: boolean; newTrait?: string }>
       unlock: (id: string) => Promise<Skill>
+    }
+    ddaAPI: {
+      getState: () => Promise<{ state: 'anxious' | 'flow' | 'bored'; xpMultiplier: number; suggestion: string }>
+      getSuggestion: () => Promise<{ mood: string; tips: string[]; suggestedQuestTypes: string[] } | null>
     }
   }
 }
