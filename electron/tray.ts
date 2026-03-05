@@ -5,7 +5,9 @@ import { showHud, hideHud } from './windows/hudWindow'
 let tray: Tray | null = null
 
 export function createTray(mainWindow: BrowserWindow): void {
-  const iconPath = join(app.getAppPath(), 'resources', 'icon.png')
+  const iconPath = app.isPackaged
+    ? join(process.resourcesPath, 'icon.png')
+    : join(app.getAppPath(), 'resources', 'icon.png')
   const icon = nativeImage.createFromPath(iconPath)
   tray = new Tray(icon)
   tray.setToolTip('Quest Board')

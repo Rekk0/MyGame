@@ -31,7 +31,7 @@ export function registerDdaHandlers(): void {
     const recentQuests = getAllQuests()
     try {
       const text = await callAI(
-        buildDailySuggestionPrompt(player, state, recentQuests),
+        buildDailySuggestionPrompt({ ...player, worldStyle: player.worldStyle as WorldStyle }, state, recentQuests),
         buildDailySuggestionSystemPrompt(player.worldStyle as WorldStyle)
       )
       const jsonMatch = text.match(/\{[\s\S]*\}/)

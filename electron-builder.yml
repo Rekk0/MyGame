@@ -10,15 +10,25 @@ files:
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.*}'
   - '!{karma.conf.js,.mocharc.yml}'
+extraResources:
+  - from: electron/services/db/migrations
+    to: migrations
+  - from: resources/icon.png
+    to: icon.png
 asarUnpack:
   - resources/**
+  - '**/node_modules/better-sqlite3/**'
 win:
   executableName: quest-board
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
-  createDesktopShortcut: always
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  allowElevation: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -38,9 +48,6 @@ linux:
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
-snapStore:
-  channels:
-    - edge
 deb:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
