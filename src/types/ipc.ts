@@ -39,4 +39,8 @@ export const IPC = {
 
   MEDAL_GET_ALL: 'medal:get-all',
   MEDAL_GENERATE: 'medal:generate',
+
+  SKILL_GET_ALL: 'skill:get-all',
+  SKILL_ADD_XP: 'skill:add-xp',
+  SKILL_UNLOCK: 'skill:unlock',
 } as const

@@ -5,6 +5,7 @@ import { registerAiHandlers } from './aiHandlers'
 import { registerSettingsHandlers } from './settingsHandlers'
 import { registerAchievementHandlers } from './achievementHandlers'
 import { registerMedalHandlers } from './medalHandlers'
+import { registerSkillHandlers } from './skillHandlers'
 
 export function registerAllHandlers(): void {
   registerQuestHandlers()
@@ -14,4 +15,5 @@ export function registerAllHandlers(): void {
   registerSettingsHandlers()
   registerAchievementHandlers()
   registerMedalHandlers()
+  registerSkillHandlers()
 }

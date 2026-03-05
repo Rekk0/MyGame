@@ -72,6 +72,12 @@ const medalAPI = {
     ipcRenderer.invoke(IPC.MEDAL_GENERATE, args),
 }
 
+const skillAPI = {
+  getAll: () => ipcRenderer.invoke(IPC.SKILL_GET_ALL),
+  addXp: (id: string, amount: number) => ipcRenderer.invoke(IPC.SKILL_ADD_XP, id, amount),
+  unlock: (id: string) => ipcRenderer.invoke(IPC.SKILL_UNLOCK, id),
+}
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('questAPI', questAPI)
@@ -83,6 +89,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('settingsAPI', settingsAPI)
     contextBridge.exposeInMainWorld('achievementAPI', achievementAPI)
     contextBridge.exposeInMainWorld('medalAPI', medalAPI)
+    contextBridge.exposeInMainWorld('skillAPI', skillAPI)
   } catch (error) {
     console.error(error)
   }
@@ -105,4 +112,6 @@ if (process.contextIsolated) {
   window.achievementAPI = achievementAPI
   // @ts-ignore
   window.medalAPI = medalAPI
+  // @ts-ignore
+  window.skillAPI = skillAPI
 }

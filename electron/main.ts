@@ -7,6 +7,7 @@ import { registerAllHandlers } from './ipc/index'
 import { registerWindowHandlers } from './ipc/windowHandlers'
 import { getAllPlayers, resetDailyEp } from './services/db/repositories/playerRepo'
 import { initAchievements } from './services/db/repositories/achievementRepo'
+import { initSkills } from './services/db/repositories/skillRepo'
 import { createMainWindow } from './windows/mainWindow'
 import { createHudWindow, showHud } from './windows/hudWindow'
 import { createQuickInputWindow, toggleQuickInput } from './windows/quickInput'
@@ -24,7 +25,7 @@ app.whenReady().then(() => {
 
   runMigrations()
   registerAllHandlers()
-  getAllPlayers().forEach((p) => initAchievements(p.id))
+  getAllPlayers().forEach((p) => { initAchievements(p.id); initSkills(p.id) })
 
   const configPath = join(app.getPath('userData'), 'quest-board-config.json')
   const config: { lastResetDate?: string } = existsSync(configPath)

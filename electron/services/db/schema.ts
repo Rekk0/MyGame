@@ -50,6 +50,20 @@ export const medals = sqliteTable('medals', {
   unlockedAt: text('unlocked_at').notNull(),
 })
 
+export const skills = sqliteTable('skills', {
+  id: text('id').primaryKey(),
+  playerId: text('player_id').notNull().default(''),
+  name: text('name').notNull(),
+  category: text('category').notNull(),
+  description: text('description').notNull(),
+  level: integer('level').notNull().default(1),
+  xp: integer('xp').notNull().default(0),
+  maxXp: integer('max_xp').notNull().default(100),
+  traits: text('traits').notNull().default('[]'),
+  parentSkillId: text('parent_skill_id'),
+  isUnlocked: integer('is_unlocked').notNull().default(0),
+})
+
 export const streaks = sqliteTable('streaks', {
   id: text('id').primaryKey(),
   playerId: text('player_id').notNull().default(''),

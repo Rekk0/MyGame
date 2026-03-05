@@ -77,11 +77,26 @@ export const useQuestStore = create<QuestState>((set, get) => ({
   completeQuest: async (id: string) => {
     const quest = get().quests.find((q) => q.id === id)
     const xp = quest?.xp ?? 10
+    const type = quest?.type ?? 'daily'
     await window.questAPI.complete(id)
     await window.playerAPI.addXp(xp)
     await window.playerAPI.addGold(5)
     await window.playerAPI.consumeEp(10)
     await window.streakAPI.record()
+    // 技能 XP：根据任务类型给对应技能加经验
+    const SKILL_XP_MAP: Record<string, { skillKey: string; amount: number }> = {
+      daily: { skillKey: 'time-mgmt', amount: 5 },
+      dungeon: { skillKey: 'productivity', amount: 10 },
+      main: { skillKey: 'resilience', amount: 20 },
+      adventure: { skillKey: 'learning', amount: 8 },
+    }
+    const skillXp = SKILL_XP_MAP[type]
+    if (skillXp) {
+      // 技能 ID 格式为 `${playerId}-${skillKey}`，需要从 skillAPI 拿到实际 ID
+      const allSkills = await window.skillAPI.getAll()
+      const target = allSkills.find(s => s.id.endsWith(`-${skillXp.skillKey}`) && s.isUnlocked)
+      if (target) void window.skillAPI.addXp(target.id, skillXp.amount)
+    }
     await Promise.all([
       get().fetchQuests(),
       usePlayerStore.getState().fetchPlayer(),

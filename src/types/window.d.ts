@@ -3,6 +3,7 @@ import type { Player, WorldStyle } from './player'
 import type { Streak } from './streak'
 import type { Achievement } from './achievement'
 import type { Medal, MedalCategory } from './medal'
+import type { Skill } from './skill'
 
 declare global {
   interface Window {
@@ -60,6 +61,11 @@ declare global {
     medalAPI: {
       getAll: () => Promise<Medal[]>
       generate: (args: { name: string; category: MedalCategory; description: string }) => Promise<Medal | null>
+    }
+    skillAPI: {
+      getAll: () => Promise<Skill[]>
+      addXp: (id: string, amount: number) => Promise<{ skill: Skill; leveledUp: boolean; newTrait?: string }>
+      unlock: (id: string) => Promise<Skill>
     }
   }
 }

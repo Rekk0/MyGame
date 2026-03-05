@@ -14,6 +14,7 @@ import {
 import type { WorldStyle } from '../../src/types/player'
 import { notifyHudUpdate } from '../windows/hudWindow'
 import { initAchievements } from '../services/db/repositories/achievementRepo'
+import { initSkills } from '../services/db/repositories/skillRepo'
 
 export function registerPlayerHandlers(): void {
   ipcMain.handle(IPC.PLAYER_GET, () => getPlayer())
@@ -23,6 +24,7 @@ export function registerPlayerHandlers(): void {
   ipcMain.handle(IPC.PLAYER_CREATE, (_e, name: string, worldStyle: WorldStyle) => {
     const player = createPlayer(name, worldStyle)
     initAchievements(player.id)
+    initSkills(player.id)
     return player
   })
 
