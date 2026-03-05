@@ -35,6 +35,12 @@ const windowAPI = {
   hideHud: () => ipcRenderer.invoke(IPC.WINDOW_HIDE_HUD),
   showQuickInput: () => ipcRenderer.invoke(IPC.WINDOW_SHOW_QUICK_INPUT),
   hideQuickInput: () => ipcRenderer.invoke(IPC.WINDOW_HIDE_QUICK_INPUT),
+  showQuestHud: () => ipcRenderer.invoke(IPC.WINDOW_SHOW_QUEST_HUD),
+  hideQuestHud: () => ipcRenderer.invoke(IPC.WINDOW_HIDE_QUEST_HUD),
+  getHudConfig: () => ipcRenderer.invoke(IPC.WINDOW_GET_HUD_CONFIG),
+  saveHudConfig: (patch: object) => ipcRenderer.invoke(IPC.WINDOW_SAVE_HUD_CONFIG, patch),
+  setHudPosition: (x: number, y: number) => ipcRenderer.invoke(IPC.WINDOW_SET_HUD_POSITION, x, y),
+  setQuestHudPosition: (x: number, y: number) => ipcRenderer.invoke(IPC.WINDOW_SET_QUEST_HUD_POSITION, x, y),
 }
 
 const dataAPI = {

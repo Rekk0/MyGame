@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+/* Stable grabbing cursor during HUD drag — prevents flicker between grab/pointer */
+html.hud-dragging,
+html.hud-dragging * {
+  cursor: grabbing !important;
+  user-select: none !important;
+}

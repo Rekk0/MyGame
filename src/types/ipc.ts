@@ -25,6 +25,14 @@ export const IPC = {
   WINDOW_HIDE_HUD: 'window:hide-hud',
   WINDOW_SHOW_QUICK_INPUT: 'window:show-quick-input',
   WINDOW_HIDE_QUICK_INPUT: 'window:hide-quick-input',
+  WINDOW_GET_HUD_POSITION: 'window:get-hud-position',
+  WINDOW_SET_HUD_POSITION: 'window:set-hud-position',
+  WINDOW_SHOW_QUEST_HUD: 'window:show-quest-hud',
+  WINDOW_HIDE_QUEST_HUD: 'window:hide-quest-hud',
+  WINDOW_GET_QUEST_HUD_POSITION: 'window:get-quest-hud-position',
+  WINDOW_SET_QUEST_HUD_POSITION: 'window:set-quest-hud-position',
+  WINDOW_GET_HUD_CONFIG: 'window:get-hud-config',
+  WINDOW_SAVE_HUD_CONFIG: 'window:save-hud-config',
 
   DATA_UPDATED: 'data:updated',
 

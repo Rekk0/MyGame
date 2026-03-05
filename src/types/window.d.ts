@@ -37,6 +37,12 @@ declare global {
       hideHud: () => Promise<void>
       showQuickInput: () => Promise<void>
       hideQuickInput: () => Promise<void>
+      showQuestHud: () => Promise<void>
+      hideQuestHud: () => Promise<void>
+      getHudConfig: () => Promise<{ hudX?: number; hudY?: number; questHudX?: number; questHudY?: number }>
+      saveHudConfig: (patch: object) => Promise<void>
+      setHudPosition: (x: number, y: number) => Promise<void>
+      setQuestHudPosition: (x: number, y: number) => Promise<void>
     }
     dataAPI: {
       onUpdated: (callback: () => void) => () => void

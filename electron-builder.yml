@@ -20,6 +20,11 @@ asarUnpack:
   - '**/node_modules/better-sqlite3/**'
 win:
   executableName: quest-board
+  target:
+    - nsis
+    - portable
+portable:
+  artifactName: ${name}-${version}-portable.${ext}
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

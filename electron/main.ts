@@ -1,6 +1,6 @@
 import { app, globalShortcut, dialog } from 'electron'
 import { join } from 'path'
-import { existsSync, readFileSync, writeFileSync, appendFileSync } from 'fs'
+import { appendFileSync } from 'fs'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { runMigrations } from './services/db/index'
 import { registerAllHandlers } from './ipc/index'
@@ -10,8 +10,10 @@ import { initAchievements } from './services/db/repositories/achievementRepo'
 import { initSkills } from './services/db/repositories/skillRepo'
 import { createMainWindow } from './windows/mainWindow'
 import { createHudWindow, showHud } from './windows/hudWindow'
+import { createQuestHudWindow } from './windows/questHudWindow'
 import { createQuickInputWindow, toggleQuickInput } from './windows/quickInput'
 import { createAchievementWindow } from './windows/achievementWindow'
+import { readHudConfig, writeHudConfig } from './services/hudConfig'
 import { createTray } from './tray'
 import { startStreakWarningScheduler } from './services/notification'
 
@@ -35,18 +37,16 @@ app.whenReady().then(() => {
     registerAllHandlers()
     getAllPlayers().forEach((p) => { initAchievements(p.id); initSkills(p.id) })
 
-    const configPath = join(app.getPath('userData'), 'quest-board-config.json')
-    const config: { lastResetDate?: string } = existsSync(configPath)
-      ? JSON.parse(readFileSync(configPath, 'utf-8'))
-      : {}
+    const config = readHudConfig()
     const today = new Date().toISOString().slice(0, 10)
     if (config.lastResetDate !== today) {
       if (getAllPlayers().length > 0) resetDailyEp()
-      writeFileSync(configPath, JSON.stringify({ lastResetDate: today }))
+      writeHudConfig({ lastResetDate: today })
     }
 
     const mainWindow = createMainWindow()
     createHudWindow()
+    createQuestHudWindow()
     createQuickInputWindow()
     createAchievementWindow()
     createTray(mainWindow)
