@@ -1,7 +1,8 @@
 import { randomUUID } from 'crypto'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { db } from '../index'
 import { achievements } from '../schema'
+import { getActivePlayerId } from './playerRepo'
 import type { AchievementTier } from '../../../../src/types/achievement'
 
 type AchievementRow = typeof achievements.$inferSelect
@@ -27,24 +28,32 @@ const PRESET_ACHIEVEMENTS: PresetAchievement[] = [
   { title: '主线启动', description: '完成第一个主线任务', tier: 'epic', triggerCondition: 'first_main' },
 ]
 
-export function initAchievements(): void {
-  const existing = db.select().from(achievements).all()
+function pid(): string {
+  return getActivePlayerId()
+}
+
+export function initAchievements(playerId: string): void {
+  const existing = db.select().from(achievements).where(eq(achievements.playerId, playerId)).all()
   if (existing.length > 0) return
   for (const preset of PRESET_ACHIEVEMENTS) {
-    db.insert(achievements).values({ id: randomUUID(), ...preset }).run()
+    db.insert(achievements).values({ id: randomUUID(), playerId, ...preset }).run()
   }
 }
 
 export function getAllAchievements(): AchievementRow[] {
-  return db.select().from(achievements).all()
+  return db.select().from(achievements).where(eq(achievements.playerId, pid())).all()
 }
 
 export function getUnlockedAchievements(): AchievementRow[] {
-  return db.select().from(achievements).where(eq(achievements.isUnlocked, 1)).all()
+  return db.select().from(achievements)
+    .where(and(eq(achievements.playerId, pid()), eq(achievements.isUnlocked, 1)))
+    .all()
 }
 
 export function isUnlocked(triggerCondition: string): boolean {
-  const row = db.select().from(achievements).where(eq(achievements.triggerCondition, triggerCondition)).get()
+  const row = db.select().from(achievements)
+    .where(and(eq(achievements.playerId, pid()), eq(achievements.triggerCondition, triggerCondition)))
+    .get()
   return row?.isUnlocked === 1
 }
 
@@ -57,5 +66,7 @@ export function unlockAchievement(id: string, unlockText: string | null): Achiev
 }
 
 export function getByCondition(triggerCondition: string): AchievementRow | undefined {
-  return db.select().from(achievements).where(eq(achievements.triggerCondition, triggerCondition)).get()
+  return db.select().from(achievements)
+    .where(and(eq(achievements.playerId, pid()), eq(achievements.triggerCondition, triggerCondition)))
+    .get()
 }

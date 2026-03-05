@@ -13,15 +13,18 @@ import {
 } from '../services/db/repositories/playerRepo'
 import type { WorldStyle } from '../../src/types/player'
 import { notifyHudUpdate } from '../windows/hudWindow'
+import { initAchievements } from '../services/db/repositories/achievementRepo'
 
 export function registerPlayerHandlers(): void {
   ipcMain.handle(IPC.PLAYER_GET, () => getPlayer())
 
   ipcMain.handle(IPC.PLAYER_GET_ALL, () => getAllPlayers())
 
-  ipcMain.handle(IPC.PLAYER_CREATE, (_e, name: string, worldStyle: WorldStyle) =>
-    createPlayer(name, worldStyle)
-  )
+  ipcMain.handle(IPC.PLAYER_CREATE, (_e, name: string, worldStyle: WorldStyle) => {
+    const player = createPlayer(name, worldStyle)
+    initAchievements(player.id)
+    return player
+  })
 
   ipcMain.handle(IPC.PLAYER_SWITCH, (_e, id: string) => {
     const result = switchPlayer(id)

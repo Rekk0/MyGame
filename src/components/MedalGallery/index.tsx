@@ -18,7 +18,7 @@ function MedalDetail({ medal, onClose }: { medal: Medal; onClose: () => void }):
         onClick={(e) => e.stopPropagation()}
       >
         <div
-          className="w-48 h-48"
+          className="w-48 h-48 [&>svg]:w-full [&>svg]:h-full"
           dangerouslySetInnerHTML={{ __html: medal.svgCode }}
         />
         <p className="text-lg font-bold text-yellow-400">{medal.name}</p>

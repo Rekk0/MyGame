@@ -29,6 +29,7 @@ export const players = sqliteTable('players', {
 
 export const achievements = sqliteTable('achievements', {
   id: text('id').primaryKey(),
+  playerId: text('player_id').notNull().default(''),
   title: text('title').notNull(),
   description: text('description').notNull(),
   tier: text('tier').notNull(),
@@ -40,6 +41,7 @@ export const achievements = sqliteTable('achievements', {
 
 export const medals = sqliteTable('medals', {
   id: text('id').primaryKey(),
+  playerId: text('player_id').notNull().default(''),
   name: text('name').notNull(),
   category: text('category').notNull(),
   svgCode: text('svg_code').notNull(),

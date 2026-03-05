@@ -24,7 +24,7 @@ app.whenReady().then(() => {
 
   runMigrations()
   registerAllHandlers()
-  initAchievements()
+  getAllPlayers().forEach((p) => initAchievements(p.id))
 
   const configPath = join(app.getPath('userData'), 'quest-board-config.json')
   const config: { lastResetDate?: string } = existsSync(configPath)

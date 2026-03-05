@@ -13,7 +13,7 @@ export function MedalCard({ medal, onSelect }: Props): JSX.Element {
       title="点击放大查看"
     >
       <div
-        className="w-20 h-20 pointer-events-none"
+        className="w-20 h-20 pointer-events-none [&>svg]:w-full [&>svg]:h-full"
         dangerouslySetInnerHTML={{ __html: medal.svgCode }}
       />
       <p className="text-xs font-medium text-gray-200 text-center leading-tight">{medal.name}</p>
