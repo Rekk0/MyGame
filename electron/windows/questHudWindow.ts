@@ -20,7 +20,6 @@ export function createQuestHudWindow(): BrowserWindow {
     maxHeight: 200,
     x,
     y,
-    alwaysOnTop: true,
     frame: false,
     transparent: true,
     resizable: false,
@@ -31,6 +30,8 @@ export function createQuestHudWindow(): BrowserWindow {
       sandbox: false
     }
   })
+  // Use a higher level than Stats HUD ('floating') so Quest HUD is never obscured by Stats HUD
+  questHudWindow.setAlwaysOnTop(true, 'pop-up-menu')
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     questHudWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/questHud.html`)
