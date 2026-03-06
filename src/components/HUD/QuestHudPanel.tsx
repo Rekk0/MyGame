@@ -25,6 +25,7 @@ export default function QuestHudPanel() {
 
   const { onMouseDown } = useDraggableHud(
     (x, y) => { void window.windowAPI.setQuestHudPosition(x, y) },
+    () => window.windowAPI.getQuestHudPosition(),
     locked
   )
 

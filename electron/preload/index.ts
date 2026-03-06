@@ -39,6 +39,8 @@ const windowAPI = {
   hideQuestHud: () => ipcRenderer.invoke(IPC.WINDOW_HIDE_QUEST_HUD),
   getHudConfig: () => ipcRenderer.invoke(IPC.WINDOW_GET_HUD_CONFIG),
   saveHudConfig: (patch: object) => ipcRenderer.invoke(IPC.WINDOW_SAVE_HUD_CONFIG, patch),
+  getHudPosition: () => ipcRenderer.invoke(IPC.WINDOW_GET_HUD_POSITION) as Promise<{ x: number; y: number } | null>,
+  getQuestHudPosition: () => ipcRenderer.invoke(IPC.WINDOW_GET_QUEST_HUD_POSITION) as Promise<{ x: number; y: number } | null>,
   setHudPosition: (x: number, y: number) => ipcRenderer.invoke(IPC.WINDOW_SET_HUD_POSITION, x, y),
   setQuestHudPosition: (x: number, y: number) => ipcRenderer.invoke(IPC.WINDOW_SET_QUEST_HUD_POSITION, x, y),
 }

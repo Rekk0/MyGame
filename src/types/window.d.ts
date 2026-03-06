@@ -41,6 +41,8 @@ declare global {
       hideQuestHud: () => Promise<void>
       getHudConfig: () => Promise<{ hudX?: number; hudY?: number; questHudX?: number; questHudY?: number }>
       saveHudConfig: (patch: object) => Promise<void>
+      getHudPosition: () => Promise<{ x: number; y: number } | null>
+      getQuestHudPosition: () => Promise<{ x: number; y: number } | null>
       setHudPosition: (x: number, y: number) => Promise<void>
       setQuestHudPosition: (x: number, y: number) => Promise<void>
     }

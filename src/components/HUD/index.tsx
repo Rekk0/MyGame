@@ -19,6 +19,7 @@ export default function HUD() {
 
   const { onMouseDown } = useDraggableHud(
     (x, y) => { void window.windowAPI.setHudPosition(x, y) },
+    () => window.windowAPI.getHudPosition(),
     locked
   )
 

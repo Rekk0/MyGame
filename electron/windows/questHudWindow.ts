@@ -1,15 +1,15 @@
 import { BrowserWindow, screen } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
-import { readHudConfig, writeHudConfig } from '../services/hudConfig'
+import { readHudConfig } from '../services/hudConfig'
 
 let questHudWindow: BrowserWindow | null = null
 
 export function createQuestHudWindow(): BrowserWindow {
-  const { width } = screen.getPrimaryDisplay().workAreaSize
+  const { x: ax, y: ay, width } = screen.getPrimaryDisplay().workArea
   const config = readHudConfig()
-  const x = config.questHudX ?? width - 240
-  const y = config.questHudY ?? 148
+  const x = config.questHudX ?? ax + width - 240
+  const y = config.questHudY ?? ay + 148
 
   questHudWindow = new BrowserWindow({
     width: 220,
@@ -30,12 +30,6 @@ export function createQuestHudWindow(): BrowserWindow {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
-  })
-
-  questHudWindow.on('moved', () => {
-    if (!questHudWindow) return
-    const [wx, wy] = questHudWindow.getPosition()
-    writeHudConfig({ questHudX: wx, questHudY: wy })
   })
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {

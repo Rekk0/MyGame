@@ -2,15 +2,15 @@ import { BrowserWindow, screen } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 import { IPC } from '../../src/types/ipc'
-import { readHudConfig, writeHudConfig } from '../services/hudConfig'
+import { readHudConfig } from '../services/hudConfig'
 
 let hudWindow: BrowserWindow | null = null
 
 export function createHudWindow(): BrowserWindow {
-  const { width } = screen.getPrimaryDisplay().workAreaSize
+  const { x: ax, y: ay, width } = screen.getPrimaryDisplay().workArea
   const config = readHudConfig()
-  const x = config.hudX ?? width - 240
-  const y = config.hudY ?? 20
+  const x = config.hudX ?? ax + width - 240
+  const y = config.hudY ?? ay + 20
 
   hudWindow = new BrowserWindow({
     width: 220,
@@ -31,12 +31,6 @@ export function createHudWindow(): BrowserWindow {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
-  })
-
-  hudWindow.on('moved', () => {
-    if (!hudWindow) return
-    const [wx, wy] = hudWindow.getPosition()
-    writeHudConfig({ hudX: wx, hudY: wy })
   })
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
