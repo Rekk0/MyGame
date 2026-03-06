@@ -7,6 +7,7 @@ export const quests = sqliteTable('quests', {
   gamifiedName: text('gamified_name'),
   narrative: text('narrative'),
   xp: integer('xp').notNull().default(10),
+  epCost: integer('ep_cost').notNull().default(10),
   type: text('type').notNull().default('test'),
   status: text('status').notNull().default('pending'),
   dueDate: text('due_date'),

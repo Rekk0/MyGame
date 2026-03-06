@@ -7,6 +7,7 @@ export interface Quest {
   gamifiedName: string | null
   narrative: string | null
   xp: number
+  epCost: number
   type: QuestType
   status: QuestStatus
   dueDate: string | null

@@ -10,7 +10,7 @@ interface TransformArgs {
   worldStyle: WorldStyle
 }
 
-const FALLBACK = { gamifiedName: null, narrative: null, type: 'daily', xp: 10 }
+const FALLBACK = { gamifiedName: null, narrative: null, type: 'daily', xp: 10, epCost: 10 }
 
 export function registerAiHandlers(): void {
   ipcMain.handle(IPC.AI_TRANSFORM_QUEST, async (_, { originalText, worldStyle }: TransformArgs) => {

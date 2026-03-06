@@ -56,6 +56,7 @@ declare global {
         narrative: string | null
         type: string
         xp: number
+        epCost?: number
       }>
     }
     settingsAPI: {

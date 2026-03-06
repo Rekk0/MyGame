@@ -57,6 +57,13 @@
       "when": 1772290700000,
       "tag": "0007_add_plot_logs",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1772290800000,
+      "tag": "0008_add_ep_cost",
+      "breakpoints": true
     }
   ]
 }

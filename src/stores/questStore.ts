@@ -65,6 +65,7 @@ export const useQuestStore = create<QuestState>((set, get) => ({
         narrative: result.narrative,
         type: result.type as QuestType,
         xp: result.xp,
+        epCost: result.epCost ?? 10,
       })
       await get().fetchQuests()
     } catch {
@@ -77,7 +78,7 @@ export const useQuestStore = create<QuestState>((set, get) => ({
   completeQuest: async (id: string) => {
     const quest = get().quests.find((q) => q.id === id)
     const type = quest?.type ?? 'daily'
-    const epCost = 10
+    const epCost = quest?.epCost ?? 10
 
     // 先获取当前玩家 EP
     const playerBefore = await window.playerAPI.get()
