@@ -77,11 +77,23 @@ export const useQuestStore = create<QuestState>((set, get) => ({
   completeQuest: async (id: string) => {
     const quest = get().quests.find((q) => q.id === id)
     const type = quest?.type ?? 'daily'
+    const epCost = 10
+
+    // 先获取当前玩家 EP
+    const playerBefore = await window.playerAPI.get()
+    const currentEp = playerBefore?.ep ?? 0
+
+    // 比例系数：EP 充足时为 1.0，耗尽时最低 0.5
+    const epRatio = epCost > 0 ? Math.min(1, currentEp / epCost) : 1
+    const epMultiplier = currentEp >= epCost ? 1.0 : Math.max(0.5, epRatio)
+
     const result = await window.questAPI.complete(id)
-    const xp = result.finalXp ?? quest?.xp ?? 10
+    const baseXp = result.finalXp ?? quest?.xp ?? 10
+    const xp = Math.round(baseXp * epMultiplier)
+
     await window.playerAPI.addXp(xp)
     await window.playerAPI.addGold(5)
-    await window.playerAPI.consumeEp(10)
+    await window.playerAPI.consumeEp(epCost)
     await window.streakAPI.record()
     // 技能 XP：根据任务类型给对应技能加经验
     const SKILL_XP_MAP: Record<string, { skillKey: string; amount: number }> = {
