@@ -26,6 +26,12 @@ const PRESET_ACHIEVEMENTS: PresetAchievement[] = [
   { title: '传说之境', description: '达到20级', tier: 'legendary', triggerCondition: 'level_20' },
   { title: '日常骑士', description: '完成第一个日常任务', tier: 'common', triggerCondition: 'first_daily' },
   { title: '主线启动', description: '完成第一个主线任务', tier: 'epic', triggerCondition: 'first_main' },
+  { title: '初识今日传说', description: '首次触发今日剧情总结', tier: 'common', triggerCondition: 'first_daily_plot' },
+  { title: '编年史官的起点', description: '首次触发本周剧情总结', tier: 'rare', triggerCondition: 'first_weekly_plot' },
+  { title: '七日故事家', description: '触发7次今日剧情总结', tier: 'rare', triggerCondition: 'daily_plot_7' },
+  { title: '月华叙事者', description: '触发21次今日剧情总结', tier: 'epic', triggerCondition: 'daily_plot_21' },
+  { title: '四章史诗', description: '触发4次本周剧情总结', tier: 'rare', triggerCondition: 'weekly_plot_4' },
+  { title: '不朽编年官', description: '触发12次本周剧情总结', tier: 'legendary', triggerCondition: 'weekly_plot_12' },
 ]
 
 function pid(): string {
@@ -34,9 +40,10 @@ function pid(): string {
 
 export function initAchievements(playerId: string): void {
   const existing = db.select().from(achievements).where(eq(achievements.playerId, playerId)).all()
-  if (existing.length > 0) return
   for (const preset of PRESET_ACHIEVEMENTS) {
-    db.insert(achievements).values({ id: randomUUID(), playerId, ...preset }).run()
+    if (!existing.some((e) => e.triggerCondition === preset.triggerCondition)) {
+      db.insert(achievements).values({ id: randomUUID(), playerId, ...preset }).run()
+    }
   }
 }
 

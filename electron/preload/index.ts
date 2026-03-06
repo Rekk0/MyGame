@@ -92,6 +92,13 @@ const ddaAPI = {
   getSuggestion: () => ipcRenderer.invoke(IPC.DDA_GET_SUGGESTION),
 }
 
+const plotAPI = {
+  getDailyStatus: () => ipcRenderer.invoke(IPC.PLOT_GET_DAILY_STATUS),
+  getWeeklyStatus: () => ipcRenderer.invoke(IPC.PLOT_GET_WEEKLY_STATUS),
+  generateDaily: () => ipcRenderer.invoke(IPC.PLOT_GENERATE_DAILY),
+  generateWeekly: () => ipcRenderer.invoke(IPC.PLOT_GENERATE_WEEKLY),
+}
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('questAPI', questAPI)
@@ -105,6 +112,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('medalAPI', medalAPI)
     contextBridge.exposeInMainWorld('skillAPI', skillAPI)
     contextBridge.exposeInMainWorld('ddaAPI', ddaAPI)
+    contextBridge.exposeInMainWorld('plotAPI', plotAPI)
   } catch (error) {
     console.error(error)
   }
@@ -131,4 +139,6 @@ if (process.contextIsolated) {
   window.skillAPI = skillAPI
   // @ts-ignore
   window.ddaAPI = ddaAPI
+  // @ts-ignore
+  window.plotAPI = plotAPI
 }

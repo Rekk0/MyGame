@@ -72,3 +72,12 @@ export const streaks = sqliteTable('streaks', {
   bestCount: integer('best_count').notNull().default(0),
   lastActiveDate: text('last_active_date').notNull()
 })
+
+export const plotLogs = sqliteTable('plot_logs', {
+  id: text('id').primaryKey(),
+  playerId: text('player_id').notNull().default(''),
+  type: text('type').notNull(),
+  periodKey: text('period_key').notNull(),
+  summary: text('summary').notNull(),
+  createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
+})

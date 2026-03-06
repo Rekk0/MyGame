@@ -64,3 +64,27 @@ export async function checkAchievements(): Promise<AchievementRow[]> {
 
   return newlyUnlocked
 }
+
+export async function checkPlotAchievements(
+  type: 'daily' | 'weekly',
+  count: number
+): Promise<AchievementRow[]> {
+  const checks: string[] = []
+
+  if (type === 'daily') {
+    if (count >= 1) checks.push('first_daily_plot')
+    if (count >= 7) checks.push('daily_plot_7')
+    if (count >= 21) checks.push('daily_plot_21')
+  } else {
+    if (count >= 1) checks.push('first_weekly_plot')
+    if (count >= 4) checks.push('weekly_plot_4')
+    if (count >= 12) checks.push('weekly_plot_12')
+  }
+
+  const newlyUnlocked: AchievementRow[] = []
+  for (const condition of checks) {
+    const result = await tryUnlock(condition)
+    if (result) newlyUnlocked.push(result)
+  }
+  return newlyUnlocked
+}

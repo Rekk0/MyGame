@@ -80,5 +80,11 @@ declare global {
       getState: () => Promise<{ state: 'anxious' | 'flow' | 'bored'; xpMultiplier: number; suggestion: string }>
       getSuggestion: () => Promise<{ mood: string; tips: string[]; suggestedQuestTypes: string[] } | null>
     }
+    plotAPI: {
+      getDailyStatus: () => Promise<{ eligible: boolean; cached?: string }>
+      getWeeklyStatus: () => Promise<{ eligible: boolean; cached?: string }>
+      generateDaily: () => Promise<string>
+      generateWeekly: () => Promise<string>
+    }
   }
 }

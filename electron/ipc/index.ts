@@ -7,6 +7,7 @@ import { registerAchievementHandlers } from './achievementHandlers'
 import { registerMedalHandlers } from './medalHandlers'
 import { registerSkillHandlers } from './skillHandlers'
 import { registerDdaHandlers } from './ddaHandlers'
+import { registerPlotHandlers } from './plotHandlers'
 
 export function registerAllHandlers(): void {
   registerQuestHandlers()
@@ -18,4 +19,5 @@ export function registerAllHandlers(): void {
   registerMedalHandlers()
   registerSkillHandlers()
   registerDdaHandlers()
+  registerPlotHandlers()
 }

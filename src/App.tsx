@@ -14,6 +14,7 @@ import { Settings } from './components/shared/Settings'
 import { AchievementList } from './components/Achievement/AchievementList'
 import { MedalGallery } from './components/MedalGallery'
 import { SkillTree } from './components/SkillTree'
+import { PlotScrollButton, PlotModal } from './components/PlotScroll'
 
 type DdaState = 'anxious' | 'flow' | 'bored'
 interface DdaInfo { state: DdaState; xpMultiplier: number; suggestion: string }
@@ -22,6 +23,14 @@ interface DdaSuggestion { mood: string; tips: string[]; suggestedQuestTypes: str
 const DDA_ICONS: Record<DdaState, string> = { anxious: '😰', flow: '🌊', bored: '😴' }
 const DDA_COLORS: Record<DdaState, string> = { anxious: 'text-red-400', flow: 'text-cyan-400', bored: 'text-yellow-400' }
 const DDA_LABELS: Record<DdaState, string> = { anxious: '焦虑', flow: '心流', bored: '无聊' }
+
+function getMondayISO(): string {
+  const d = new Date()
+  const day = d.getDay() || 7
+  const monday = new Date(d)
+  monday.setDate(d.getDate() - day + 1)
+  return monday.toISOString().slice(0, 10)
+}
 
 function App(): JSX.Element {
   const { player, fetchPlayer, fetchAllPlayers } = usePlayerStore()
@@ -42,6 +51,15 @@ function App(): JSX.Element {
   const [showSuggestion, setShowSuggestion] = useState(false)
   const [loadingSuggestion, setLoadingSuggestion] = useState(false)
 
+  const [showDailyPlot, setShowDailyPlot] = useState(false)
+  const [showWeeklyPlot, setShowWeeklyPlot] = useState(false)
+  const [dailyPlotSummary, setDailyPlotSummary] = useState<string | undefined>()
+  const [weeklyPlotSummary, setWeeklyPlotSummary] = useState<string | undefined>()
+  const [loadingDailyPlot, setLoadingDailyPlot] = useState(false)
+  const [loadingWeeklyPlot, setLoadingWeeklyPlot] = useState(false)
+  const [dailyPlotError, setDailyPlotError] = useState<string | undefined>()
+  const [weeklyPlotError, setWeeklyPlotError] = useState<string | undefined>()
+
   useEffect(() => {
     Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), loadSettings(), fetchAchievements(), fetchMedals(), fetchSkills()]).then(() => {
       setInitialized(true)
@@ -57,7 +75,9 @@ function App(): JSX.Element {
   }, [])
 
   const handleSwitched = async (): Promise<void> => {
-    setDdaSuggestion(null) // 切换角色时清空旧建议
+    setDdaSuggestion(null)
+    setDailyPlotSummary(undefined)
+    setWeeklyPlotSummary(undefined)
     await Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), fetchAchievements(), fetchMedals(), fetchSkills()])
     window.ddaAPI.getState().then(setDdaInfo).catch(() => {})
   }
@@ -72,6 +92,38 @@ function App(): JSX.Element {
       } catch { /* ignore */ }
       setLoadingSuggestion(false)
     }
+  }
+
+  const handleOpenDailyPlot = async (): Promise<void> => {
+    setDailyPlotError(undefined)
+    setShowDailyPlot(true)
+    if (dailyPlotSummary) return
+    setLoadingDailyPlot(true)
+    try {
+      const summary = await window.plotAPI.generateDaily()
+      setDailyPlotSummary(summary)
+      fetchAchievements(); fetchMedals()
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      setDailyPlotError(msg.includes('configured') ? '请先配置 AI（点击 ⚙ 设置）' : msg)
+    }
+    setLoadingDailyPlot(false)
+  }
+
+  const handleOpenWeeklyPlot = async (): Promise<void> => {
+    setWeeklyPlotError(undefined)
+    setShowWeeklyPlot(true)
+    if (weeklyPlotSummary) return
+    setLoadingWeeklyPlot(true)
+    try {
+      const summary = await window.plotAPI.generateWeekly()
+      setWeeklyPlotSummary(summary)
+      fetchAchievements(); fetchMedals()
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      setWeeklyPlotError(msg.includes('configured') ? '请先配置 AI（点击 ⚙ 设置）' : msg)
+    }
+    setLoadingWeeklyPlot(false)
   }
 
   if (!initialized) {
@@ -98,6 +150,16 @@ function App(): JSX.Element {
   const unlockedCount = achievements.filter((a) => a.isUnlocked).length
   const streakCount = streak?.currentCount ?? 0
   const streakBonus = streakCount >= 30 ? 25 : streakCount >= 7 ? 10 : 0
+
+  const today = new Date().toISOString().slice(0, 10)
+  const todayCompletedCount = quests.filter(
+    (q) => q.status === 'completed' && q.completedAt?.startsWith(today)
+  ).length
+
+  const weekStart = getMondayISO()
+  const weekCompletedCount = quests.filter(
+    (q) => q.status === 'completed' && q.completedAt && q.completedAt >= weekStart
+  ).length
 
   return (
     <div className="flex min-h-screen bg-gray-900 p-6 gap-6">
@@ -156,6 +218,24 @@ function App(): JSX.Element {
           </div>
         </div>
       )}
+      {showDailyPlot && (
+        <PlotModal
+          type="daily"
+          onClose={() => setShowDailyPlot(false)}
+          summary={dailyPlotSummary}
+          loading={loadingDailyPlot}
+          error={dailyPlotError}
+        />
+      )}
+      {showWeeklyPlot && (
+        <PlotModal
+          type="weekly"
+          onClose={() => setShowWeeklyPlot(false)}
+          summary={weeklyPlotSummary}
+          loading={loadingWeeklyPlot}
+          error={weeklyPlotError}
+        />
+      )}
       <CharacterCard player={player} onManage={() => setShowManager(true)} />
       <div className="flex flex-1 flex-col gap-4">
         <QuestInput onSubmit={createQuest} />
@@ -181,8 +261,15 @@ function App(): JSX.Element {
           </button>
         )}
         <button
+          onClick={() => setShowSkillTree(true)}
+          className="mt-4 text-gray-600 hover:text-green-400 text-lg"
+          title="技能树"
+        >
+          🌳
+        </button>
+        <button
           onClick={() => setShowAchievements(true)}
-          className="mt-4 text-gray-600 hover:text-yellow-400 text-lg"
+          className="mt-2 text-gray-600 hover:text-yellow-400 text-lg"
           title="成就"
         >
           🏆 {unlockedCount}
@@ -194,13 +281,13 @@ function App(): JSX.Element {
         >
           🎖 {medals.length}
         </button>
-        <button
-          onClick={() => setShowSkillTree(true)}
-          className="mt-2 text-gray-600 hover:text-green-400 text-lg"
-          title="技能树"
-        >
-          🌳
-        </button>
+        <div className="flex-1" />
+        {todayCompletedCount >= 3 && (
+          <PlotScrollButton type="daily" onOpen={handleOpenDailyPlot} />
+        )}
+        {weekCompletedCount >= 15 && (
+          <PlotScrollButton type="weekly" onOpen={handleOpenWeeklyPlot} />
+        )}
         <button
           onClick={() => setShowSettings(true)}
           className="mt-2 text-gray-600 hover:text-gray-400 text-lg"

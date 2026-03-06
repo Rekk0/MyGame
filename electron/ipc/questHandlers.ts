@@ -22,7 +22,11 @@ import type { Achievement } from '../../src/types/achievement'
 const MEDAL_TRIGGERS: Record<string, { name: string; category: 'streak' | 'mastery' | 'adventure' | 'oath'; description: string }> = {
   streak_7:  { name: '七日勋章',     category: 'streak',  description: '连续坚持七天的荣耀' },
   streak_30: { name: '燃烧之魂勋章', category: 'streak',  description: '三十天不间断的火焰意志' },
-  level_10:  { name: '英雄勋章',     category: 'mastery', description: '达到10级的卓越成就' },
+  level_10:      { name: '英雄勋章',     category: 'mastery',   description: '达到10级的卓越成就' },
+  daily_plot_7:  { name: '故事编织勋章', category: 'mastery',   description: '七天如织，故事成锦' },
+  daily_plot_21: { name: '传说叙事勋章', category: 'mastery',   description: '以笔为剑，铸就传说' },
+  weekly_plot_4: { name: '月华编年勋章', category: 'adventure', description: '四周光阴，化作史诗' },
+  weekly_plot_12:{ name: '史诗宗师勋章', category: 'adventure', description: '年岁积淀，笔墨不朽' },
 }
 
 export function registerQuestHandlers(): void {

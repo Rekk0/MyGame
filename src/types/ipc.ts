@@ -55,4 +55,9 @@ export const IPC = {
 
   DDA_GET_STATE: 'dda:get-state',
   DDA_GET_SUGGESTION: 'dda:get-suggestion',
+
+  PLOT_GET_DAILY_STATUS: 'plot:get-daily-status',
+  PLOT_GET_WEEKLY_STATUS: 'plot:get-weekly-status',
+  PLOT_GENERATE_DAILY: 'plot:generate-daily',
+  PLOT_GENERATE_WEEKLY: 'plot:generate-weekly',
 } as const
