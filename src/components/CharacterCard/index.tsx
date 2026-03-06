@@ -20,9 +20,9 @@ export function CharacterCard({ player, onManage }: CharacterCardProps): JSX.Ele
         <button
           onClick={onManage}
           className="text-gray-500 hover:text-gray-300 text-base leading-none mt-1"
-          title="角色管理"
+          title="切换角色"
         >
-          ⚙
+          ⇄
         </button>
       </div>
 
