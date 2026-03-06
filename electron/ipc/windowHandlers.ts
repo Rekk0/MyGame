@@ -38,9 +38,9 @@ export function registerWindowHandlers(mainWindow: BrowserWindow): void {
   ipcMain.handle(IPC.WINDOW_SET_HUD_POSITION, (_e, rx: number, ry: number) => {
     const win = getHudWindow()
     if (!win) return
-    const [w, h] = win.getSize()
-    const [x, y] = clamp(rx, ry, w, h)
+    const [x, y] = clamp(rx, ry, 220, 128)  // fixed logical size, avoid getSize() drift
     win.setPosition(x, y)
+    win.setSize(220, 128)  // reset physical drift caused by setPosition on fractional DPI
     hudLastPos = { x, y }
     writeHudConfig({ hudX: x, hudY: y })
   })
@@ -56,9 +56,9 @@ export function registerWindowHandlers(mainWindow: BrowserWindow): void {
   ipcMain.handle(IPC.WINDOW_SET_QUEST_HUD_POSITION, (_e, rx: number, ry: number) => {
     const win = getQuestHudWindow()
     if (!win) return
-    const [w, h] = win.getSize()
-    const [x, y] = clamp(rx, ry, w, h)
+    const [x, y] = clamp(rx, ry, 220, 200)  // fixed logical size, avoid getSize() drift
     win.setPosition(x, y)
+    win.setSize(220, 200)  // reset physical drift caused by setPosition on fractional DPI
     questHudLastPos = { x, y }
     writeHudConfig({ questHudX: x, questHudY: y })
   })
