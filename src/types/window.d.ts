@@ -39,12 +39,13 @@ declare global {
       hideQuickInput: () => Promise<void>
       showQuestHud: () => Promise<void>
       hideQuestHud: () => Promise<void>
-      getHudConfig: () => Promise<{ hudX?: number; hudY?: number; questHudX?: number; questHudY?: number }>
+      getHudConfig: () => Promise<{ hudX?: number; hudY?: number; hudPinned?: boolean; questHudX?: number; questHudY?: number }>
       saveHudConfig: (patch: object) => Promise<void>
       getHudPosition: () => Promise<{ x: number; y: number } | null>
       getQuestHudPosition: () => Promise<{ x: number; y: number } | null>
       setHudPosition: (x: number, y: number) => Promise<void>
       setQuestHudPosition: (x: number, y: number) => Promise<void>
+      setHudPinned: (pinned: boolean) => Promise<void>
     }
     dataAPI: {
       onUpdated: (callback: () => void) => () => void

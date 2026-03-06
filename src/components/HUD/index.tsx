@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useStreakStore } from '../../stores/streakStore'
 import { useQuestStore } from '../../stores/questStore'
@@ -14,6 +14,16 @@ export default function HUD() {
   const streak = useStreakStore((s) => s.streak)
   const quests = useQuestStore((s) => s.quests)
   const [locked, setLocked] = useState(false)
+  const [pinned, setPinned] = useState(false)
+
+  useEffect(() => {
+    window.windowAPI.getHudConfig().then((cfg) => {
+      if (cfg.hudPinned) {
+        setPinned(true)
+        void window.windowAPI.setHudPinned(true)
+      }
+    })
+  }, [])
 
   const pendingCount = quests.filter((q) => q.status === 'pending').length
 
@@ -22,6 +32,12 @@ export default function HUD() {
     () => window.windowAPI.getHudPosition(),
     locked
   )
+
+  function togglePinned() {
+    const next = !pinned
+    setPinned(next)
+    void window.windowAPI.setHudPinned(next)
+  }
 
   if (!player) return null
 
@@ -34,6 +50,14 @@ export default function HUD() {
       >
         <span className="text-xs font-semibold text-gray-400 truncate">{player.name}</span>
         <div className="flex items-center gap-1 shrink-0">
+          <button
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={togglePinned}
+            className={`text-xs px-1 leading-none ${pinned ? 'text-yellow-400' : 'text-gray-500 hover:text-gray-200'}`}
+            title={pinned ? '取消系统置顶' : '置于所有窗口最上层'}
+          >
+            📌
+          </button>
           <button
             onMouseDown={(e) => e.stopPropagation()}
             onClick={() => setLocked((v) => !v)}

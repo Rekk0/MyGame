@@ -65,4 +65,17 @@ export function registerWindowHandlers(mainWindow: BrowserWindow): void {
 
   ipcMain.handle(IPC.WINDOW_GET_HUD_CONFIG, () => readHudConfig())
   ipcMain.handle(IPC.WINDOW_SAVE_HUD_CONFIG, (_e, patch: object) => writeHudConfig(patch))
+
+  ipcMain.handle(IPC.WINDOW_SET_HUD_PINNED, (_e, pinned: boolean) => {
+    const win = getHudWindow()
+    if (win) {
+      if (pinned) {
+        // 'screen-saver' level: above fullscreen apps and system UI on Windows
+        win.setAlwaysOnTop(true, 'screen-saver')
+      } else {
+        win.setAlwaysOnTop(false)
+      }
+    }
+    writeHudConfig({ hudPinned: pinned })
+  })
 }

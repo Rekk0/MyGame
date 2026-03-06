@@ -7,6 +7,7 @@ export interface HudConfig {
   hudX?: number
   hudY?: number
   hudLocked?: boolean
+  hudPinned?: boolean
   questHudX?: number
   questHudY?: number
   questHudLocked?: boolean

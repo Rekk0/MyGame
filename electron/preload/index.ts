@@ -43,6 +43,7 @@ const windowAPI = {
   getQuestHudPosition: () => ipcRenderer.invoke(IPC.WINDOW_GET_QUEST_HUD_POSITION) as Promise<{ x: number; y: number } | null>,
   setHudPosition: (x: number, y: number) => ipcRenderer.invoke(IPC.WINDOW_SET_HUD_POSITION, x, y),
   setQuestHudPosition: (x: number, y: number) => ipcRenderer.invoke(IPC.WINDOW_SET_QUEST_HUD_POSITION, x, y),
+  setHudPinned: (pinned: boolean) => ipcRenderer.invoke(IPC.WINDOW_SET_HUD_PINNED, pinned),
 }
 
 const dataAPI = {

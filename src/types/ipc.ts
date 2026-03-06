@@ -33,6 +33,7 @@ export const IPC = {
   WINDOW_SET_QUEST_HUD_POSITION: 'window:set-quest-hud-position',
   WINDOW_GET_HUD_CONFIG: 'window:get-hud-config',
   WINDOW_SAVE_HUD_CONFIG: 'window:save-hud-config',
+  WINDOW_SET_HUD_PINNED: 'window:set-hud-pinned',
 
   DATA_UPDATED: 'data:updated',
 
