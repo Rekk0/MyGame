@@ -8,7 +8,7 @@ interface CharacterCardProps {
 
 export function CharacterCard({ player, onManage }: CharacterCardProps): JSX.Element {
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-gray-700 bg-gray-800 p-4 w-56">
+    <div className="flex flex-col gap-3 rounded-xl border border-gray-700 bg-gray-800 p-4 w-56 shrink-0">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-lg font-bold text-white">{player.name}</p>

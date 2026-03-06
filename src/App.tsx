@@ -162,7 +162,7 @@ function App(): JSX.Element {
   ).length
 
   return (
-    <div className="flex min-h-screen bg-gray-900 p-6 gap-6">
+    <div className="flex h-screen bg-gray-900 p-4 gap-4 overflow-hidden">
       {showManager && (
         <CharacterManager
           currentPlayer={player}
@@ -237,12 +237,14 @@ function App(): JSX.Element {
         />
       )}
       <CharacterCard player={player} onManage={() => setShowManager(true)} />
-      <div className="flex flex-1 flex-col gap-4">
+      <div className="flex flex-1 flex-col gap-4 min-h-0">
         <QuestInput onSubmit={createQuest} />
-        <QuestList quests={quests} autoTransform={autoTransform} transformingIds={transformingIds}
-          onComplete={completeQuest} onDelete={deleteQuest} onTransform={transformQuest} />
+        <div className="flex-1 overflow-y-auto min-h-0 pr-1">
+          <QuestList quests={quests} autoTransform={autoTransform} transformingIds={transformingIds}
+            onComplete={completeQuest} onDelete={deleteQuest} onTransform={transformQuest} />
+        </div>
       </div>
-      <div className="flex w-28 flex-col items-center pt-2">
+      <div className="flex w-28 shrink-0 flex-col items-center pt-2">
         <p className="text-2xl font-bold text-orange-400">🔥 {streakCount}</p>
         <p className="mt-1 text-xs text-gray-500">连胜天数</p>
         {streak && streak.bestCount > 0 && (
