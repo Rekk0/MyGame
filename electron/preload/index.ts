@@ -70,6 +70,11 @@ const settingsAPI = {
   getAiConfig: () => ipcRenderer.invoke(IPC.SETTINGS_GET_AI_CONFIG),
   setAiConfig: (config: { provider: string; apiKey: string; model: string }) =>
     ipcRenderer.invoke(IPC.SETTINGS_SET_AI_CONFIG, config),
+  onLanguageChanged: (callback: (lang: string) => void) => {
+    const handler = (_e: Electron.IpcRendererEvent, lang: string) => callback(lang)
+    ipcRenderer.on(IPC.SETTINGS_LANGUAGE_CHANGED, handler)
+    return () => ipcRenderer.removeListener(IPC.SETTINGS_LANGUAGE_CHANGED, handler)
+  },
 }
 
 const achievementAPI = {

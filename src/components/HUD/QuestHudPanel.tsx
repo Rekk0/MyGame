@@ -3,6 +3,7 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { useQuestStore } from '../../stores/questStore'
 import { useDraggableHud } from '../../hooks/useDraggableHud'
 import { useT } from '../../utils/i18n'
+import { useLanguageStore } from '../../stores/languageStore'
 import type { Quest } from '../../types/quest'
 
 const WIN_W = 220
@@ -31,10 +32,17 @@ export default function QuestHudPanel() {
       if (cfg.hudBgOpacity !== undefined) setBgOpacity(cfg.hudBgOpacity)
       if (cfg.hudTextOpacity !== undefined) setTextOpacity(cfg.hudTextOpacity)
     })
-    return window.windowAPI.onHudConfigChanged((cfg) => {
+    window.settingsAPI.getAiConfig().then((cfg) => {
+      if (cfg?.language) useLanguageStore.getState().setLanguage(cfg.language)
+    })
+    const unsubLang = window.settingsAPI.onLanguageChanged((lang) => {
+      useLanguageStore.getState().setLanguage(lang as 'zh' | 'en')
+    })
+    const unsubConfig = window.windowAPI.onHudConfigChanged((cfg) => {
       if (cfg.hudBgOpacity !== undefined) setBgOpacity(cfg.hudBgOpacity)
       if (cfg.hudTextOpacity !== undefined) setTextOpacity(cfg.hudTextOpacity)
     })
+    return () => { unsubLang(); unsubConfig() }
   }, [])
 
   const pending = quests.filter((q) => q.status === 'pending')

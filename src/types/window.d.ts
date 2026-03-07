@@ -65,6 +65,7 @@ declare global {
     settingsAPI: {
       getAiConfig: () => Promise<{ provider: string; apiKey: string; model: string; autoTransform: boolean; language?: 'zh' | 'en'; theme?: 'dark' | 'light' } | null>
       setAiConfig: (config: { provider: string; apiKey: string; model: string; autoTransform: boolean; language?: 'zh' | 'en'; theme?: 'dark' | 'light' }) => Promise<void>
+      onLanguageChanged: (callback: (lang: string) => void) => () => void
     }
     achievementAPI: {
       getAll: () => Promise<Achievement[]>

@@ -44,6 +44,7 @@ export const IPC = {
 
   SETTINGS_GET_AI_CONFIG: 'settings:get-ai-config',
   SETTINGS_SET_AI_CONFIG: 'settings:set-ai-config',
+  SETTINGS_LANGUAGE_CHANGED: 'settings:language-changed',
 
   ACHIEVEMENT_GET_ALL: 'achievement:get-all',
   ACHIEVEMENT_GET_UNLOCKED: 'achievement:get-unlocked',

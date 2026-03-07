@@ -4,6 +4,7 @@ import { useStreakStore } from '../../stores/streakStore'
 import { useQuestStore } from '../../stores/questStore'
 import { useDraggableHud } from '../../hooks/useDraggableHud'
 import { useT } from '../../utils/i18n'
+import { useLanguageStore } from '../../stores/languageStore'
 import HudBars from './HudBars'
 import HudStats from './HudStats'
 
@@ -30,10 +31,17 @@ export default function HUD() {
         void window.windowAPI.setHudPinned(true)
       }
     })
-    return window.windowAPI.onHudConfigChanged((cfg) => {
+    window.settingsAPI.getAiConfig().then((cfg) => {
+      if (cfg?.language) useLanguageStore.getState().setLanguage(cfg.language)
+    })
+    const unsubLang = window.settingsAPI.onLanguageChanged((lang) => {
+      useLanguageStore.getState().setLanguage(lang as 'zh' | 'en')
+    })
+    const unsubConfig = window.windowAPI.onHudConfigChanged((cfg) => {
       if (cfg.hudBgOpacity !== undefined) setBgOpacity(cfg.hudBgOpacity)
       if (cfg.hudTextOpacity !== undefined) setTextOpacity(cfg.hudTextOpacity)
     })
+    return () => { unsubLang(); unsubConfig() }
   }, [])
 
   const pendingCount = quests.filter((q) => q.status === 'pending').length
