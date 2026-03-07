@@ -11,6 +11,12 @@ const PROVIDERS = [
   { value: 'deepseek', label: 'DeepSeek', defaultModel: 'deepseek-chat' },
   { value: 'kimi', label: 'Kimi (Moonshot)', defaultModel: 'moonshot-v1-8k' },
   { value: 'minimax', label: 'MiniMax', defaultModel: 'abab6.5s-chat' },
+  { value: 'gemini', label: 'Google Gemini', defaultModel: 'gemini-2.0-flash' },
+  { value: 'groq', label: 'Groq', defaultModel: 'llama-3.3-70b-versatile' },
+  { value: 'qwen', label: '通义千问 (Qwen)', defaultModel: 'qwen-plus' },
+  { value: 'zhipu', label: '智谱 GLM', defaultModel: 'glm-4-flash' },
+  { value: 'grok', label: 'xAI Grok', defaultModel: 'grok-3-mini' },
+  { value: 'ollama', label: 'Ollama (本地)', defaultModel: 'llama3.2' },
 ]
 
 interface SettingsProps {
@@ -93,8 +99,12 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs text-gray-400">{t('apiKey')}</label>
-          <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)}
-            placeholder="API Key" className="rounded bg-gray-700 text-white px-3 py-2 text-sm outline-none" />
+          {provider === 'ollama' ? (
+            <p className="text-xs text-gray-500 px-3 py-2">Ollama 本地服务无需 API Key</p>
+          ) : (
+            <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)}
+              placeholder="API Key" className="rounded bg-gray-700 text-white px-3 py-2 text-sm outline-none" />
+          )}
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs text-gray-400">{t('modelName')}</label>

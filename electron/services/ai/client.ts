@@ -5,7 +5,7 @@ import { join } from 'path'
 import { existsSync, readFileSync } from 'fs'
 
 interface AISettings {
-  provider: 'claude' | 'openai' | 'deepseek' | 'kimi' | 'minimax'
+  provider: 'claude' | 'openai' | 'deepseek' | 'kimi' | 'minimax' | 'gemini' | 'groq' | 'qwen' | 'zhipu' | 'grok' | 'ollama'
   apiKey: string
   model: string
   language?: 'zh' | 'en'
@@ -15,6 +15,12 @@ const BASE_URLS: Record<string, string> = {
   deepseek: 'https://api.deepseek.com',
   kimi: 'https://api.moonshot.cn/v1',
   minimax: 'https://api.minimax.chat/v1',
+  gemini: 'https://generativelanguage.googleapis.com/v1beta/openai',
+  groq: 'https://api.groq.com/openai/v1',
+  qwen: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  zhipu: 'https://open.bigmodel.cn/api/paas/v4',
+  grok: 'https://api.x.ai/v1',
+  ollama: 'http://localhost:11434/v1',
 }
 
 function loadSettings(): AISettings | null {
@@ -38,7 +44,7 @@ async function callClaude(prompt: string, system: string, apiKey: string, model:
 
 async function callOpenAICompatible(prompt: string, system: string, apiKey: string, model: string, provider: string): Promise<string> {
   const baseURL = BASE_URLS[provider]
-  const client = new OpenAI({ apiKey, baseURL, timeout: 30000 })
+  const client = new OpenAI({ apiKey: apiKey || 'ollama', baseURL, timeout: 30000 })
   const resp = await client.chat.completions.create({
     model,
     messages: [
@@ -51,7 +57,7 @@ async function callOpenAICompatible(prompt: string, system: string, apiKey: stri
 
 export async function callAI(prompt: string, systemPrompt: string): Promise<string> {
   const settings = loadSettings()
-  if (!settings?.apiKey) throw new Error('AI service not configured')
+  if (!settings?.apiKey && settings?.provider !== 'ollama') throw new Error('AI service not configured')
   const system = settings.language === 'en'
     ? `${systemPrompt}\nPlease respond in English.`
     : systemPrompt
