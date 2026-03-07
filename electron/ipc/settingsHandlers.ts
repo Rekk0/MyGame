@@ -9,6 +9,7 @@ interface AIConfig {
   model: string
   autoTransform?: boolean
   language?: 'zh' | 'en'
+  theme?: 'dark' | 'light'
 }
 
 function getConfigPath(): string {

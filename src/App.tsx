@@ -6,6 +6,7 @@ import { useAchievementStore } from './stores/achievementStore'
 import { useMedalStore } from './stores/medalStore'
 import { useSkillStore } from './stores/skillStore'
 import { useLanguageStore } from './stores/languageStore'
+import { useUIStore } from './stores/uiStore'
 import { useT } from './utils/i18n'
 import { CharacterCard } from './components/CharacterCard'
 import { CharacterManager } from './components/CharacterCard/CharacterManager'
@@ -42,6 +43,7 @@ function App(): JSX.Element {
   const { medals, fetchMedals } = useMedalStore()
   const { skills, fetchSkills } = useSkillStore()
   const { setLanguage } = useLanguageStore()
+  const { setTheme } = useUIStore()
   const t = useT()
   const [initialized, setInitialized] = useState(false)
   const [showManager, setShowManager] = useState(false)
@@ -67,6 +69,7 @@ function App(): JSX.Element {
   useEffect(() => {
     window.settingsAPI.getAiConfig().then((cfg) => {
       if (cfg?.language) setLanguage(cfg.language)
+      if (cfg?.theme) setTheme(cfg.theme)
     }).catch(() => {})
     Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), loadSettings(), fetchAchievements(), fetchMedals(), fetchSkills()]).then(() => {
       setInitialized(true)

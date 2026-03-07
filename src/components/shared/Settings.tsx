@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from './Button'
 import { useQuestStore } from '../../stores/questStore'
 import { useLanguageStore, type Language } from '../../stores/languageStore'
+import { useUIStore, type Theme } from '../../stores/uiStore'
 import { useT } from '../../utils/i18n'
 
 const PROVIDERS = [
@@ -26,6 +27,7 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
   const [hudBgOpacity, setHudBgOpacity] = useState(75)
   const [hudTextOpacity, setHudTextOpacity] = useState(100)
   const { language, setLanguage } = useLanguageStore()
+  const { theme, setTheme } = useUIStore()
   const t = useT()
 
   useEffect(() => {
@@ -64,8 +66,12 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
     setLanguage(lang)
   }
 
+  const handleThemeChange = (t: Theme): void => {
+    setTheme(t)
+  }
+
   const handleSave = async (): Promise<void> => {
-    await window.settingsAPI.setAiConfig({ provider, apiKey, model, autoTransform, language })
+    await window.settingsAPI.setAiConfig({ provider, apiKey, model, autoTransform, language, theme })
     useQuestStore.getState().setAutoTransform(autoTransform)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
@@ -125,6 +131,19 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
                 onClick={() => handleLanguageChange('en')}
                 className={`text-xs px-3 py-1 rounded-full border transition-colors ${language === 'en' ? 'border-blue-500 text-blue-400' : 'border-gray-600 text-gray-400 hover:text-white'}`}
               >English</button>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-gray-300">{t('theme')}</label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleThemeChange('dark')}
+                className={`text-xs px-3 py-1 rounded-full border transition-colors ${theme === 'dark' ? 'border-blue-500 text-blue-400' : 'border-gray-600 text-gray-400 hover:text-white'}`}
+              >🌙</button>
+              <button
+                onClick={() => handleThemeChange('light')}
+                className={`text-xs px-3 py-1 rounded-full border transition-colors ${theme === 'light' ? 'border-blue-500 text-blue-400' : 'border-gray-600 text-gray-400 hover:text-white'}`}
+              >☀️</button>
             </div>
           </div>
         </div>
