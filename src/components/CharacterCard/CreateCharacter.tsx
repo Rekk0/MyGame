@@ -15,7 +15,7 @@ export function CreateCharacter({ onCreated }: CreateCharacterProps): JSX.Elemen
   const [name, setName] = useState('')
   const [worldStyle, setWorldStyle] = useState<WorldStyle | null>(null)
   const { createPlayer, loading } = usePlayerStore()
-  const { language } = useLanguageStore()
+  const { language, setLanguage } = useLanguageStore()
   const t = useT()
 
   const worldStyles = WORLD_STYLE_DATA[language]
@@ -28,7 +28,29 @@ export function CreateCharacter({ onCreated }: CreateCharacterProps): JSX.Elemen
   }
 
   return (
-    <div className="flex flex-col items-center gap-6 rounded-xl border border-gray-700 bg-gray-800 p-8 w-full max-w-lg">
+    <div className="relative flex flex-col items-center gap-6 rounded-xl border border-gray-700 bg-gray-800 p-8 w-full max-w-lg">
+      <div className="absolute top-4 right-4 flex gap-1">
+        <button
+          onClick={() => setLanguage('zh')}
+          className={`text-xs px-2 py-0.5 rounded border transition-colors ${
+            language === 'zh'
+              ? 'border-yellow-400 text-yellow-400'
+              : 'border-gray-600 text-gray-500 hover:text-gray-300'
+          }`}
+        >
+          中文
+        </button>
+        <button
+          onClick={() => setLanguage('en')}
+          className={`text-xs px-2 py-0.5 rounded border transition-colors ${
+            language === 'en'
+              ? 'border-yellow-400 text-yellow-400'
+              : 'border-gray-600 text-gray-500 hover:text-gray-300'
+          }`}
+        >
+          EN
+        </button>
+      </div>
       <div className="text-center">
         <h1 className="text-2xl font-bold text-yellow-400">⚔️ {t('createCharacterTitle')}</h1>
         <p className="mt-2 text-sm text-gray-400">{t('adventureSubtitle')}</p>
