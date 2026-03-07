@@ -64,7 +64,20 @@ export function registerWindowHandlers(mainWindow: BrowserWindow): void {
   })
 
   ipcMain.handle(IPC.WINDOW_GET_HUD_CONFIG, () => readHudConfig())
-  ipcMain.handle(IPC.WINDOW_SAVE_HUD_CONFIG, (_e, patch: object) => writeHudConfig(patch))
+  ipcMain.handle(IPC.WINDOW_SAVE_HUD_CONFIG, (_e, patch: object) => {
+    writeHudConfig(patch)
+    const cfg = readHudConfig()
+    getHudWindow()?.webContents.send(IPC.WINDOW_HUD_CONFIG_CHANGED, cfg)
+    getQuestHudWindow()?.webContents.send(IPC.WINDOW_HUD_CONFIG_CHANGED, cfg)
+  })
+
+  ipcMain.handle(IPC.WINDOW_SET_HUD_IGNORE_MOUSE, (_e, ignore: boolean) => {
+    getHudWindow()?.setIgnoreMouseEvents(ignore, { forward: true })
+  })
+
+  ipcMain.handle(IPC.WINDOW_SET_QUEST_HUD_IGNORE_MOUSE, (_e, ignore: boolean) => {
+    getQuestHudWindow()?.setIgnoreMouseEvents(ignore, { forward: true })
+  })
 
   ipcMain.handle(IPC.WINDOW_SET_HUD_PINNED, (_e, pinned: boolean) => {
     const win = getHudWindow()

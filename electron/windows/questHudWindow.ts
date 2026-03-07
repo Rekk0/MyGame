@@ -33,6 +33,10 @@ export function createQuestHudWindow(): BrowserWindow {
   // Use a higher level than Stats HUD ('floating') so Quest HUD is never obscured by Stats HUD
   questHudWindow.setAlwaysOnTop(true, 'pop-up-menu')
 
+  if (config.questHudLocked) {
+    questHudWindow.setIgnoreMouseEvents(true, { forward: true })
+  }
+
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     questHudWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/questHud.html`)
   } else {

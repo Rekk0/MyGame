@@ -34,6 +34,9 @@ export const IPC = {
   WINDOW_GET_HUD_CONFIG: 'window:get-hud-config',
   WINDOW_SAVE_HUD_CONFIG: 'window:save-hud-config',
   WINDOW_SET_HUD_PINNED: 'window:set-hud-pinned',
+  WINDOW_SET_HUD_IGNORE_MOUSE: 'window:set-hud-ignore-mouse',
+  WINDOW_SET_QUEST_HUD_IGNORE_MOUSE: 'window:set-quest-hud-ignore-mouse',
+  WINDOW_HUD_CONFIG_CHANGED: 'window:hud-config-changed',
 
   DATA_UPDATED: 'data:updated',
 

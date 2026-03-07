@@ -33,6 +33,10 @@ export function createHudWindow(): BrowserWindow {
     }
   })
 
+  if (config.hudLocked) {
+    hudWindow.setIgnoreMouseEvents(true, { forward: true })
+  }
+
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     hudWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/hud.html`)
   } else {

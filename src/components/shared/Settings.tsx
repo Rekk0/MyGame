@@ -21,6 +21,8 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
   const [autoTransform, setAutoTransform] = useState(true)
   const [saved, setSaved] = useState(false)
   const [pendingToggle, setPendingToggle] = useState<boolean | null>(null)
+  const [hudBgOpacity, setHudBgOpacity] = useState(75)
+  const [hudTextOpacity, setHudTextOpacity] = useState(100)
 
   useEffect(() => {
     window.settingsAPI.getAiConfig().then((cfg) => {
@@ -30,6 +32,10 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
         setModel(cfg.model)
         setAutoTransform(cfg.autoTransform ?? true)
       }
+    })
+    window.windowAPI.getHudConfig().then((cfg) => {
+      setHudBgOpacity(Math.round((cfg.hudBgOpacity ?? 0.75) * 100))
+      setHudTextOpacity(Math.round((cfg.hudTextOpacity ?? 1.0) * 100))
     })
   }, [])
 
@@ -44,6 +50,10 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
   const handleConfirm = (): void => {
     if (pendingToggle !== null) setAutoTransform(pendingToggle)
     setPendingToggle(null)
+  }
+
+  const handleHudOpacityChange = (bg: number, text: number): void => {
+    void window.windowAPI.saveHudConfig({ hudBgOpacity: bg / 100, hudTextOpacity: text / 100 })
   }
 
   const handleSave = async (): Promise<void> => {
@@ -95,6 +105,35 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
             </div>
           </div>
         )}
+        <div className="border-t border-gray-700 pt-3 flex flex-col gap-3">
+          <h3 className="text-sm font-semibold text-gray-300">HUD 外观</h3>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-400">背景透明度</label>
+              <span className="text-xs text-gray-300 w-8 text-right">{hudBgOpacity}%</span>
+            </div>
+            <input type="range" min={0} max={100} value={hudBgOpacity}
+              onChange={(e) => {
+                const v = Number(e.target.value)
+                setHudBgOpacity(v)
+                handleHudOpacityChange(v, hudTextOpacity)
+              }}
+              className="w-full accent-blue-500" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-gray-400">文字透明度</label>
+              <span className="text-xs text-gray-300 w-8 text-right">{hudTextOpacity}%</span>
+            </div>
+            <input type="range" min={0} max={100} value={hudTextOpacity}
+              onChange={(e) => {
+                const v = Number(e.target.value)
+                setHudTextOpacity(v)
+                handleHudOpacityChange(hudBgOpacity, v)
+              }}
+              className="w-full accent-blue-500" />
+          </div>
+        </div>
         <Button variant="primary" onClick={handleSave}>{saved ? '已保存 ✓' : '保存'}</Button>
       </div>
     </div>

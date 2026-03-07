@@ -11,6 +11,8 @@ export interface HudConfig {
   questHudX?: number
   questHudY?: number
   questHudLocked?: boolean
+  hudBgOpacity?: number
+  hudTextOpacity?: number
 }
 
 function configPath(): string {

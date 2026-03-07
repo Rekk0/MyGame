@@ -44,6 +44,13 @@ const windowAPI = {
   setHudPosition: (x: number, y: number) => ipcRenderer.invoke(IPC.WINDOW_SET_HUD_POSITION, x, y),
   setQuestHudPosition: (x: number, y: number) => ipcRenderer.invoke(IPC.WINDOW_SET_QUEST_HUD_POSITION, x, y),
   setHudPinned: (pinned: boolean) => ipcRenderer.invoke(IPC.WINDOW_SET_HUD_PINNED, pinned),
+  setHudIgnoreMouse: (ignore: boolean) => ipcRenderer.invoke(IPC.WINDOW_SET_HUD_IGNORE_MOUSE, ignore),
+  setQuestHudIgnoreMouse: (ignore: boolean) => ipcRenderer.invoke(IPC.WINDOW_SET_QUEST_HUD_IGNORE_MOUSE, ignore),
+  onHudConfigChanged: (callback: (cfg: object) => void) => {
+    const handler = (_e: Electron.IpcRendererEvent, cfg: object) => callback(cfg)
+    ipcRenderer.on(IPC.WINDOW_HUD_CONFIG_CHANGED, handler)
+    return () => ipcRenderer.removeListener(IPC.WINDOW_HUD_CONFIG_CHANGED, handler)
+  },
 }
 
 const dataAPI = {

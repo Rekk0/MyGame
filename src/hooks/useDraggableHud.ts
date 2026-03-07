@@ -10,7 +10,14 @@ type GetPosFn = () => Promise<{ x: number; y: number } | null>
  * the accumulating gap that occurs when using window.screenLeft/screenTop.
  * All clamping is delegated to the main process.
  */
-export function useDraggableHud(setPosFn: SetPosFn, getPosFn: GetPosFn, locked: boolean) {
+export function useDraggableHud(
+  setPosFn: SetPosFn,
+  getPosFn: GetPosFn,
+  locked: boolean,
+  setLocked: (v: boolean) => void,
+  target: 'hud' | 'questHud',
+  lockKey: 'hudLocked' | 'questHudLocked',
+) {
   const rafId = useRef<number | null>(null)
   const pendingPos = useRef<{ x: number; y: number } | null>(null)
 
@@ -64,5 +71,16 @@ export function useDraggableHud(setPosFn: SetPosFn, getPosFn: GetPosFn, locked: 
     })()
   }, [locked, getPosFn, setPosFn])
 
-  return { onMouseDown }
+  const toggleLock = useCallback(async () => {
+    const newLocked = !locked
+    setLocked(newLocked)
+    await window.windowAPI.saveHudConfig({ [lockKey]: newLocked })
+    if (target === 'hud') {
+      await window.windowAPI.setHudIgnoreMouse(newLocked)
+    } else {
+      await window.windowAPI.setQuestHudIgnoreMouse(newLocked)
+    }
+  }, [locked, setLocked, target, lockKey])
+
+  return { onMouseDown, toggleLock }
 }
