@@ -52,6 +52,13 @@ export function CreateCharacter({ onCreated }: CreateCharacterProps): JSX.Elemen
         </button>
       </div>
       <div className="text-center">
+        <p className="text-4xl font-black tracking-tight text-yellow-400">{t('appName')}</p>
+        <p className="mt-1 text-sm text-gray-400 italic">{t('appSlogan')}</p>
+      </div>
+
+      <div className="w-full border-t border-gray-700" />
+
+      <div className="text-center">
         <h1 className="text-2xl font-bold text-yellow-400">⚔️ {t('createCharacterTitle')}</h1>
         <p className="mt-2 text-sm text-gray-400">{t('adventureSubtitle')}</p>
       </div>

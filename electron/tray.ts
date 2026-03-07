@@ -11,7 +11,7 @@ export function createTray(mainWindow: BrowserWindow): void {
     : join(app.getAppPath(), 'resources', 'icon.png')
   const icon = nativeImage.createFromPath(iconPath)
   tray = new Tray(icon)
-  tray.setToolTip('Quest Board')
+  tray.setToolTip('游纪')
 
   const showAll = () => {
     mainWindow.show()

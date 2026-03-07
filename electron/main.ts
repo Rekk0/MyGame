@@ -69,7 +69,7 @@ app.whenReady().then(() => {
   } catch (err) {
     logError(err)
     dialog.showErrorBox(
-      'Quest Board 启动失败',
+      '游纪 启动失败',
       `错误信息已写入：\n${join(app.getPath('userData'), 'startup-error.log')}\n\n${err instanceof Error ? err.message : String(err)}`
     )
     app.quit()

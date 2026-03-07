@@ -2,6 +2,9 @@ import { useLanguageStore, type Language } from '../stores/languageStore'
 
 const STRINGS = {
   zh: {
+    // App name & slogan
+    appName: '游纪',
+    appSlogan: '让你办"正事儿"和游戏一样上瘾',
     // App / general
     loading: '加载中...',
     save: '保存',
@@ -95,6 +98,8 @@ const STRINGS = {
     autoOffHint: '关闭后需要手动允许任务AI游戏化',
   },
   en: {
+    appName: 'MyGame',
+    appSlogan: 'Make adulting feel as addictive as gaming',
     loading: 'Loading...',
     save: 'Save',
     saved: 'Saved ✓',

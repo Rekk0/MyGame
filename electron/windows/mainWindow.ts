@@ -6,7 +6,7 @@ export function createMainWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    title: 'Quest Board',
+    title: '游纪',
     show: false,
     autoHideMenuBar: true,
     webPreferences: {

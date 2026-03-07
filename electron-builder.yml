@@ -1,5 +1,5 @@
 appId: com.questboard.app
-productName: quest-board
+productName: MyGame
 directories:
   buildResources: resources
 files:
