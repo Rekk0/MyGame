@@ -9,7 +9,7 @@ const PAD = 55
 
 interface Props {
   skills: Skill[]
-  onSelect: (skill: Skill) => void
+  onSelect: (skill: Skill | null) => void
 }
 
 interface SimNode extends d3.SimulationNodeDatum { id: string }
@@ -21,6 +21,7 @@ export function SkillGraph({ skills, onSelect }: Props) {
   const nodesRef = useRef<SimNode[]>([])
   const simRef = useRef<d3.Simulation<SimNode, never> | null>(null)
   const dragRef = useRef<{ id: string; moved: boolean } | null>(null)
+  const nodeJustSelectedRef = useRef(false)
 
   useEffect(() => {
     if (skills.length === 0) return
@@ -88,7 +89,10 @@ export function SkillGraph({ skills, onSelect }: Props) {
     simRef.current?.alphaTarget(0)
     if (!moved) {
       const skill = skills.find(s => s.id === id)
-      if (skill) onSelect(skill)
+      if (skill) {
+        nodeJustSelectedRef.current = true
+        onSelect(skill)
+      }
     }
     dragRef.current = null
   }
@@ -96,10 +100,20 @@ export function SkillGraph({ skills, onSelect }: Props) {
   const skillMap = new Map(skills.map(s => [s.id, s]))
   const links = skills.filter(s => s.parentSkillId && skillMap.has(s.parentSkillId))
 
+  const handleSvgClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (nodeJustSelectedRef.current) {
+      nodeJustSelectedRef.current = false
+      return
+    }
+    if (e.target === e.currentTarget) {
+      onSelect(null)
+    }
+  }
+
   return (
     <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} width="100%" height="100%"
       style={{ display: 'block', touchAction: 'none', userSelect: 'none' }}
-      onPointerMove={handleSvgMove} onPointerUp={handleSvgUp}
+      onPointerMove={handleSvgMove} onPointerUp={handleSvgUp} onClick={handleSvgClick}
     >
       {links.map(s => {
         const from = pos.get(s.parentSkillId!), to = pos.get(s.id)
@@ -110,7 +124,7 @@ export function SkillGraph({ skills, onSelect }: Props) {
         const p = pos.get(s.id)
         if (!p) return null
         return (
-          <g key={s.id} style={{ cursor: 'grab' }} onPointerDown={e => handleNodeDown(e, s.id)}>
+          <g key={s.id} style={{ cursor: 'grab' }} onPointerDown={e => handleNodeDown(e, s.id)} onClick={e => e.stopPropagation()}>
             <SkillNode skill={s} x={p.x} y={p.y} onSelect={() => {}} />
           </g>
         )
