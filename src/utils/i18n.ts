@@ -193,7 +193,7 @@ export function useT(): (key: StringKey) => string {
 // World style bilingual data
 export const WORLD_STYLE_DATA = {
   zh: [
-    { value: 'realistic', label: '现实', desc: '当代都市，真实世界' },
+    { value: 'realistic', label: '战争', desc: '现代战争，军事行动' },
     { value: 'wuxia', label: '武侠', desc: '江湖恩怨，侠义精神' },
     { value: 'xianxia', label: '仙侠', desc: '修仙问道，飞升成仙' },
     { value: 'fantasy', label: '奇幻', desc: '魔法大陆，龙与地下城' },
@@ -201,7 +201,7 @@ export const WORLD_STYLE_DATA = {
     { value: 'apocalypse', label: '末日', desc: '末世求生，荒野冒险' },
   ],
   en: [
-    { value: 'realistic', label: 'Real', desc: 'Modern urban, real world' },
+    { value: 'realistic', label: 'War', desc: 'Modern warfare, military ops' },
     { value: 'wuxia', label: 'Wuxia', desc: 'Rivers & Lakes, chivalric spirit' },
     { value: 'xianxia', label: 'Xianxia', desc: 'Cultivate immortality, ascend' },
     { value: 'fantasy', label: 'Fantasy', desc: 'Magic realm, dragons & dungeons' },
