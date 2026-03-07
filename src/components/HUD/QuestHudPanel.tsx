@@ -51,7 +51,7 @@ export default function QuestHudPanel() {
   return (
     <div style={{ width: WIN_W, height: WIN_H }} className="relative rounded-xl select-none overflow-hidden">
       {/* Background layer — opacity controlled independently */}
-      <div style={{ opacity: bgOpacity }} className="absolute inset-0 bg-black rounded-xl" />
+      <div style={{ opacity: bgOpacity }} className="absolute inset-0 bg-black rounded-xl pointer-events-none" />
       {/* Content layer — text/UI opacity controlled independently */}
       <div style={{ opacity: textOpacity }} className="relative text-white flex flex-col h-full">
         {/* Drag handle / title bar */}
