@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Input } from '../shared/Input'
 import { Button } from '../shared/Button'
+import { useT } from '../../utils/i18n'
 
 interface QuestInputProps {
   onSubmit: (text: string) => void
@@ -8,6 +9,7 @@ interface QuestInputProps {
 
 export function QuestInput({ onSubmit }: QuestInputProps): JSX.Element {
   const [text, setText] = useState('')
+  const t = useT()
 
   const handleSubmit = () => {
     const trimmed = text.trim()
@@ -25,12 +27,12 @@ export function QuestInput({ onSubmit }: QuestInputProps): JSX.Element {
       <Input
         value={text}
         onChange={setText}
-        placeholder="输入新任务..."
+        placeholder={t('questInputPlaceholder')}
         onKeyDown={handleKeyDown}
         autoFocus
       />
       <Button onClick={handleSubmit} disabled={!text.trim()}>
-        添加
+        {t('addBtn')}
       </Button>
     </div>
   )

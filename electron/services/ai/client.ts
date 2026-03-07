@@ -8,6 +8,7 @@ interface AISettings {
   provider: 'claude' | 'openai' | 'deepseek' | 'kimi' | 'minimax'
   apiKey: string
   model: string
+  language?: 'zh' | 'en'
 }
 
 const BASE_URLS: Record<string, string> = {
@@ -51,8 +52,11 @@ async function callOpenAICompatible(prompt: string, system: string, apiKey: stri
 export async function callAI(prompt: string, systemPrompt: string): Promise<string> {
   const settings = loadSettings()
   if (!settings?.apiKey) throw new Error('AI service not configured')
+  const system = settings.language === 'en'
+    ? `${systemPrompt}\nPlease respond in English.`
+    : systemPrompt
   if (settings.provider === 'claude') {
-    return callClaude(prompt, systemPrompt, settings.apiKey, settings.model)
+    return callClaude(prompt, system, settings.apiKey, settings.model)
   }
-  return callOpenAICompatible(prompt, systemPrompt, settings.apiKey, settings.model, settings.provider)
+  return callOpenAICompatible(prompt, system, settings.apiKey, settings.model, settings.provider)
 }

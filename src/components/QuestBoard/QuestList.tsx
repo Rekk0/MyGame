@@ -1,6 +1,7 @@
 import { Reorder } from 'framer-motion'
 import type { Quest } from '../../types/quest'
 import { useQuestStore } from '../../stores/questStore'
+import { useT } from '../../utils/i18n'
 import { QuestCard } from './QuestCard'
 
 interface QuestListProps {
@@ -14,11 +15,12 @@ interface QuestListProps {
 
 export function QuestList({ quests, autoTransform, transformingIds, onComplete, onDelete, onTransform }: QuestListProps): JSX.Element {
   const { questOrder, reorderQuests } = useQuestStore()
+  const t = useT()
 
   if (quests.length === 0) {
     return (
       <div className="py-12 text-center text-gray-500 text-sm">
-        还没有任务，开始创建你的第一个冒险吧！
+        {t('emptyQuests')}
       </div>
     )
   }
@@ -60,7 +62,7 @@ export function QuestList({ quests, autoTransform, transformingIds, onComplete, 
         <>
           <div className="flex items-center gap-2 mt-2">
             <div className="flex-1 h-px bg-gray-700" />
-            <span className="text-xs text-gray-500">已完成</span>
+            <span className="text-xs text-gray-500">{t('completedSection')}</span>
             <div className="flex-1 h-px bg-gray-700" />
           </div>
           <div className="flex flex-col gap-2">

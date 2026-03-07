@@ -5,6 +5,8 @@ import { useStreakStore } from './stores/streakStore'
 import { useAchievementStore } from './stores/achievementStore'
 import { useMedalStore } from './stores/medalStore'
 import { useSkillStore } from './stores/skillStore'
+import { useLanguageStore } from './stores/languageStore'
+import { useT } from './utils/i18n'
 import { CharacterCard } from './components/CharacterCard'
 import { CharacterManager } from './components/CharacterCard/CharacterManager'
 import { QuestInput } from './components/QuestBoard/QuestInput'
@@ -22,7 +24,7 @@ interface DdaSuggestion { mood: string; tips: string[]; suggestedQuestTypes: str
 
 const DDA_ICONS: Record<DdaState, string> = { anxious: '😰', flow: '🌊', bored: '😴' }
 const DDA_COLORS: Record<DdaState, string> = { anxious: 'text-red-400', flow: 'text-cyan-400', bored: 'text-yellow-400' }
-const DDA_LABELS: Record<DdaState, string> = { anxious: '焦虑', flow: '心流', bored: '无聊' }
+const DDA_LABEL_KEYS: Record<DdaState, 'ddaAnxious' | 'ddaFlow' | 'ddaBored'> = { anxious: 'ddaAnxious', flow: 'ddaFlow', bored: 'ddaBored' }
 
 function getMondayISO(): string {
   const d = new Date()
@@ -39,6 +41,8 @@ function App(): JSX.Element {
   const { achievements, fetchAchievements } = useAchievementStore()
   const { medals, fetchMedals } = useMedalStore()
   const { skills, fetchSkills } = useSkillStore()
+  const { setLanguage } = useLanguageStore()
+  const t = useT()
   const [initialized, setInitialized] = useState(false)
   const [showManager, setShowManager] = useState(false)
   const [showCreate, setShowCreate] = useState(false)
@@ -61,6 +65,9 @@ function App(): JSX.Element {
   const [weeklyPlotError, setWeeklyPlotError] = useState<string | undefined>()
 
   useEffect(() => {
+    window.settingsAPI.getAiConfig().then((cfg) => {
+      if (cfg?.language) setLanguage(cfg.language)
+    }).catch(() => {})
     Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), loadSettings(), fetchAchievements(), fetchMedals(), fetchSkills()]).then(() => {
       setInitialized(true)
       window.ddaAPI.getState().then(setDdaInfo).catch(() => {})
@@ -105,7 +112,7 @@ function App(): JSX.Element {
       fetchAchievements(); fetchMedals()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      setDailyPlotError(msg.includes('configured') ? '请先配置 AI（点击 ⚙ 设置）' : msg)
+      setDailyPlotError(msg.includes('configured') ? t('configureAI') : msg)
     }
     setLoadingDailyPlot(false)
   }
@@ -121,7 +128,7 @@ function App(): JSX.Element {
       fetchAchievements(); fetchMedals()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
-      setWeeklyPlotError(msg.includes('configured') ? '请先配置 AI（点击 ⚙ 设置）' : msg)
+      setWeeklyPlotError(msg.includes('configured') ? t('configureAI') : msg)
     }
     setLoadingWeeklyPlot(false)
   }
@@ -129,7 +136,7 @@ function App(): JSX.Element {
   if (!initialized) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-900">
-        <p className="text-gray-400">加载中...</p>
+        <p className="text-gray-400">{t('loading')}</p>
       </div>
     )
   }
@@ -182,7 +189,7 @@ function App(): JSX.Element {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
           <div className="bg-gray-900 rounded-xl w-[700px] h-[500px] flex flex-col p-4">
             <div className="flex justify-between items-center mb-3">
-              <h2 className="text-white font-bold text-lg">技能树</h2>
+              <h2 className="text-white font-bold text-lg">{t('skillTreeTitle')}</h2>
               <button onClick={() => setShowSkillTree(false)} className="text-gray-400 hover:text-white">✕</button>
             </div>
             <div className="flex-1">
@@ -195,25 +202,25 @@ function App(): JSX.Element {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setShowSuggestion(false)}>
           <div className="bg-gray-800 rounded-xl p-5 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-white font-bold">今日建议</h3>
+              <h3 className="text-white font-bold">{t('todaySuggestion')}</h3>
               <button onClick={() => setShowSuggestion(false)} className="text-gray-400 hover:text-white">✕</button>
             </div>
             {loadingSuggestion ? (
-              <p className="text-gray-400 text-sm">AI 生成中...</p>
+              <p className="text-gray-400 text-sm">{t('aiGenerating')}</p>
             ) : ddaSuggestion ? (
               <>
-                <p className="text-cyan-300 text-sm mb-2">状态：{ddaSuggestion.mood}</p>
+                <p className="text-cyan-300 text-sm mb-2">{t('status')}{ddaSuggestion.mood}</p>
                 <ul className="space-y-1">
                   {ddaSuggestion.tips.map((tip, i) => (
                     <li key={i} className="text-gray-300 text-sm">• {tip}</li>
                   ))}
                 </ul>
                 {ddaSuggestion.suggestedQuestTypes.length > 0 && (
-                  <p className="text-gray-500 text-xs mt-3">推荐类型：{ddaSuggestion.suggestedQuestTypes.join('、')}</p>
+                  <p className="text-gray-500 text-xs mt-3">{t('recommendedTypes')}{ddaSuggestion.suggestedQuestTypes.join('、')}</p>
                 )}
               </>
             ) : (
-              <p className="text-gray-400 text-sm">暂无建议（需配置 AI）</p>
+              <p className="text-gray-400 text-sm">{t('noSuggestion')}</p>
             )}
           </div>
         </div>
@@ -246,9 +253,9 @@ function App(): JSX.Element {
       </div>
       <div className="flex w-28 shrink-0 flex-col items-center pt-2">
         <p className="text-2xl font-bold text-orange-400">🔥 {streakCount}</p>
-        <p className="mt-1 text-xs text-gray-500">连胜天数</p>
+        <p className="mt-1 text-xs text-gray-500">{t('streakDays')}</p>
         {streak && streak.bestCount > 0 && (
-          <p className="mt-1 text-xs text-gray-600">最高 {streak.bestCount} 天</p>
+          <p className="mt-1 text-xs text-gray-600">{t('streakBest')} {streak.bestCount}{t('streakBestSuffix')}</p>
         )}
         {streakBonus > 0 && (
           <p className="mt-1 text-xs text-green-400">+{streakBonus}% XP</p>
@@ -259,7 +266,7 @@ function App(): JSX.Element {
             className={`mt-3 text-sm font-medium ${DDA_COLORS[ddaInfo.state]} hover:opacity-80`}
             title={ddaInfo.suggestion}
           >
-            {DDA_ICONS[ddaInfo.state]} {DDA_LABELS[ddaInfo.state]}
+            {DDA_ICONS[ddaInfo.state]} {t(DDA_LABEL_KEYS[ddaInfo.state])}
           </button>
         )}
         <button

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Quest } from '../../types/quest'
 import { Button } from '../shared/Button'
+import { useT } from '../../utils/i18n'
 
 interface QuestCardProps {
   quest: Quest
@@ -22,6 +23,7 @@ const typeColors: Record<string, string> = {
 
 export function QuestCard({ quest, autoTransform, isTransforming, onComplete, onDelete, onTransform }: QuestCardProps): JSX.Element {
   const [showOriginal, setShowOriginal] = useState(false)
+  const t = useT()
   const name = quest.gamifiedName ?? quest.originalText
   const isCompleted = quest.status === 'completed'
   const showTransformBtn = !quest.gamifiedName && !autoTransform
@@ -42,13 +44,13 @@ export function QuestCard({ quest, autoTransform, isTransforming, onComplete, on
             {quest.gamifiedName && (
               <button onClick={() => setShowOriginal(!showOriginal)}
                 className="text-gray-600 hover:text-gray-400 underline underline-offset-2">
-                {showOriginal ? '收起' : '原文'}
+                {showOriginal ? t('collapseBtn') : t('originalBtn')}
               </button>
             )}
             {showTransformBtn && (
               <button onClick={() => onTransform(quest.id)} disabled={isTransforming}
                 className="text-blue-500 hover:text-blue-400 disabled:text-gray-600 underline underline-offset-2">
-                {isTransforming ? '转化中...' : '转化'}
+                {isTransforming ? t('transformingBtn') : t('transformBtn')}
               </button>
             )}
           </div>

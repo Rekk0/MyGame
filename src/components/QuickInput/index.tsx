@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { useQuestStore } from '../../stores/questStore'
+import { useT } from '../../utils/i18n'
 
 export default function QuickInput() {
   const [text, setText] = useState('')
   const createQuest = useQuestStore((s) => s.createQuest)
   const inputRef = useRef<HTMLInputElement>(null)
+  const t = useT()
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -29,7 +31,7 @@ export default function QuickInput() {
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="输入任务，回车提交..."
+        placeholder={t('quickInputPlaceholder')}
         className="w-full bg-transparent text-white text-base outline-none placeholder-gray-500"
       />
     </div>

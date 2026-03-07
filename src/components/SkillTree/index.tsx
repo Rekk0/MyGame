@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { Skill } from '../../types/skill'
 import { SkillGraph } from './SkillGraph'
 import { SkillTooltip } from './SkillTooltip'
+import { useT } from '../../utils/i18n'
 
 interface Props {
   skills: Skill[]
@@ -9,6 +10,7 @@ interface Props {
 
 export function SkillTree({ skills }: Props) {
   const [selected, setSelected] = useState<Skill | null>(null)
+  const t = useT()
 
   return (
     <div className="relative w-full h-full bg-gray-950 rounded-lg overflow-hidden">
@@ -27,8 +29,8 @@ export function SkillTree({ skills }: Props) {
             <div className="mt-1 text-gray-300">{selected.description}</div>
             {selected.traits.length > 0 && (
               <div className="mt-1.5">
-                <div className="text-purple-400 font-medium">特质：</div>
-                {selected.traits.map((t, i) => <div key={i} className="text-purple-300">· {t}</div>)}
+                <div className="text-purple-400 font-medium">{t('traits')}</div>
+                {selected.traits.map((trait, i) => <div key={i} className="text-purple-300">· {trait}</div>)}
               </div>
             )}
             <div className="mt-2">

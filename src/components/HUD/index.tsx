@@ -3,6 +3,7 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { useStreakStore } from '../../stores/streakStore'
 import { useQuestStore } from '../../stores/questStore'
 import { useDraggableHud } from '../../hooks/useDraggableHud'
+import { useT } from '../../utils/i18n'
 import HudBars from './HudBars'
 import HudStats from './HudStats'
 
@@ -17,6 +18,7 @@ export default function HUD() {
   const [pinned, setPinned] = useState(false)
   const [bgOpacity, setBgOpacity] = useState(0.75)
   const [textOpacity, setTextOpacity] = useState(1.0)
+  const t = useT()
 
   useEffect(() => {
     window.windowAPI.getHudConfig().then((cfg) => {
@@ -55,11 +57,8 @@ export default function HUD() {
 
   return (
     <div style={{ width: WIN_W, height: WIN_H }} className="relative rounded-xl select-none overflow-hidden">
-      {/* Background layer — opacity controlled independently */}
       <div style={{ opacity: bgOpacity }} className="absolute inset-0 bg-black rounded-xl pointer-events-none" />
-      {/* Content layer — text/UI opacity controlled independently */}
       <div style={{ opacity: textOpacity }} className="relative text-white flex flex-col h-full">
-        {/* Drag handle / title bar */}
         <div
           onMouseDown={onMouseDown}
           className={`flex items-center justify-between px-2 py-1.5 ${locked ? 'cursor-default' : 'cursor-grab'}`}
@@ -70,7 +69,7 @@ export default function HUD() {
               onMouseDown={(e) => e.stopPropagation()}
               onClick={togglePinned}
               className={`text-xs px-1 leading-none ${pinned ? 'text-yellow-400' : 'text-gray-500 hover:text-gray-200'}`}
-              title={pinned ? '取消系统置顶' : '置于所有窗口最上层'}
+              title={pinned ? t('unpinFromTop') : t('pinToTop')}
             >
               📌
             </button>
@@ -78,7 +77,7 @@ export default function HUD() {
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => void toggleLock()}
               className="text-gray-500 hover:text-gray-200 text-xs px-1 leading-none"
-              title={locked ? '解锁位置' : '锁定位置'}
+              title={locked ? t('unlockPosition') : t('lockPosition')}
             >
               {locked ? '🔒' : '🔓'}
             </button>
@@ -86,7 +85,7 @@ export default function HUD() {
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => void window.windowAPI.hideHud()}
               className="text-gray-500 hover:text-red-400 text-xs px-1 leading-none"
-              title="隐藏"
+              title={t('hideHud')}
             >
               ×
             </button>

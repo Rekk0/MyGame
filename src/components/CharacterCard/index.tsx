@@ -1,5 +1,6 @@
 import type { Player } from '../../types/player'
 import { ProgressBar } from '../shared/ProgressBar'
+import { useT } from '../../utils/i18n'
 
 interface CharacterCardProps {
   player: Player
@@ -7,6 +8,7 @@ interface CharacterCardProps {
 }
 
 export function CharacterCard({ player, onManage }: CharacterCardProps): JSX.Element {
+  const t = useT()
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-gray-700 bg-gray-800 p-4 w-56 shrink-0">
       <div className="flex items-start justify-between">
@@ -20,25 +22,25 @@ export function CharacterCard({ player, onManage }: CharacterCardProps): JSX.Ele
         <button
           onClick={onManage}
           className="text-gray-500 hover:text-gray-300 text-base leading-none mt-1"
-          title="切换角色"
+          title={t('switchCharacter')}
         >
           ⇄
         </button>
       </div>
 
       <div>
-        <p className="mb-1 text-xs text-gray-400">经验值</p>
+        <p className="mb-1 text-xs text-gray-400">{t('xp')}</p>
         <ProgressBar current={player.xp} max={player.xpToNextLevel} color="blue" />
       </div>
 
       <div>
-        <p className="mb-1 text-xs text-gray-400">精力</p>
+        <p className="mb-1 text-xs text-gray-400">{t('ep')}</p>
         <ProgressBar current={player.ep} max={player.maxEp} color="green" />
       </div>
 
       <div className="flex items-center gap-1 text-sm text-yellow-400">
         <span>💰</span>
-        <span>{player.gold} 金币</span>
+        <span>{player.gold} {t('gold')}</span>
       </div>
     </div>
   )

@@ -7,6 +7,8 @@ interface AIConfig {
   provider: string
   apiKey: string
   model: string
+  autoTransform?: boolean
+  language?: 'zh' | 'en'
 }
 
 function getConfigPath(): string {

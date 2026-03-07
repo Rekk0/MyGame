@@ -1,4 +1,5 @@
 import type { Achievement, AchievementTier } from '../../types/achievement'
+import { useT } from '../../utils/i18n'
 
 const TIER_BORDER: Record<AchievementTier, string> = {
   common: 'border-gray-500',
@@ -8,22 +9,23 @@ const TIER_BORDER: Record<AchievementTier, string> = {
   Ultra: 'border-red-500',
 }
 
-const TIER_LABEL: Record<AchievementTier, string> = {
-  common: '普通',
-  rare: '稀有',
-  epic: '史诗',
-  legendary: '传说',
-  Ultra: 'Ultra',
-}
-
 interface Props {
   achievements: Achievement[]
   onClose: () => void
 }
 
 export function AchievementList({ achievements, onClose }: Props): JSX.Element {
+  const t = useT()
   const unlocked = achievements.filter((a) => a.isUnlocked)
   const locked = achievements.filter((a) => !a.isUnlocked)
+
+  const TIER_LABEL: Record<AchievementTier, string> = {
+    common: t('tierCommon'),
+    rare: t('tierRare'),
+    epic: t('tierEpic'),
+    legendary: t('tierLegendary'),
+    Ultra: 'Ultra',
+  }
 
   function renderCard(a: Achievement): JSX.Element {
     if (!a.isUnlocked) {
@@ -31,7 +33,7 @@ export function AchievementList({ achievements, onClose }: Props): JSX.Element {
         <div key={a.id} className="border border-gray-700 rounded-lg p-3 flex items-center gap-3 opacity-40">
           <span className="text-2xl">❓</span>
           <div>
-            <p className="text-sm text-gray-500">??? 未解锁 ???</p>
+            <p className="text-sm text-gray-500">{t('lockedAchievement')}</p>
           </div>
         </div>
       )
@@ -53,7 +55,7 @@ export function AchievementList({ achievements, onClose }: Props): JSX.Element {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={onClose}>
       <div className="bg-gray-900 rounded-xl p-6 w-96 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold text-white">成就 ({unlocked.length}/{achievements.length})</h2>
+          <h2 className="text-lg font-bold text-white">{t('achievementsTitle')} ({unlocked.length}/{achievements.length})</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-white">✕</button>
         </div>
         <div className="flex flex-col gap-2">

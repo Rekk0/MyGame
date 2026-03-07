@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useT } from '../../utils/i18n'
 
 interface PlotScrollButtonProps {
   type: 'daily' | 'weekly'
@@ -6,9 +7,10 @@ interface PlotScrollButtonProps {
 }
 
 export function PlotScrollButton({ type, onOpen }: PlotScrollButtonProps): JSX.Element {
+  const t = useT()
   const isDaily = type === 'daily'
   const colorClass = isDaily ? 'text-purple-300 border-purple-400 hover:border-purple-300' : 'text-yellow-300 border-yellow-400 hover:border-yellow-300'
-  const title = isDaily ? '今日剧情' : '本周史诗'
+  const title = isDaily ? t('dailyPlotTitle') : t('weeklyPlotTitle')
 
   return (
     <div className="relative mt-2">
@@ -33,8 +35,9 @@ interface PlotModalProps {
 }
 
 export function PlotModal({ type, onClose, summary, loading, error }: PlotModalProps): JSX.Element {
+  const t = useT()
   const isDaily = type === 'daily'
-  const titleText = isDaily ? '今日剧情' : '本周史诗'
+  const titleText = isDaily ? t('dailyPlotTitle') : t('weeklyPlotTitle')
   const titleColor = isDaily ? 'text-purple-300' : 'text-yellow-300'
   const borderColor = isDaily ? 'border-purple-500' : 'border-yellow-500'
 
@@ -80,14 +83,14 @@ export function PlotModal({ type, onClose, summary, loading, error }: PlotModalP
         </div>
         <div className="flex-1 overflow-y-auto">
           {loading ? (
-            <p className="text-gray-400 text-sm">AI 正在编写故事...</p>
+            <p className="text-gray-400 text-sm">{t('aiWritingStory')}</p>
           ) : error ? (
             <p className="text-red-400 text-sm">{error}</p>
           ) : (
             <p
               className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap cursor-pointer"
               onClick={handleSkip}
-              title={typing ? '点击跳过打字动画' : undefined}
+              title={typing ? t('clickToSkip') : undefined}
             >
               {displayed}
             </p>
