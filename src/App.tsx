@@ -264,10 +264,11 @@ function App(): JSX.Element {
         )}
         <button
           onClick={() => setShowSkillTree(true)}
-          className="mt-4 text-gray-600 hover:text-green-400 text-lg"
+          className="mt-4 flex items-center gap-1 text-gray-600 hover:text-green-400"
           title="技能树"
         >
-          🌳
+          <span className="text-lg">🌳</span>
+          <span className="text-xs">技能树</span>
         </button>
         <button
           onClick={() => setShowAchievements(true)}
