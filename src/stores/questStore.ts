@@ -9,6 +9,7 @@ interface QuestState {
   error: string | null
   autoTransform: boolean
   transformingIds: string[]
+  questOrder: string[]
   fetchQuests: () => Promise<void>
   loadSettings: () => Promise<void>
   setAutoTransform: (val: boolean) => void
@@ -16,6 +17,7 @@ interface QuestState {
   transformQuest: (id: string) => Promise<void>
   completeQuest: (id: string) => Promise<void>
   deleteQuest: (id: string) => Promise<void>
+  reorderQuests: (ids: string[]) => void
 }
 
 export const useQuestStore = create<QuestState>((set, get) => ({
@@ -24,6 +26,9 @@ export const useQuestStore = create<QuestState>((set, get) => ({
   error: null,
   autoTransform: true,
   transformingIds: [],
+  questOrder: [],
+
+  reorderQuests: (ids: string[]) => set({ questOrder: ids }),
 
   fetchQuests: async () => {
     set({ loading: true, error: null })
