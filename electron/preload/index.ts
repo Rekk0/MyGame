@@ -44,6 +44,7 @@ const windowAPI = {
   setHudPosition: (x: number, y: number) => ipcRenderer.invoke(IPC.WINDOW_SET_HUD_POSITION, x, y),
   setQuestHudPosition: (x: number, y: number) => ipcRenderer.invoke(IPC.WINDOW_SET_QUEST_HUD_POSITION, x, y),
   setHudPinned: (pinned: boolean) => ipcRenderer.invoke(IPC.WINDOW_SET_HUD_PINNED, pinned),
+  setQuestHudPinned: (pinned: boolean) => ipcRenderer.invoke(IPC.WINDOW_SET_QUEST_HUD_PINNED, pinned),
   setHudIgnoreMouse: (ignore: boolean) => ipcRenderer.invoke(IPC.WINDOW_SET_HUD_IGNORE_MOUSE, ignore),
   setQuestHudIgnoreMouse: (ignore: boolean) => ipcRenderer.invoke(IPC.WINDOW_SET_QUEST_HUD_IGNORE_MOUSE, ignore),
   onHudConfigChanged: (callback: (cfg: object) => void) => {
@@ -68,7 +69,7 @@ const aiAPI = {
 
 const settingsAPI = {
   getAiConfig: () => ipcRenderer.invoke(IPC.SETTINGS_GET_AI_CONFIG),
-  setAiConfig: (config: { provider: string; apiKey: string; model: string }) =>
+  setAiConfig: (config: { provider: string; apiKey: string; model: string; autoTransform?: boolean; language?: string; theme?: string; quickInputHotkey?: string }) =>
     ipcRenderer.invoke(IPC.SETTINGS_SET_AI_CONFIG, config),
   onLanguageChanged: (callback: (lang: string) => void) => {
     const handler = (_e: Electron.IpcRendererEvent, lang: string) => callback(lang)
@@ -111,6 +112,10 @@ const plotAPI = {
   generateWeekly: () => ipcRenderer.invoke(IPC.PLOT_GENERATE_WEEKLY),
 }
 
+const shellAPI = {
+  openExternal: (url: string) => ipcRenderer.invoke(IPC.SHELL_OPEN_EXTERNAL, url),
+}
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('questAPI', questAPI)
@@ -125,6 +130,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('skillAPI', skillAPI)
     contextBridge.exposeInMainWorld('ddaAPI', ddaAPI)
     contextBridge.exposeInMainWorld('plotAPI', plotAPI)
+    contextBridge.exposeInMainWorld('shellAPI', shellAPI)
   } catch (error) {
     console.error(error)
   }
@@ -153,4 +159,6 @@ if (process.contextIsolated) {
   window.ddaAPI = ddaAPI
   // @ts-ignore
   window.plotAPI = plotAPI
+  // @ts-ignore
+  window.shellAPI = shellAPI
 }

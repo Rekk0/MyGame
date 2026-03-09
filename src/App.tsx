@@ -18,6 +18,7 @@ import { AchievementList } from './components/Achievement/AchievementList'
 import { MedalGallery } from './components/MedalGallery'
 import { SkillTree } from './components/SkillTree'
 import { PlotScrollButton, PlotModal } from './components/PlotScroll'
+import { ApiKeyWarningDialog } from './components/shared/ApiKeyWarningDialog'
 
 type DdaState = 'anxious' | 'flow' | 'bored'
 interface DdaInfo { state: DdaState; xpMultiplier: number; suggestion: string }
@@ -57,6 +58,8 @@ function App(): JSX.Element {
   const [showSuggestion, setShowSuggestion] = useState(false)
   const [loadingSuggestion, setLoadingSuggestion] = useState(false)
 
+  const [showApiKeyWarning, setShowApiKeyWarning] = useState(false)
+
   const [showDailyPlot, setShowDailyPlot] = useState(false)
   const [showWeeklyPlot, setShowWeeklyPlot] = useState(false)
   const [dailyPlotSummary, setDailyPlotSummary] = useState<string | undefined>()
@@ -68,12 +71,19 @@ function App(): JSX.Element {
 
   useEffect(() => {
     window.settingsAPI.getAiConfig().then((cfg) => {
-      if (cfg?.language) setLanguage(cfg.language)
+      setLanguage(cfg?.language ?? 'zh')
       if (cfg?.theme) setTheme(cfg.theme)
     }).catch(() => {})
     Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), loadSettings(), fetchAchievements(), fetchMedals(), fetchSkills()]).then(() => {
       setInitialized(true)
       window.ddaAPI.getState().then(setDdaInfo).catch(() => {})
+      const currentPlayer = usePlayerStore.getState().player
+      if (currentPlayer) {
+        window.settingsAPI.getAiConfig().then((cfg) => {
+          const hasKey = cfg?.provider === 'ollama' || (!!cfg?.apiKey && cfg.apiKey.trim().length > 0)
+          if (!hasKey) setShowApiKeyWarning(true)
+        }).catch(() => {})
+      }
     })
   }, [])
 
@@ -173,6 +183,7 @@ function App(): JSX.Element {
 
   return (
     <div className="flex h-screen bg-gray-900 p-4 gap-4 overflow-hidden">
+      {showApiKeyWarning && <ApiKeyWarningDialog onClose={() => setShowApiKeyWarning(false)} />}
       {showManager && (
         <CharacterManager
           currentPlayer={player}

@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow, screen } from 'electron'
+import { ipcMain, BrowserWindow, screen, shell } from 'electron'
 import { IPC } from '../../src/types/ipc'
 import { showHud, hideHud, getHudWindow } from '../windows/hudWindow'
 import { showQuestHud, hideQuestHud, getQuestHudWindow } from '../windows/questHudWindow'
@@ -81,19 +81,21 @@ export function registerWindowHandlers(mainWindow: BrowserWindow): void {
 
   ipcMain.handle(IPC.WINDOW_SET_HUD_PINNED, (_e, pinned: boolean) => {
     const win = getHudWindow()
-    const questWin = getQuestHudWindow()
-    if (win) {
-      if (pinned) {
-        // 'screen-saver' level: above fullscreen apps and system UI on Windows
-        win.setAlwaysOnTop(true, 'screen-saver')
-        // Keep Quest HUD above Stats HUD even at screen-saver level
-        questWin?.setAlwaysOnTop(true, 'screen-saver')
-      } else {
-        win.setAlwaysOnTop(false)
-        // Restore Quest HUD to pop-up-menu (above Stats HUD default floating level)
-        questWin?.setAlwaysOnTop(true, 'pop-up-menu')
-      }
-    }
+    if (!win) return
+    if (pinned) win.setAlwaysOnTop(true, 'screen-saver')
+    else win.setAlwaysOnTop(false)
     writeHudConfig({ hudPinned: pinned })
+  })
+
+  ipcMain.handle(IPC.WINDOW_SET_QUEST_HUD_PINNED, (_e, pinned: boolean) => {
+    const win = getQuestHudWindow()
+    if (!win) return
+    if (pinned) win.setAlwaysOnTop(true, 'screen-saver')
+    else win.setAlwaysOnTop(false)
+    writeHudConfig({ questHudPinned: pinned })
+  })
+
+  ipcMain.handle(IPC.SHELL_OPEN_EXTERNAL, (_e, url: string) => {
+    shell.openExternal(url)
   })
 }
