@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import type { Player } from '../../types/player'
 import { usePlayerStore } from '../../stores/playerStore'
 import { ProgressBar } from '../shared/ProgressBar'
 import { useT } from '../../utils/i18n'
+import { MoodCheck } from '../MoodCheck'
 
 interface CharacterCardProps {
   player: Player
@@ -12,6 +14,7 @@ export function CharacterCard({ player, onManage }: CharacterCardProps): JSX.Ele
   const t = useT()
   const sleep = usePlayerStore((s) => s.sleep)
   const rest = usePlayerStore((s) => s.rest)
+  const [showMood, setShowMood] = useState(false)
 
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-gray-700 bg-gray-800 p-4 w-56 shrink-0">
@@ -73,6 +76,15 @@ export function CharacterCard({ player, onManage }: CharacterCardProps): JSX.Ele
           ☕ 休息
         </button>
       </div>
+
+      <button
+        onClick={() => setShowMood(true)}
+        className="w-full rounded bg-gray-700 px-2 py-1 text-xs text-gray-300 hover:bg-gray-600 transition-colors"
+      >
+        🎭 记一笔心情
+      </button>
+
+      {showMood && <MoodCheck onClose={() => setShowMood(false)} />}
     </div>
   )
 }

@@ -100,5 +100,8 @@ declare global {
     shellAPI: {
       openExternal: (url: string) => Promise<void>
     }
+    resourceAPI: {
+      recordMood: (score: number) => Promise<Player>
+    }
   }
 }

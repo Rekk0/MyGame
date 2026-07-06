@@ -18,7 +18,11 @@ import { unlockAchievement } from '../services/db/repositories/achievementRepo'
 import { buildAchievementSystemPrompt, buildAchievementPrompt } from '../services/ai/prompts/achievement'
 import { generateMedal } from './medalHandlers'
 import { analyzePlayerState, getDdaAdjustment, getStreakMultiplier } from '../services/dda'
-import { resolveRatings, computeDeltas, finalXp } from '../services/resources/settlement'
+import { clamp, computeDeltas, finalXp } from '../services/resources/settlement'
+import { correctRatings, scaledCoeffs, selectHistory } from '../services/resources/calibration'
+import { historyForQuest } from '../services/db/repositories/calibrationRepo'
+import { getScales, recomputeProfile } from '../services/resources/profile'
+import type { Ratings } from '../../src/types/resource'
 import type { Achievement } from '../../src/types/achievement'
 
 const MEDAL_TRIGGERS: Record<string, { name: string; category: 'streak' | 'mastery' | 'adventure' | 'oath'; description: string }> = {
@@ -60,20 +64,48 @@ export function registerQuestHandlers(): void {
   ipcMain.handle(IPC.QUEST_COMPLETE, async (_e, id: string) => {
     const quest = completeQuest(id)
     const player = getPlayer()!
-    const ratings = resolveRatings(quest)
+
+    // —— v1：用户拖过滑杆 → 直接用用户值；跳过评分 → 历史修正 AI 隐藏预估 ——
+    const userRated = quest.userDrive != null
+    let ratings: Ratings
+    if (userRated) {
+      ratings = {
+        E: quest.userEnergyPct ?? clamp(quest.epCost, 0, 100),
+        D: quest.userDrive!,
+        L: quest.userLike ?? 5,
+      }
+    } else {
+      const rawAi: Ratings = {
+        E: quest.aiEnergyPct ?? clamp(quest.epCost, 0, 100),
+        D: quest.aiDrive ?? 5,
+        L: quest.aiLike ?? 5,
+      }
+      const { byText, byType } = historyForQuest(quest.type, quest.originalText)
+      const hist = selectHistory(byText, byType)
+      ratings = correctRatings(rawAi, hist.mean, hist.n)
+    }
+
+    // —— v2：个人系数缩放（仅意志力/精神；XP 不缩放）——
+    const deltas = computeDeltas(ratings, scaledCoeffs(getScales()))
+
     const baseXp = quest.xp ?? 10
-    const { xpMultiplier: ddaMult } = getDdaAdjustment(analyzePlayerState())
+    const state = analyzePlayerState()
+    const { xpMultiplier: ddaMult } = getDdaAdjustment(state)
     const streakMult = getStreakMultiplier()
     const xp = finalXp(baseXp, ratings, player.ep, player.maxEp, ddaMult, streakMult)
+
     addXp(xp)
     addGold(5)
-    const deltas = computeDeltas(ratings)
     applyResourceDeltas(deltas)
     logEvent({
       source: 'quest', questId: id,
       energyDelta: deltas.energy, willpowerDelta: deltas.willpower, spiritDelta: deltas.spirit,
       e: ratings.E, d: ratings.D, l: ratings.L,
     })
+
+    // —— v2 反馈：本次是用户实填 → 重算个人系数 profile ——
+    if (userRated) recomputeProfile()
+
     notifyHudUpdate()
 
     const newAchievements = await checkAchievements()

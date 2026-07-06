@@ -66,7 +66,8 @@ export function getSkillById(id: string): Skill | undefined {
 export function addSkillXp(id: string, amount: number): { leveledUp: boolean; newLevel: number; newDescription: string } {
   const skill = db.select().from(skills).where(eq(skills.id, id)).get()
   if (!skill) return { leveledUp: false, newLevel: 1, newDescription: '' }
-  let { xp, level, maxXp, description } = skill
+  const { description } = skill
+  let { xp, level, maxXp } = skill
   xp += amount
   let leveledUp = false
   while (xp >= maxXp) {

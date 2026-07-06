@@ -114,6 +114,10 @@ const plotAPI = {
   generateWeekly: () => ipcRenderer.invoke(IPC.PLOT_GENERATE_WEEKLY),
 }
 
+const resourceAPI = {
+  recordMood: (score: number) => ipcRenderer.invoke(IPC.MOOD_RECORD, score),
+}
+
 const shellAPI = {
   openExternal: (url: string) => ipcRenderer.invoke(IPC.SHELL_OPEN_EXTERNAL, url),
 }
@@ -133,10 +137,13 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('ddaAPI', ddaAPI)
     contextBridge.exposeInMainWorld('plotAPI', plotAPI)
     contextBridge.exposeInMainWorld('shellAPI', shellAPI)
+    contextBridge.exposeInMainWorld('resourceAPI', resourceAPI)
   } catch (error) {
     console.error(error)
   }
 } else {
+  // @ts-ignore
+  window.resourceAPI = resourceAPI
   // @ts-ignore
   window.questAPI = questAPI
   // @ts-ignore

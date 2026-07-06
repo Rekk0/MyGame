@@ -19,6 +19,7 @@ import { registerQuickInputShortcut } from './services/shortcutManager'
 import { createTray } from './tray'
 import { startStreakWarningScheduler } from './services/notification'
 import { migrateLegacyUserDataFile } from './services/legacyMigration'
+import { recomputeProfile } from './services/resources/profile'
 
 let isQuitting = false
 
@@ -45,7 +46,10 @@ app.whenReady().then(() => {
     const config = readHudConfig()
     const today = new Date().toISOString().slice(0, 10)
     if (config.lastResetDate !== today) {
-      if (getAllPlayers().length > 0) sleep(8)
+      if (getAllPlayers().length > 0) {
+        sleep(8)
+        try { recomputeProfile() } catch { /* ignore */ }
+      }
       writeHudConfig({ lastResetDate: today })
     }
 

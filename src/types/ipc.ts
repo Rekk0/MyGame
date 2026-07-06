@@ -68,5 +68,7 @@ export const IPC = {
   PLOT_GENERATE_DAILY: 'plot:generate-daily',
   PLOT_GENERATE_WEEKLY: 'plot:generate-weekly',
 
+  MOOD_RECORD: 'resource:mood',
+
   SHELL_OPEN_EXTERNAL: 'shell:open-external',
 } as const

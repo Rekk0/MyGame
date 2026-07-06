@@ -2,6 +2,18 @@ import { R } from './constants'
 import type { Ratings, ResourceDelta } from '../../../src/types/resource'
 import type { Quest } from '../../../src/types/quest'
 
+export interface DeltaCoeffs {
+  willpowerMaxCost: number
+  spiritJoyGain: number
+  spiritViolationLoss: number
+}
+
+const DEFAULT_COEFFS: DeltaCoeffs = {
+  willpowerMaxCost: R.willpowerMaxCost,
+  spiritJoyGain: R.spiritJoyGain,
+  spiritViolationLoss: R.spiritViolationLoss,
+}
+
 export function clamp(v: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, v))
 }
@@ -18,14 +30,17 @@ function normZero(n: number): number {
   return Object.is(n, -0) ? 0 : n
 }
 
-export function computeDeltas({ E, D, L }: Ratings): Required<ResourceDelta> {
+export function computeDeltas(
+  { E, D, L }: Ratings,
+  c: DeltaCoeffs = DEFAULT_COEFFS,
+): Required<ResourceDelta> {
   const forced = clamp((5 - D) / 5, 0, 1)
   const joy = clamp((L - 5) / 5, -1, 1)
   return {
     energy: -E,
-    willpower: normZero(-Math.round(R.willpowerMaxCost * forced * (0.5 + 0.5 * E / 100))),
-    spirit: normZero(Math.round(R.spiritJoyGain * joy)
-      - Math.round(R.spiritViolationLoss * forced * (1 - L / 10))),
+    willpower: normZero(-Math.round(c.willpowerMaxCost * forced * (0.5 + 0.5 * E / 100))),
+    spirit: normZero(Math.round(c.spiritJoyGain * joy)
+      - Math.round(c.spiritViolationLoss * forced * (1 - L / 10))),
   }
 }
 
