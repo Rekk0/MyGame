@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { useQuestStore } from '../../stores/questStore'
 import { useT } from '../../utils/i18n'
+import RatingSliders from '../QuestBoard/RatingSliders'
 
 export default function QuickInput() {
   const [text, setText] = useState('')
   const createQuest = useQuestStore((s) => s.createQuest)
   const inputRef = useRef<HTMLInputElement>(null)
+  const ratingsRef = useRef<{ E?: number; D?: number; L?: number } | undefined>(undefined)
   const t = useT()
 
   useEffect(() => {
@@ -14,8 +16,9 @@ export default function QuickInput() {
 
   const handleSubmit = async () => {
     if (!text.trim()) return
-    await createQuest(text.trim())
+    await createQuest(text.trim(), ratingsRef.current)
     setText('')
+    ratingsRef.current = undefined
     window.windowAPI.hideQuickInput()
   }
 
@@ -25,7 +28,7 @@ export default function QuickInput() {
   }
 
   return (
-    <div className="flex h-screen items-center px-4 bg-gray-900 rounded-lg">
+    <div className="flex flex-col h-screen justify-center px-4 bg-gray-900 rounded-lg gap-3">
       <input
         ref={inputRef}
         value={text}
@@ -34,6 +37,7 @@ export default function QuickInput() {
         placeholder={t('quickInputPlaceholder')}
         className="w-full bg-transparent text-white text-base outline-none placeholder-gray-500"
       />
+      <RatingSliders onChange={(r) => { ratingsRef.current = r }} />
     </div>
   )
 }

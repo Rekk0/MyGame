@@ -10,6 +10,8 @@ interface PlayerState {
   createPlayer: (name: string, worldStyle: WorldStyle) => Promise<void>
   switchPlayer: (id: string) => Promise<void>
   deletePlayer: (id: string) => Promise<void>
+  sleep: (hours?: number) => Promise<void>
+  rest: () => Promise<void>
 }
 
 export const usePlayerStore = create<PlayerState>((set) => ({
@@ -47,5 +49,15 @@ export const usePlayerStore = create<PlayerState>((set) => ({
     const next = await window.playerAPI.delete(id)
     set({ player: next ?? null })
     await usePlayerStore.getState().fetchAllPlayers()
+  },
+
+  sleep: async (hours?: number) => {
+    await window.playerAPI.sleep(hours)
+    await usePlayerStore.getState().fetchPlayer()
+  },
+
+  rest: async () => {
+    await window.playerAPI.rest()
+    await usePlayerStore.getState().fetchPlayer()
   },
 }))

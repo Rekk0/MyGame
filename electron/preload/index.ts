@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { IPC } from '../../src/types/ipc'
 
 const questAPI = {
-  create: (data: { originalText: string; dueDate?: string | null }) =>
+  create: (data: { originalText: string; dueDate?: string | null; userEnergyPct?: number; userDrive?: number; userLike?: number }) =>
     ipcRenderer.invoke(IPC.QUEST_CREATE, data),
   getAll: () => ipcRenderer.invoke(IPC.QUEST_GET_ALL),
   getById: (id: string) => ipcRenderer.invoke(IPC.QUEST_GET_BY_ID, id),
@@ -21,6 +21,8 @@ const playerAPI = {
   addGold: (amount: number) => ipcRenderer.invoke(IPC.PLAYER_ADD_GOLD, amount),
   consumeEp: (amount: number) => ipcRenderer.invoke(IPC.PLAYER_CONSUME_EP, amount),
   resetEp: () => ipcRenderer.invoke(IPC.PLAYER_RESET_EP),
+  sleep: (hours?: number) => ipcRenderer.invoke(IPC.PLAYER_SLEEP, hours),
+  rest: () => ipcRenderer.invoke(IPC.PLAYER_REST),
 }
 
 const streakAPI = {

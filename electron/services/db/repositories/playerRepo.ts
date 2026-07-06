@@ -3,6 +3,8 @@ import { eq } from 'drizzle-orm'
 import { db } from '../index'
 import { players } from '../schema'
 import type { WorldStyle } from '../../../../src/types/player'
+import type { ResourceDelta } from '../../../../src/types/resource'
+import { computeSleep, computeRest, computePassive, clamp } from '../../resources/settlement'
 
 type PlayerRow = typeof players.$inferSelect
 
@@ -97,6 +99,35 @@ export function consumeEp(amount: number): PlayerWithXp {
   return getPlayer()!
 }
 
-export function resetDailyEp(): void {
-  db.update(players).set({ ep: 100 }).run()
+export function applyResourceDeltas(d: ResourceDelta): PlayerWithXp {
+  const p = getPlayer()!
+  db.update(players).set({
+    ep: clamp(p.ep + (d.energy ?? 0), 0, p.maxEp),
+    willpower: clamp(p.willpower + (d.willpower ?? 0), 0, p.maxWillpower),
+    spirit: clamp(p.spirit + (d.spirit ?? 0), 0, p.maxSpirit),
+  }).where(eq(players.id, p.id)).run()
+  return getPlayer()!
 }
+
+export function sleep(hours = 8): PlayerWithXp {
+  const p = getPlayer()!
+  const { ep, willpower } = computeSleep(hours, p.willpower, p.maxEp, p.maxWillpower)
+  db.update(players).set({ ep, willpower }).where(eq(players.id, p.id)).run()
+  return getPlayer()!
+}
+
+export function rest(): PlayerWithXp {
+  const p = getPlayer()!
+  const { ep, willpower } = computeRest(p.ep, p.willpower, p.maxEp, p.maxWillpower)
+  db.update(players).set({ ep, willpower }).where(eq(players.id, p.id)).run()
+  return getPlayer()!
+}
+
+export function passiveRegen(hours: number): void {
+  const p = getPlayer()
+  if (!p) return
+  db.update(players).set({ willpower: computePassive(p.willpower, p.maxWillpower, hours) })
+    .where(eq(players.id, p.id)).run()
+}
+
+export const resetDailyEp = () => { sleep(8) }

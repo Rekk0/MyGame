@@ -8,7 +8,7 @@ import type { Skill } from './skill'
 declare global {
   interface Window {
     questAPI: {
-      create: (data: { originalText: string; dueDate?: string | null }) => Promise<Quest>
+      create: (data: { originalText: string; dueDate?: string | null; userEnergyPct?: number; userDrive?: number; userLike?: number }) => Promise<Quest>
       getAll: () => Promise<Quest[]>
       getById: (id: string) => Promise<Quest | undefined>
       update: (id: string, data: Partial<Quest>) => Promise<Quest>
@@ -25,6 +25,8 @@ declare global {
       addGold: (amount: number) => Promise<Player>
       consumeEp: (amount: number) => Promise<Player>
       resetEp: () => Promise<Player>
+      sleep: (hours?: number) => Promise<Player>
+      rest: () => Promise<Player>
     }
     streakAPI: {
       get: () => Promise<Streak | undefined>
@@ -61,6 +63,9 @@ declare global {
         type: string
         xp: number
         epCost?: number
+        aiEnergyPct?: number
+        aiDrive?: number
+        aiLike?: number
       }>
     }
     settingsAPI: {

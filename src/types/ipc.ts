@@ -15,6 +15,8 @@ export const IPC = {
   PLAYER_ADD_GOLD: 'player:add-gold',
   PLAYER_CONSUME_EP: 'player:consume-ep',
   PLAYER_RESET_EP: 'player:reset-ep',
+  PLAYER_SLEEP: 'player:sleep',
+  PLAYER_REST: 'player:rest',
 
   STREAK_GET: 'streak:get',
   STREAK_RECORD: 'streak:record',

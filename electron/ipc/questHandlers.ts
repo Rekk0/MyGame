@@ -8,7 +8,8 @@ import {
   deleteQuest,
   completeQuest,
 } from '../services/db/repositories/questRepo'
-import { getPlayer } from '../services/db/repositories/playerRepo'
+import { getPlayer, addXp, addGold, applyResourceDeltas } from '../services/db/repositories/playerRepo'
+import { logEvent } from '../services/db/repositories/resourceRepo'
 import { notifyHudUpdate } from '../windows/hudWindow'
 import { showAchievementPopup } from '../windows/achievementWindow'
 import { checkAchievements } from '../services/achievementChecker'
@@ -17,6 +18,7 @@ import { unlockAchievement } from '../services/db/repositories/achievementRepo'
 import { buildAchievementSystemPrompt, buildAchievementPrompt } from '../services/ai/prompts/achievement'
 import { generateMedal } from './medalHandlers'
 import { analyzePlayerState, getDdaAdjustment, getStreakMultiplier } from '../services/dda'
+import { resolveRatings, computeDeltas, finalXp } from '../services/resources/settlement'
 import type { Achievement } from '../../src/types/achievement'
 
 const MEDAL_TRIGGERS: Record<string, { name: string; category: 'streak' | 'mastery' | 'adventure' | 'oath'; description: string }> = {
@@ -30,7 +32,10 @@ const MEDAL_TRIGGERS: Record<string, { name: string; category: 'streak' | 'maste
 }
 
 export function registerQuestHandlers(): void {
-  ipcMain.handle(IPC.QUEST_CREATE, (_e, data: { originalText: string; dueDate?: string | null }) => {
+  ipcMain.handle(IPC.QUEST_CREATE, (_e, data: {
+    originalText: string; dueDate?: string | null
+    userEnergyPct?: number; userDrive?: number; userLike?: number
+  }) => {
     const result = createQuest(data)
     notifyHudUpdate()
     return result
@@ -54,15 +59,25 @@ export function registerQuestHandlers(): void {
 
   ipcMain.handle(IPC.QUEST_COMPLETE, async (_e, id: string) => {
     const quest = completeQuest(id)
-    const state = analyzePlayerState()
-    const { xpMultiplier: ddaMultiplier } = getDdaAdjustment(state)
+    const player = getPlayer()!
+    const ratings = resolveRatings(quest)
+    const baseXp = quest.xp ?? 10
+    const { xpMultiplier: ddaMult } = getDdaAdjustment(analyzePlayerState())
     const streakMult = getStreakMultiplier()
-    const finalXp = Math.round((quest.xp ?? 10) * ddaMultiplier * streakMult)
+    const xp = finalXp(baseXp, ratings, player.ep, player.maxEp, ddaMult, streakMult)
+    addXp(xp)
+    addGold(5)
+    const deltas = computeDeltas(ratings)
+    applyResourceDeltas(deltas)
+    logEvent({
+      source: 'quest', questId: id,
+      energyDelta: deltas.energy, willpowerDelta: deltas.willpower, spiritDelta: deltas.spirit,
+      e: ratings.E, d: ratings.D, l: ratings.L,
+    })
     notifyHudUpdate()
 
     const newAchievements = await checkAchievements()
     if (newAchievements.length > 0) {
-      const player = getPlayer()
       for (const ach of newAchievements) {
         const achievement: Achievement = {
           ...ach,
@@ -87,6 +102,6 @@ export function registerQuestHandlers(): void {
       }
     }
 
-    return { quest, newAchievements, finalXp }
+    return { quest, newAchievements, finalXp: xp }
   })
 }

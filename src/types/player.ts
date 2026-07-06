@@ -10,6 +10,10 @@ export interface Player {
   gold: number
   ep: number
   maxEp: number
+  willpower: number
+  maxWillpower: number
+  spirit: number
+  maxSpirit: number
   worldStyle: WorldStyle
   createdAt: string
 }

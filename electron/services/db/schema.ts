@@ -12,6 +12,12 @@ export const quests = sqliteTable('quests', {
   status: text('status').notNull().default('pending'),
   dueDate: text('due_date'),
   completedAt: text('completed_at'),
+  aiEnergyPct: integer('ai_energy_pct'),
+  aiDrive: integer('ai_drive'),
+  aiLike: integer('ai_like'),
+  userEnergyPct: integer('user_energy_pct'),
+  userDrive: integer('user_drive'),
+  userLike: integer('user_like'),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString())
 })
 
@@ -24,6 +30,10 @@ export const players = sqliteTable('players', {
   gold: integer('gold').notNull().default(0),
   ep: integer('ep').notNull().default(100),
   maxEp: integer('max_ep').notNull().default(100),
+  willpower: integer('willpower').notNull().default(100),
+  maxWillpower: integer('max_willpower').notNull().default(100),
+  spirit: integer('spirit').notNull().default(70),
+  maxSpirit: integer('max_spirit').notNull().default(100),
   worldStyle: text('world_style').notNull().default('realistic'),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString())
 })
@@ -80,5 +90,19 @@ export const plotLogs = sqliteTable('plot_logs', {
   type: text('type').notNull(),
   periodKey: text('period_key').notNull(),
   summary: text('summary').notNull(),
+  createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
+})
+
+export const resourceEvents = sqliteTable('resource_events', {
+  id: text('id').primaryKey(),
+  playerId: text('player_id').notNull().default(''),
+  source: text('source').notNull(),
+  questId: text('quest_id'),
+  energyDelta: integer('energy_delta').notNull().default(0),
+  willpowerDelta: integer('willpower_delta').notNull().default(0),
+  spiritDelta: integer('spirit_delta').notNull().default(0),
+  e: integer('e'),
+  d: integer('d'),
+  l: integer('l'),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
 })

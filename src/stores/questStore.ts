@@ -13,7 +13,7 @@ interface QuestState {
   fetchQuests: () => Promise<void>
   loadSettings: () => Promise<void>
   setAutoTransform: (val: boolean) => void
-  createQuest: (originalText: string) => Promise<void>
+  createQuest: (originalText: string, ratings?: { E?: number; D?: number; L?: number }) => Promise<void>
   transformQuest: (id: string) => Promise<void>
   completeQuest: (id: string) => Promise<void>
   deleteQuest: (id: string) => Promise<void>
@@ -47,8 +47,13 @@ export const useQuestStore = create<QuestState>((set, get) => ({
 
   setAutoTransform: (val: boolean) => set({ autoTransform: val }),
 
-  createQuest: async (originalText: string) => {
-    const quest = await window.questAPI.create({ originalText })
+  createQuest: async (originalText: string, ratings?: { E?: number; D?: number; L?: number }) => {
+    const quest = await window.questAPI.create({
+      originalText,
+      userEnergyPct: ratings?.E,
+      userDrive: ratings?.D,
+      userLike: ratings?.L,
+    })
     await get().fetchQuests()
     if (get().autoTransform) void get().transformQuest(quest.id)
   },
@@ -71,6 +76,9 @@ export const useQuestStore = create<QuestState>((set, get) => ({
         type: result.type as QuestType,
         xp: result.xp,
         epCost: result.epCost ?? 10,
+        aiEnergyPct: result.aiEnergyPct,
+        aiDrive: result.aiDrive,
+        aiLike: result.aiLike,
       })
       await get().fetchQuests()
     } catch {
@@ -83,23 +91,8 @@ export const useQuestStore = create<QuestState>((set, get) => ({
   completeQuest: async (id: string) => {
     const quest = get().quests.find((q) => q.id === id)
     const type = quest?.type ?? 'daily'
-    const epCost = quest?.epCost ?? 10
 
-    // 先获取当前玩家 EP
-    const playerBefore = await window.playerAPI.get()
-    const currentEp = playerBefore?.ep ?? 0
-
-    // 比例系数：EP 充足时为 1.0，耗尽时最低 0.5
-    const epRatio = epCost > 0 ? Math.min(1, currentEp / epCost) : 1
-    const epMultiplier = currentEp >= epCost ? 1.0 : Math.max(0.5, epRatio)
-
-    const result = await window.questAPI.complete(id)
-    const baseXp = result.finalXp ?? quest?.xp ?? 10
-    const xp = Math.round(baseXp * epMultiplier)
-
-    await window.playerAPI.addXp(xp)
-    await window.playerAPI.addGold(5)
-    await window.playerAPI.consumeEp(epCost)
+    await window.questAPI.complete(id)
     await window.streakAPI.record()
     // 技能 XP：根据任务类型给对应技能加经验
     const SKILL_XP_MAP: Record<string, { skillKey: string; amount: number }> = {
@@ -110,7 +103,6 @@ export const useQuestStore = create<QuestState>((set, get) => ({
     }
     const skillXp = SKILL_XP_MAP[type]
     if (skillXp) {
-      // 技能 ID 格式为 `${playerId}-${skillKey}`，需要从 skillAPI 拿到实际 ID
       const allSkills = await window.skillAPI.getAll()
       const target = allSkills.find(s => s.id.endsWith(`-${skillXp.skillKey}`) && s.isUnlocked)
       if (target) void window.skillAPI.addXp(target.id, skillXp.amount)

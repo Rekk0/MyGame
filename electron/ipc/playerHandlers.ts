@@ -9,7 +9,8 @@ import {
   addXp,
   addGold,
   consumeEp,
-  resetDailyEp,
+  sleep,
+  rest,
 } from '../services/db/repositories/playerRepo'
 import type { WorldStyle } from '../../src/types/player'
 import { notifyHudUpdate } from '../windows/hudWindow'
@@ -51,8 +52,20 @@ export function registerPlayerHandlers(): void {
   ipcMain.handle(IPC.PLAYER_CONSUME_EP, (_e, amount: number) => consumeEp(amount))
 
   ipcMain.handle(IPC.PLAYER_RESET_EP, () => {
-    resetDailyEp()
+    sleep(8)
     notifyHudUpdate()
     return getPlayer()
+  })
+
+  ipcMain.handle(IPC.PLAYER_SLEEP, (_e, hours?: number) => {
+    const p = sleep(hours ?? 8)
+    notifyHudUpdate()
+    return p
+  })
+
+  ipcMain.handle(IPC.PLAYER_REST, () => {
+    const p = rest()
+    notifyHudUpdate()
+    return p
   })
 }

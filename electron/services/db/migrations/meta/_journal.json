@@ -64,6 +64,13 @@
       "when": 1772290800000,
       "tag": "0008_add_ep_cost",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1783357043552,
+      "tag": "0009_talented_baron_strucker",
+      "breakpoints": true
     }
   ]
 }

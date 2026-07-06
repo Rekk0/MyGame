@@ -12,5 +12,11 @@ export interface Quest {
   status: QuestStatus
   dueDate: string | null
   completedAt: string | null
+  aiEnergyPct: number | null
+  aiDrive: number | null
+  aiLike: number | null
+  userEnergyPct: number | null
+  userDrive: number | null
+  userLike: number | null
   createdAt: string
 }

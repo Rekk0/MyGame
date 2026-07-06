@@ -11,9 +11,23 @@ function pid(): string {
   return getActivePlayerId()
 }
 
-export function createQuest(data: { originalText: string; dueDate?: string | null }): Quest {
+export function createQuest(data: {
+  originalText: string
+  dueDate?: string | null
+  userEnergyPct?: number
+  userDrive?: number
+  userLike?: number
+}): Quest {
   const id = randomUUID()
-  db.insert(quests).values({ id, playerId: pid(), originalText: data.originalText, dueDate: data.dueDate ?? null }).run()
+  db.insert(quests).values({
+    id,
+    playerId: pid(),
+    originalText: data.originalText,
+    dueDate: data.dueDate ?? null,
+    userEnergyPct: data.userEnergyPct ?? null,
+    userDrive: data.userDrive ?? null,
+    userLike: data.userLike ?? null,
+  }).run()
   return db.select().from(quests).where(eq(quests.id, id)).get()!
 }
 
