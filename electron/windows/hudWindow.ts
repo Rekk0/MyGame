@@ -21,7 +21,6 @@ export function createHudWindow(): BrowserWindow {
     maxHeight: 128,
     x,
     y,
-    alwaysOnTop: true,
     frame: false,
     transparent: true,
     resizable: false,
@@ -32,6 +31,10 @@ export function createHudWindow(): BrowserWindow {
       sandbox: false
     }
   })
+
+  // Default pinned=true for backwards compatibility; only skip if explicitly false
+  const isPinned = config.hudPinned !== false
+  if (isPinned) hudWindow.setAlwaysOnTop(true, 'screen-saver')
 
   if (config.hudLocked) {
     hudWindow.setIgnoreMouseEvents(true, { forward: true })

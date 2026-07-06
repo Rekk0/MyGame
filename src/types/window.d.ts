@@ -103,5 +103,11 @@ declare global {
     resourceAPI: {
       recordMood: (score: number) => Promise<Player>
     }
+    companionAPI: {
+      runAction: (action: string, payload?: unknown) => Promise<void>
+      getReply: (event?: string) => Promise<unknown>
+      onReply: (cb: (reply: unknown) => void) => () => void
+      onNavigate: (cb: (target: unknown) => void) => () => void
+    }
   }
 }

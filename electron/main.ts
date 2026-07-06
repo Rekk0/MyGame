@@ -13,11 +13,13 @@ import { createHudWindow, showHud } from './windows/hudWindow'
 import { createQuestHudWindow } from './windows/questHudWindow'
 import { createQuickInputWindow } from './windows/quickInput'
 import { createAchievementWindow } from './windows/achievementWindow'
+import { createCompanionWindow } from './windows/companionWindow'
 import { readHudConfig, writeHudConfig } from './services/hudConfig'
 import { readAiConfig } from './ipc/settingsHandlers'
 import { registerQuickInputShortcut } from './services/shortcutManager'
 import { createTray } from './tray'
 import { startStreakWarningScheduler } from './services/notification'
+import { startCompanionScheduler, evaluate } from './services/companion/scheduler'
 import { migrateLegacyUserDataFile } from './services/legacyMigration'
 import { recomputeProfile } from './services/resources/profile'
 
@@ -58,11 +60,14 @@ app.whenReady().then(() => {
     createQuestHudWindow()
     createQuickInputWindow()
     createAchievementWindow()
+    createCompanionWindow()
     createTray(mainWindow)
     registerWindowHandlers(mainWindow)
     const aiCfg = readAiConfig()
     registerQuickInputShortcut(aiCfg?.quickInputHotkey)
     startStreakWarningScheduler()
+    startCompanionScheduler()
+    void evaluate('startup')
 
     mainWindow.on('close', (event) => {
       if (!isQuitting) {

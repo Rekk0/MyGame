@@ -1,4 +1,4 @@
-appId: com.questboard.app
+appId: com.mygame.app
 productName: MyGame
 directories:
   buildResources: resources
@@ -19,7 +19,7 @@ asarUnpack:
   - resources/**
   - '**/node_modules/better-sqlite3/**'
 win:
-  executableName: quest-board
+  executableName: MyGame
   target:
     - nsis
     - portable

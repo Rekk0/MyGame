@@ -22,6 +22,7 @@ import { clamp, computeDeltas, finalXp } from '../services/resources/settlement'
 import { correctRatings, scaledCoeffs, selectHistory } from '../services/resources/calibration'
 import { historyForQuest } from '../services/db/repositories/calibrationRepo'
 import { getScales, recomputeProfile } from '../services/resources/profile'
+import { evaluate } from '../services/companion/scheduler'
 import type { Ratings } from '../../src/types/resource'
 import type { Achievement } from '../../src/types/achievement'
 
@@ -107,6 +108,7 @@ export function registerQuestHandlers(): void {
     if (userRated) recomputeProfile()
 
     notifyHudUpdate()
+    void evaluate('quest_completed', quest.gamifiedName ?? undefined)
 
     const newAchievements = await checkAchievements()
     if (newAchievements.length > 0) {

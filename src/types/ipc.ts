@@ -70,5 +70,12 @@ export const IPC = {
 
   MOOD_RECORD: 'resource:mood',
 
+  COMPANION_GET_REPLY: 'companion:get-reply',
+  COMPANION_RUN_ACTION: 'companion:run-action',
+  COMPANION_REPLY_PUSHED: 'companion:reply-pushed',
+  COMPANION_NAVIGATE: 'companion:navigate',
+  WINDOW_SHOW_COMPANION: 'window:show-companion',
+  WINDOW_HIDE_COMPANION: 'window:hide-companion',
+
   SHELL_OPEN_EXTERNAL: 'shell:open-external',
 } as const

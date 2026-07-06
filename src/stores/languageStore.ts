@@ -8,6 +8,6 @@ interface LanguageStore {
 }
 
 export const useLanguageStore = create<LanguageStore>((set) => ({
-  language: 'zh',
+  language: 'zh', // 永久默认值：中文
   setLanguage: (language) => set({ language }),
 }))

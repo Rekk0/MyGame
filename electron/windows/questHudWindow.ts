@@ -30,8 +30,10 @@ export function createQuestHudWindow(): BrowserWindow {
       sandbox: false
     }
   })
-  // Use a higher level than Stats HUD ('floating') so Quest HUD is never obscured by Stats HUD
-  questHudWindow.setAlwaysOnTop(true, 'pop-up-menu')
+
+  // Default pinned=true for backwards compatibility; only skip if explicitly false
+  const isQuestPinned = config.questHudPinned !== false
+  if (isQuestPinned) questHudWindow.setAlwaysOnTop(true, 'screen-saver')
 
   if (config.questHudLocked) {
     questHudWindow.setIgnoreMouseEvents(true, { forward: true })

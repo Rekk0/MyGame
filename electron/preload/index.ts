@@ -122,6 +122,22 @@ const shellAPI = {
   openExternal: (url: string) => ipcRenderer.invoke(IPC.SHELL_OPEN_EXTERNAL, url),
 }
 
+const companionAPI = {
+  runAction: (action: string, payload?: unknown) =>
+    ipcRenderer.invoke(IPC.COMPANION_RUN_ACTION, action, payload),
+  getReply: (event?: string) => ipcRenderer.invoke(IPC.COMPANION_GET_REPLY, event),
+  onReply: (cb: (reply: unknown) => void) => {
+    const h = (_e: Electron.IpcRendererEvent, r: unknown) => cb(r)
+    ipcRenderer.on(IPC.COMPANION_REPLY_PUSHED, h)
+    return () => ipcRenderer.removeListener(IPC.COMPANION_REPLY_PUSHED, h)
+  },
+  onNavigate: (cb: (target: unknown) => void) => {
+    const h = (_e: Electron.IpcRendererEvent, t: unknown) => cb(t)
+    ipcRenderer.on(IPC.COMPANION_NAVIGATE, h)
+    return () => ipcRenderer.removeListener(IPC.COMPANION_NAVIGATE, h)
+  },
+}
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('questAPI', questAPI)
@@ -138,12 +154,15 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('plotAPI', plotAPI)
     contextBridge.exposeInMainWorld('shellAPI', shellAPI)
     contextBridge.exposeInMainWorld('resourceAPI', resourceAPI)
+    contextBridge.exposeInMainWorld('companionAPI', companionAPI)
   } catch (error) {
     console.error(error)
   }
 } else {
   // @ts-ignore
   window.resourceAPI = resourceAPI
+  // @ts-ignore
+  window.companionAPI = companionAPI
   // @ts-ignore
   window.questAPI = questAPI
   // @ts-ignore

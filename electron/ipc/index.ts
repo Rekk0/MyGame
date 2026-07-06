@@ -9,6 +9,7 @@ import { registerSkillHandlers } from './skillHandlers'
 import { registerDdaHandlers } from './ddaHandlers'
 import { registerPlotHandlers } from './plotHandlers'
 import { registerResourceHandlers } from './resourceHandlers'
+import { registerCompanionHandlers } from './companionHandlers'
 
 export function registerAllHandlers(): void {
   registerQuestHandlers()
@@ -22,4 +23,5 @@ export function registerAllHandlers(): void {
   registerDdaHandlers()
   registerPlotHandlers()
   registerResourceHandlers()
+  registerCompanionHandlers()
 }

@@ -1,9 +1,13 @@
 import { ipcMain, BrowserWindow, screen, shell } from 'electron'
 import { IPC } from '../../src/types/ipc'
-import { showHud, hideHud, getHudWindow } from '../windows/hudWindow'
+import { showHud, hideHud, getHudWindow, notifyHudUpdate } from '../windows/hudWindow'
 import { showQuestHud, hideQuestHud, getQuestHudWindow } from '../windows/questHudWindow'
+import { showCompanion, hideCompanion } from '../windows/companionWindow'
 import { showQuickInput, hideQuickInput } from '../windows/quickInput'
 import { readHudConfig, writeHudConfig } from '../services/hudConfig'
+import { rest, sleep } from '../services/db/repositories/playerRepo'
+import { getAllQuests } from '../services/db/repositories/questRepo'
+import { pickRecommended } from '../services/companion/policy'
 
 // Authoritative last-set positions — avoids DPI round-trip drift from win.getPosition()
 let hudLastPos: { x: number; y: number } | null = null
@@ -26,6 +30,8 @@ export function registerWindowHandlers(mainWindow: BrowserWindow): void {
   ipcMain.handle(IPC.WINDOW_HIDE_QUICK_INPUT, () => hideQuickInput())
   ipcMain.handle(IPC.WINDOW_SHOW_QUEST_HUD, () => showQuestHud())
   ipcMain.handle(IPC.WINDOW_HIDE_QUEST_HUD, () => hideQuestHud())
+  ipcMain.handle(IPC.WINDOW_SHOW_COMPANION, () => showCompanion())
+  ipcMain.handle(IPC.WINDOW_HIDE_COMPANION, () => hideCompanion())
 
   ipcMain.handle(IPC.WINDOW_GET_HUD_POSITION, () => {
     const win = getHudWindow()
@@ -93,6 +99,24 @@ export function registerWindowHandlers(mainWindow: BrowserWindow): void {
     if (pinned) win.setAlwaysOnTop(true, 'screen-saver')
     else win.setAlwaysOnTop(false)
     writeHudConfig({ questHudPinned: pinned })
+  })
+
+  ipcMain.handle(IPC.COMPANION_RUN_ACTION, (_e, action: string) => {
+    const navigateMain = (payload: object): void => {
+      mainWindow.webContents.send(IPC.COMPANION_NAVIGATE, payload)
+    }
+    switch (action) {
+      case 'rest': { rest(); notifyHudUpdate(); return }
+      case 'sleep': { sleep(8); notifyHudUpdate(); return }
+      case 'add_task': return showQuickInput()
+      case 'view_plot': { mainWindow.show(); mainWindow.focus(); navigateMain({ target: 'plot' }); return }
+      case 'record_mood': { mainWindow.show(); mainWindow.focus(); navigateMain({ target: 'mood' }); return }
+      case 'recommend_liked':
+      case 'recommend_task': {
+        const q = pickRecommended(getAllQuests() as never[], action === 'recommend_liked' ? 'like' : 'easy')
+        mainWindow.show(); mainWindow.focus(); navigateMain({ target: 'quest', questId: q?.id ?? null }); return
+      }
+    }
   })
 
   ipcMain.handle(IPC.SHELL_OPEN_EXTERNAL, (_e, url: string) => {

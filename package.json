@@ -1,5 +1,5 @@
 {
-  "name": "quest-board",
+  "name": "my-game",
   "version": "1.0.0",
   "description": "A gamified personal management desktop app",
   "main": "./out/main/main.js",

@@ -22,6 +22,7 @@ export default function QuestHudPanel() {
   const player = usePlayerStore((s) => s.player)
   const quests = useQuestStore((s) => s.quests)
   const [locked, setLocked] = useState(false)
+  const [pinned, setPinned] = useState(true)
   const [bgOpacity, setBgOpacity] = useState(0.75)
   const [textOpacity, setTextOpacity] = useState(1.0)
   const t = useT()
@@ -31,6 +32,10 @@ export default function QuestHudPanel() {
       if (cfg.questHudLocked) setLocked(true)
       if (cfg.hudBgOpacity !== undefined) setBgOpacity(cfg.hudBgOpacity)
       if (cfg.hudTextOpacity !== undefined) setTextOpacity(cfg.hudTextOpacity)
+      if (cfg.questHudPinned === false) {
+        setPinned(false)
+        void window.windowAPI.setQuestHudPinned(false)
+      }
     })
     window.settingsAPI.getAiConfig().then((cfg) => {
       if (cfg?.language) useLanguageStore.getState().setLanguage(cfg.language)
@@ -56,6 +61,12 @@ export default function QuestHudPanel() {
     'questHudLocked',
   )
 
+  function togglePinned() {
+    const next = !pinned
+    setPinned(next)
+    void window.windowAPI.setQuestHudPinned(next)
+  }
+
   if (!player) return null
 
   return (
@@ -72,6 +83,14 @@ export default function QuestHudPanel() {
           <span className="text-xs font-semibold text-gray-400">📋 {t('pendingShort')}</span>
           <div className="flex items-center gap-1">
             <span className="text-xs text-gray-500">{pending.length}</span>
+            <button
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={togglePinned}
+              className={`text-xs px-1 leading-none ${pinned ? 'text-yellow-400' : 'text-gray-500 hover:text-gray-200'}`}
+              title={pinned ? t('unpinFromTop') : t('pinToTop')}
+            >
+              📌
+            </button>
             <button
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => void toggleLock()}

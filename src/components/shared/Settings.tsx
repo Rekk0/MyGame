@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from './Button'
+import { HotkeyInput } from './HotkeyInput'
 import { useQuestStore } from '../../stores/questStore'
 import { useLanguageStore, type Language } from '../../stores/languageStore'
 import { useUIStore, type Theme } from '../../stores/uiStore'
@@ -32,6 +33,7 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
   const [pendingToggle, setPendingToggle] = useState<boolean | null>(null)
   const [hudBgOpacity, setHudBgOpacity] = useState(75)
   const [hudTextOpacity, setHudTextOpacity] = useState(100)
+  const [quickInputHotkey, setQuickInputHotkey] = useState('Ctrl+Shift+Q')
   const { language, setLanguage } = useLanguageStore()
   const { theme, setTheme } = useUIStore()
   const t = useT()
@@ -43,6 +45,7 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
         setApiKey(cfg.apiKey)
         setModel(cfg.model)
         setAutoTransform(cfg.autoTransform ?? true)
+        if (cfg.quickInputHotkey) setQuickInputHotkey(cfg.quickInputHotkey)
       }
     })
     window.windowAPI.getHudConfig().then((cfg) => {
@@ -77,7 +80,7 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
   }
 
   const handleSave = async (): Promise<void> => {
-    await window.settingsAPI.setAiConfig({ provider, apiKey, model, autoTransform, language, theme })
+    await window.settingsAPI.setAiConfig({ provider, apiKey, model, autoTransform, language, theme, quickInputHotkey })
     useQuestStore.getState().setAutoTransform(autoTransform)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
@@ -184,6 +187,13 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
                 handleHudOpacityChange(hudBgOpacity, v)
               }}
               className="w-full accent-blue-500" />
+          </div>
+        </div>
+        <div className="border-t border-gray-700 pt-3 flex flex-col gap-2">
+          <h3 className="text-sm font-semibold text-gray-300">{t('shortcuts')}</h3>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-gray-400">{t('quickInputShortcut')}</label>
+            <HotkeyInput value={quickInputHotkey} onChange={setQuickInputHotkey} />
           </div>
         </div>
         <Button variant="primary" onClick={handleSave}>{saved ? t('saved') : t('save')}</Button>

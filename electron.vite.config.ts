@@ -29,7 +29,8 @@ export default defineConfig({
           hud: resolve(__dirname, 'src/hud.html'),
           quickInput: resolve(__dirname, 'src/quickInput.html'),
           achievement: resolve(__dirname, 'src/achievement.html'),
-          questHud: resolve(__dirname, 'src/questHud.html')
+          questHud: resolve(__dirname, 'src/questHud.html'),
+          companion: resolve(__dirname, 'src/companion.html')
         }
       }
     },

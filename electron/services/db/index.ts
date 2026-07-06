@@ -5,11 +5,13 @@ import { app } from 'electron'
 import { join } from 'path'
 import { mkdirSync } from 'fs'
 import * as schema from './schema'
+import { migrateLegacyUserDataFile } from '../legacyMigration'
 
 const userDataPath = app.getPath('userData')
 mkdirSync(userDataPath, { recursive: true })
 
-const dbPath = join(userDataPath, 'quest-board.db')
+migrateLegacyUserDataFile('my-game.db', 'quest-board.db')
+const dbPath = join(userDataPath, 'my-game.db')
 const sqlite = new Database(dbPath)
 
 export const db = drizzle(sqlite, { schema })

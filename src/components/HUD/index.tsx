@@ -16,7 +16,7 @@ export default function HUD() {
   const streak = useStreakStore((s) => s.streak)
   const quests = useQuestStore((s) => s.quests)
   const [locked, setLocked] = useState(false)
-  const [pinned, setPinned] = useState(false)
+  const [pinned, setPinned] = useState(true)
   const [bgOpacity, setBgOpacity] = useState(0.75)
   const [textOpacity, setTextOpacity] = useState(1.0)
   const t = useT()
@@ -26,9 +26,9 @@ export default function HUD() {
       if (cfg.hudLocked) setLocked(true)
       if (cfg.hudBgOpacity !== undefined) setBgOpacity(cfg.hudBgOpacity)
       if (cfg.hudTextOpacity !== undefined) setTextOpacity(cfg.hudTextOpacity)
-      if (cfg.hudPinned) {
-        setPinned(true)
-        void window.windowAPI.setHudPinned(true)
+      if (cfg.hudPinned === false) {
+        setPinned(false)
+        void window.windowAPI.setHudPinned(false)
       }
     })
     window.settingsAPI.getAiConfig().then((cfg) => {

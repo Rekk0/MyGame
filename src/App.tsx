@@ -94,6 +94,14 @@ function App(): JSX.Element {
     })
   }, [])
 
+  useEffect(() => {
+    return window.companionAPI.onNavigate((target: unknown) => {
+      const t = target as { target?: string }
+      if (t?.target === 'plot') setShowDailyPlot(true)
+      // mood / quest targets: Phase 2 / future
+    })
+  }, [])
+
   const handleSwitched = async (): Promise<void> => {
     setDdaSuggestion(null)
     setDailyPlotSummary(undefined)
