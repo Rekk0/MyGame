@@ -1,17 +1,6 @@
 import { useEffect, useState } from 'react'
-import {
-  BatteryLow,
-  CloudLightning,
-  Flame,
-  GearSix,
-  Medal,
-  TreeStructure,
-  Trophy,
-  Waves
-} from '@phosphor-icons/react'
 import { usePlayerStore } from './stores/playerStore'
 import { useQuestStore } from './stores/questStore'
-import { useStreakStore } from './stores/streakStore'
 import { useAchievementStore } from './stores/achievementStore'
 import { useMedalStore } from './stores/medalStore'
 import { useSkillStore } from './stores/skillStore'
@@ -30,34 +19,7 @@ import { SkillTree } from './components/SkillTree'
 import { PlotScrollButton, PlotModal } from './components/PlotScroll'
 import { ApiKeyWarningDialog } from './components/shared/ApiKeyWarningDialog'
 import { ModalShell } from './components/shared/Panel'
-
-type DdaState = 'anxious' | 'flow' | 'bored'
-interface DdaInfo {
-  state: DdaState
-  xpMultiplier: number
-  suggestion: string
-}
-interface DdaSuggestion {
-  mood: string
-  tips: string[]
-  suggestedQuestTypes: string[]
-}
-
-const DDA_ICONS: Record<DdaState, JSX.Element> = {
-  anxious: <CloudLightning size={16} weight="fill" />,
-  flow: <Waves size={16} weight="fill" />,
-  bored: <BatteryLow size={16} weight="fill" />
-}
-const DDA_COLORS: Record<DdaState, string> = {
-  anxious: 'text-crimson',
-  flow: 'text-arcane',
-  bored: 'text-gold'
-}
-const DDA_LABEL_KEYS: Record<DdaState, 'ddaAnxious' | 'ddaFlow' | 'ddaBored'> = {
-  anxious: 'ddaAnxious',
-  flow: 'ddaFlow',
-  bored: 'ddaBored'
-}
+import { MenuDock, type ScreenId } from './components/shell/MenuDock'
 
 function getMondayISO(): string {
   const d = new Date()
@@ -80,7 +42,6 @@ function App(): JSX.Element {
     transformingIds,
     loadSettings
   } = useQuestStore()
-  const { streak, fetchStreak } = useStreakStore()
   const { achievements, fetchAchievements } = useAchievementStore()
   const { medals, fetchMedals } = useMedalStore()
   const { skills, fetchSkills } = useSkillStore()
@@ -94,10 +55,7 @@ function App(): JSX.Element {
   const [showAchievements, setShowAchievements] = useState(false)
   const [showMedals, setShowMedals] = useState(false)
   const [showSkillTree, setShowSkillTree] = useState(false)
-  const [ddaInfo, setDdaInfo] = useState<DdaInfo | null>(null)
-  const [ddaSuggestion, setDdaSuggestion] = useState<DdaSuggestion | null>(null)
-  const [showSuggestion, setShowSuggestion] = useState(false)
-  const [loadingSuggestion, setLoadingSuggestion] = useState(false)
+  const [activeScreen, setActiveScreen] = useState<ScreenId>('board')
 
   const [showApiKeyWarning, setShowApiKeyWarning] = useState(false)
 
@@ -122,17 +80,12 @@ function App(): JSX.Element {
       fetchPlayer(),
       fetchAllPlayers(),
       fetchQuests(),
-      fetchStreak(),
       loadSettings(),
       fetchAchievements(),
       fetchMedals(),
       fetchSkills()
     ]).then(() => {
       setInitialized(true)
-      window.ddaAPI
-        .getState()
-        .then(setDdaInfo)
-        .catch(() => {})
       const currentPlayer = usePlayerStore.getState().player
       if (currentPlayer) {
         window.settingsAPI
@@ -153,10 +106,6 @@ function App(): JSX.Element {
       fetchAchievements()
       fetchMedals()
       fetchSkills()
-      window.ddaAPI
-        .getState()
-        .then(setDdaInfo)
-        .catch(() => {})
     })
   }, [])
 
@@ -164,41 +113,21 @@ function App(): JSX.Element {
     return window.companionAPI.onNavigate((target: unknown) => {
       const t = target as { target?: string }
       if (t?.target === 'plot') setShowDailyPlot(true)
-      // mood / quest targets: Phase 2 / future
     })
   }, [])
 
   const handleSwitched = async (): Promise<void> => {
-    setDdaSuggestion(null)
     setDailyPlotSummary(undefined)
     setWeeklyPlotSummary(undefined)
+    setActiveScreen('board')
     await Promise.all([
       fetchPlayer(),
       fetchAllPlayers(),
       fetchQuests(),
-      fetchStreak(),
       fetchAchievements(),
       fetchMedals(),
       fetchSkills()
     ])
-    window.ddaAPI
-      .getState()
-      .then(setDdaInfo)
-      .catch(() => {})
-  }
-
-  const handleShowSuggestion = async (): Promise<void> => {
-    setShowSuggestion(true)
-    if (!ddaSuggestion) {
-      setLoadingSuggestion(true)
-      try {
-        const s = await window.ddaAPI.getSuggestion()
-        setDdaSuggestion(s)
-      } catch {
-        /* ignore */
-      }
-      setLoadingSuggestion(false)
-    }
   }
 
   const handleOpenDailyPlot = async (): Promise<void> => {
@@ -257,8 +186,6 @@ function App(): JSX.Element {
   }
 
   const unlockedCount = achievements.filter((a) => a.isUnlocked).length
-  const streakCount = streak?.currentCount ?? 0
-  const streakBonus = streakCount >= 30 ? 25 : streakCount >= 7 ? 10 : 0
 
   const today = new Date().toISOString().slice(0, 10)
   const todayCompletedCount = quests.filter(
@@ -297,41 +224,6 @@ function App(): JSX.Element {
           </div>
         </ModalShell>
       )}
-      {showSuggestion && (
-        <ModalShell
-          title={t('todaySuggestion')}
-          onClose={() => setShowSuggestion(false)}
-          className="mx-4 w-full max-w-sm"
-        >
-          <div className="px-5 pb-5 pt-3">
-            {loadingSuggestion ? (
-              <p className="text-sm text-ink-dim">{t('aiGenerating')}</p>
-            ) : ddaSuggestion ? (
-              <>
-                <p className="mb-2 text-sm text-arcane">
-                  {t('status')}
-                  {ddaSuggestion.mood}
-                </p>
-                <ul className="space-y-1">
-                  {ddaSuggestion.tips.map((tip, i) => (
-                    <li key={i} className="text-sm text-ink">
-                      • {tip}
-                    </li>
-                  ))}
-                </ul>
-                {ddaSuggestion.suggestedQuestTypes.length > 0 && (
-                  <p className="mt-3 text-xs text-ink-dim">
-                    {t('recommendedTypes')}
-                    {ddaSuggestion.suggestedQuestTypes.join('、')}
-                  </p>
-                )}
-              </>
-            ) : (
-              <p className="text-sm text-ink-dim">{t('noSuggestion')}</p>
-            )}
-          </div>
-        </ModalShell>
-      )}
       {showDailyPlot && (
         <PlotModal
           type="daily"
@@ -350,7 +242,7 @@ function App(): JSX.Element {
           error={weeklyPlotError}
         />
       )}
-      <CharacterCard player={player} onManage={() => setShowManager(true)} />
+      <CharacterCard key={player.id} player={player} onManage={() => setShowManager(true)} />
       <div className="flex flex-1 flex-col gap-4 min-h-0">
         <QuestInput onSubmit={createQuest} />
         <div className="flex-1 overflow-y-auto min-h-0 pr-1">
@@ -364,65 +256,29 @@ function App(): JSX.Element {
           />
         </div>
       </div>
-      <div className="flex w-28 shrink-0 flex-col items-center pt-2">
-        <p className="flex items-center gap-1 text-2xl font-bold tabular-nums text-will">
-          <Flame size={22} weight="fill" />
-          {streakCount}
-        </p>
-        <p className="mt-1 text-xs text-ink-dim">{t('streakDays')}</p>
-        {streak && streak.bestCount > 0 && (
-          <p className="mt-1 text-xs text-ink-faint">
-            {t('streakBest')} {streak.bestCount}
-            {t('streakBestSuffix')}
-          </p>
-        )}
-        {streakBonus > 0 && <p className="mt-1 text-xs text-ep">+{streakBonus}% XP</p>}
-        {ddaInfo && (
-          <button
-            onClick={handleShowSuggestion}
-            className={`mt-3 flex items-center gap-1 text-sm font-medium ${DDA_COLORS[ddaInfo.state]} hover:opacity-80`}
-            title={ddaInfo.suggestion}
-          >
-            {DDA_ICONS[ddaInfo.state]} {t(DDA_LABEL_KEYS[ddaInfo.state])}
-          </button>
-        )}
-        <button
-          onClick={() => setShowSkillTree(true)}
-          className="mt-4 flex items-center gap-1 text-ink-dim transition-colors hover:text-ep"
-          title="技能树"
-        >
-          <TreeStructure size={18} />
-          <span className="text-xs">技能树</span>
-        </button>
-        <button
-          onClick={() => setShowAchievements(true)}
-          className="mt-2 flex items-center gap-1 text-ink-dim transition-colors hover:text-gold"
-          title="成就"
-        >
-          <Trophy size={18} />
-          <span className="text-xs tabular-nums">{unlockedCount}</span>
-        </button>
-        <button
-          onClick={() => setShowMedals(true)}
-          className="mt-2 flex items-center gap-1 text-ink-dim transition-colors hover:text-gold-bright"
-          title="勋章"
-        >
-          <Medal size={18} />
-          <span className="text-xs tabular-nums">{medals.length}</span>
-        </button>
-        <div className="flex-1" />
-        {todayCompletedCount >= 3 && <PlotScrollButton type="daily" onOpen={handleOpenDailyPlot} />}
-        {weekCompletedCount >= 15 && (
-          <PlotScrollButton type="weekly" onOpen={handleOpenWeeklyPlot} />
-        )}
-        <button
-          onClick={() => setShowSettings(true)}
-          className="mt-2 text-ink-dim transition-colors hover:text-ink-hi"
-          title="AI 设置"
-        >
-          <GearSix size={18} />
-        </button>
-      </div>
+      <MenuDock
+        active={activeScreen}
+        onNavigate={(s) => {
+          if (s === 'skills') setShowSkillTree(true)
+          else if (s === 'achievements') setShowAchievements(true)
+          else if (s === 'medals') setShowMedals(true)
+          // journal: no-op in P1, plot handled via plotSlot
+        }}
+        onOpenSettings={() => setShowSettings(true)}
+        achievementCount={unlockedCount}
+        medalCount={medals.length}
+        plotBadge={false}
+        plotSlot={
+          <>
+            {todayCompletedCount >= 3 && (
+              <PlotScrollButton type="daily" onOpen={handleOpenDailyPlot} />
+            )}
+            {weekCompletedCount >= 15 && (
+              <PlotScrollButton type="weekly" onOpen={handleOpenWeeklyPlot} />
+            )}
+          </>
+        }
+      />
     </div>
   )
 }

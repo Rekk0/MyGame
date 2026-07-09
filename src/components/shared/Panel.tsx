@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { X } from "@phosphor-icons/react";
 
 interface PanelProps {
@@ -37,6 +38,14 @@ export function ModalShell({
   className = "",
   titleClassName = "text-gold",
 }: ModalShellProps): JSX.Element {
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { e.stopPropagation(); onClose() }
+    }
+    window.addEventListener('keydown', h, true)
+    return () => window.removeEventListener('keydown', h, true)
+  }, [onClose])
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-scrim"

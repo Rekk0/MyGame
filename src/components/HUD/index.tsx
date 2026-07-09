@@ -10,7 +10,7 @@ import HudBars from './HudBars'
 import HudStats from './HudStats'
 
 const WIN_W = 220
-const WIN_H = 128
+const WIN_H = 184
 
 export default function HUD() {
   const player = usePlayerStore((s) => s.player)

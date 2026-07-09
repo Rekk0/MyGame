@@ -14,11 +14,11 @@ export function createHudWindow(): BrowserWindow {
 
   hudWindow = new BrowserWindow({
     width: 220,
-    height: 128,
+    height: 184,
     minWidth: 220,
     maxWidth: 220,
-    minHeight: 128,
-    maxHeight: 128,
+    minHeight: 184,
+    maxHeight: 184,
     x,
     y,
     frame: false,
