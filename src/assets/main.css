@@ -55,6 +55,14 @@
   --rpg-world-accent: var(--rpg-gold);
 }
 
+/* ---- 世界观 accent 色（暗/浅共用一套，P5 联动场景辉光+纹章色）---- */
+[data-world='realistic']  { --rpg-world-accent: #7f95a3; }  /* 战争·冷钢青 */
+[data-world='wuxia']      { --rpg-world-accent: #6f9e7a; }  /* 武侠·青竹 */
+[data-world='xianxia']    { --rpg-world-accent: #7fb8c9; }  /* 仙侠·云青 */
+[data-world='fantasy']    { --rpg-world-accent: #9a7fc9; }  /* 奇幻·秘紫 */
+[data-world='scifi']      { --rpg-world-accent: #4fc1c9; }  /* 科幻·荧青 */
+[data-world='apocalypse'] { --rpg-world-accent: #c07a4a; }  /* 末日·锈橙 */
+
 @theme inline {
   --font-display: "Noto Serif SC", "SimSun", serif;
   --color-abyss: var(--rpg-bg);
@@ -85,9 +93,9 @@
   .rpg-scene {
     background:
       radial-gradient(
-        120% 70% at 50% -10%,
-        color-mix(in oklab, var(--rpg-gold) 9%, transparent),
-        transparent 60%
+        200% 100% at 50% -10%,
+        color-mix(in oklab, var(--rpg-world-accent) 18%, transparent),
+        transparent 70%
       ),
       radial-gradient(
         140% 120% at 50% 50%,

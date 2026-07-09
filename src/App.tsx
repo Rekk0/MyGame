@@ -97,6 +97,11 @@ function App(): JSX.Element {
   }, [])
 
   useEffect(() => {
+    if (player) document.documentElement.setAttribute('data-world', player.worldStyle)
+    else document.documentElement.removeAttribute('data-world')
+  }, [player?.worldStyle])
+
+  useEffect(() => {
     const h = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && activeScreen !== 'board') {
         setActiveScreen('board')
