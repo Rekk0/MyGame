@@ -2,7 +2,7 @@
   "name": "my-game",
   "version": "1.0.0",
   "description": "A gamified personal management desktop app",
-  "license": "PolyForm-Noncommercial-1.0.0",
+  "license": "AGPL-3.0-or-later",
   "main": "./out/main/main.js",
   "author": "Rekk0",
   "homepage": "https://electron-vite.org",
