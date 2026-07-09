@@ -63,11 +63,23 @@ const STRINGS = {
     originalBtn: '原文',
     transformingBtn: '转化中...',
     transformBtn: '转化',
-    // Plot scroll
+    // Quest type labels
+    questTypeMain: '主线',
+    questTypeTimed: '限时',
+    questTypeDungeon: '地下城',
+    questTypeAdventure: '冒险',
+    questTypeDaily: '日常',
+    questTypeOther: '其他',
+    // Plot scroll (kept for Journal screen)
     dailyPlotTitle: '今日剧情',
     weeklyPlotTitle: '本周史诗',
     aiWritingStory: 'AI 正在编写故事...',
     clickToSkip: '点击跳过打字动画',
+    // Journal screen
+    journalLockedDaily: '完成 3 个任务后，今日的故事将被记录',
+    journalLockedWeekly: '本周完成 15 个任务后，史诗将成章',
+    journalProgress: '当前进度',
+    journalGenerateBtn: '展开卷轴',
     // Achievements
     achievementsTitle: '成就',
     lockedAchievement: '??? 未解锁 ???',
@@ -118,7 +130,9 @@ const STRINGS = {
     moodHappy: '不错',
     moodNeutral: '还行',
     moodSad: '低落',
-    moodVerySad: '很差'
+    moodVerySad: '很差',
+    // Accessibility
+    reducedMotion: '减少动态效果'
   },
   en: {
     appName: 'MyGame',
@@ -176,10 +190,22 @@ const STRINGS = {
     originalBtn: 'Original',
     transformingBtn: 'Processing...',
     transformBtn: 'Gamify',
+    // Quest type labels
+    questTypeMain: 'Main',
+    questTypeTimed: 'Timed',
+    questTypeDungeon: 'Dungeon',
+    questTypeAdventure: 'Adventure',
+    questTypeDaily: 'Daily',
+    questTypeOther: 'Other',
     dailyPlotTitle: "Today's Plot",
     weeklyPlotTitle: 'Weekly Epic',
     aiWritingStory: 'AI is writing your story...',
     clickToSkip: 'Click to skip animation',
+    // Journal screen
+    journalLockedDaily: "Complete 3 quests to unlock today's story",
+    journalLockedWeekly: 'Complete 15 quests this week to unlock the epic',
+    journalProgress: 'Progress',
+    journalGenerateBtn: 'Unroll the scroll',
     achievementsTitle: 'Achievements',
     lockedAchievement: '??? Locked ???',
     tierCommon: 'Common',
@@ -225,7 +251,9 @@ const STRINGS = {
     moodHappy: 'Good',
     moodNeutral: 'Okay',
     moodSad: 'Low',
-    moodVerySad: 'Bad'
+    moodVerySad: 'Bad',
+    // Accessibility
+    reducedMotion: 'Reduced motion'
   }
 } as const
 

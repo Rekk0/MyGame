@@ -1,5 +1,6 @@
 import { GearSix, ListChecks, Medal, Scroll, TreeStructure, Trophy } from '@phosphor-icons/react'
 import { useT } from '../../utils/i18n'
+import { usePlotStatus } from '../../hooks/usePlotStatus'
 
 export type ScreenId = 'board' | 'skills' | 'achievements' | 'medals' | 'journal'
 
@@ -9,8 +10,6 @@ interface MenuDockProps {
   onOpenSettings: () => void
   achievementCount: number
   medalCount: number
-  plotBadge: boolean
-  plotSlot?: React.ReactNode
 }
 
 interface NavItemDef {
@@ -25,11 +24,11 @@ export function MenuDock({
   onNavigate,
   onOpenSettings,
   achievementCount,
-  medalCount,
-  plotBadge,
-  plotSlot
+  medalCount
 }: MenuDockProps): JSX.Element {
   const t = useT()
+  const { daily, weekly } = usePlotStatus()
+  const plotBadge = (daily.eligible && !daily.cached) || (weekly.eligible && !weekly.cached)
 
   const items: NavItemDef[] = [
     { id: 'board', icon: <ListChecks size={20} />, labelKey: 'navBoard' },
@@ -68,8 +67,6 @@ export function MenuDock({
       })}
 
       <div className="flex-1" />
-
-      {plotSlot}
 
       <button
         onClick={onOpenSettings}

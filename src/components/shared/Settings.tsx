@@ -48,7 +48,7 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
   const [hudTextOpacity, setHudTextOpacity] = useState(100)
   const [quickInputHotkey, setQuickInputHotkey] = useState('Ctrl+Shift+Q')
   const { language, setLanguage } = useLanguageStore()
-  const { theme, setTheme } = useUIStore()
+  const { theme, setTheme, reducedMotion, setReducedMotion } = useUIStore()
   const t = useT()
 
   useEffect(() => {
@@ -208,6 +208,17 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
                 <Sun size={14} weight={theme === 'light' ? 'fill' : 'regular'} />
               </button>
             </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-ink">{t('reducedMotion')}</span>
+            <button
+              onClick={() => setReducedMotion(!reducedMotion)}
+              className={`h-6 w-11 rounded-full border transition-colors ${reducedMotion ? 'border-edge-strong bg-gold' : 'border-edge bg-panel-raised'}`}
+            >
+              <span
+                className={`m-0.5 block h-5 w-5 rounded-full bg-ink-hi transition-transform ${reducedMotion ? 'translate-x-5' : 'translate-x-0'}`}
+              />
+            </button>
           </div>
         </div>
         <div className="flex flex-col gap-3 border-t border-edge pt-3">

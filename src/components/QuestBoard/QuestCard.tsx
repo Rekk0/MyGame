@@ -12,7 +12,7 @@ interface QuestCardProps {
   onTransform: (id: string) => void
 }
 
-const typeColors: Record<string, string> = {
+export const typeColors: Record<string, string> = {
   daily: 'text-ink-dim',
   dungeon: 'text-arcane',
   main: 'text-gold',

@@ -28,6 +28,7 @@
   --rpg-arcane: #4e7fb8;
   --rpg-on-gold: #221708;
   --rpg-scrim: rgba(8, 5, 3, 0.72);
+  --rpg-world-accent: var(--rpg-gold);
 }
 
 [data-theme="light"] {
@@ -51,6 +52,7 @@
   --rpg-arcane: #3a648f;
   --rpg-on-gold: #f7f0dc;
   --rpg-scrim: rgba(43, 32, 19, 0.45);
+  --rpg-world-accent: var(--rpg-gold);
 }
 
 @theme inline {
@@ -75,6 +77,7 @@
   --color-arcane: var(--rpg-arcane);
   --color-on-gold: var(--rpg-on-gold);
   --color-scrim: var(--rpg-scrim);
+  --color-world-accent: var(--rpg-world-accent);
 }
 
 /* Scene backdrop: base + amber top glow + edge vignette (one paint, no overlay element) */
@@ -206,4 +209,15 @@ html.hud-dragging,
 html.hud-dragging * {
   cursor: grabbing !important;
   user-select: none !important;
+}
+
+/* ResourceOrb low-warning pulse — respects OS + manual reduced-motion preference */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-reduced-motion="true"]) .orb-pulse {
+    animation: orb-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes orb-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.25; }
+  }
 }

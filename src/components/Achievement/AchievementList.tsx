@@ -1,6 +1,6 @@
 import { LockSimple } from '@phosphor-icons/react'
 import type { Achievement, AchievementTier } from '../../types/achievement'
-import { ModalShell } from '../shared/Panel'
+import { ScreenShell } from '../shared/ScreenShell'
 import { useT } from '../../utils/i18n'
 
 const TIER_BORDER: Record<AchievementTier, string> = {
@@ -13,10 +13,9 @@ const TIER_BORDER: Record<AchievementTier, string> = {
 
 interface Props {
   achievements: Achievement[]
-  onClose: () => void
 }
 
-export function AchievementList({ achievements, onClose }: Props): JSX.Element {
+export function AchievementsScreen({ achievements }: Props): JSX.Element {
   const t = useT()
   const unlocked = achievements.filter((a) => a.isUnlocked)
   const locked = achievements.filter((a) => !a.isUnlocked)
@@ -34,36 +33,32 @@ export function AchievementList({ achievements, onClose }: Props): JSX.Element {
       return (
         <div
           key={a.id}
-          className="flex items-center gap-3 rounded-lg border border-edge bg-panel-raised p-3 opacity-40"
+          className="flex items-center gap-3 rounded-lg border border-edge bg-panel-raised p-4 opacity-40"
         >
-          <LockSimple size={20} className="text-ink-dim" />
-          <p className="text-sm text-ink-dim">{t('lockedAchievement')}</p>
+          <LockSimple size={24} className="text-ink-dim" />
+          <p className="text-base text-ink-dim">{t('lockedAchievement')}</p>
         </div>
       )
     }
     const border = TIER_BORDER[a.tier]
     return (
-      <div key={a.id} className={`rpg-frame flex flex-col gap-1 rounded-lg border-2 p-3 ${border}`}>
+      <div key={a.id} className={`rpg-frame flex flex-col gap-1.5 rounded-lg border-2 p-4 ${border}`}>
         <div className="flex items-center justify-between">
-          <p className="font-display font-semibold text-ink-hi">{a.title}</p>
+          <p className="font-display text-lg font-semibold text-ink-hi">{a.title}</p>
           <span className="text-xs text-ink-dim">{TIER_LABEL[a.tier]}</span>
         </div>
-        <p className="text-xs text-ink-dim">{a.description}</p>
-        {a.unlockText && <p className="text-xs italic text-ink-faint">"{a.unlockText}"</p>}
+        <p className="text-sm text-ink-dim">{a.description}</p>
+        {a.unlockText && <p className="text-sm italic text-ink-faint">"{a.unlockText}"</p>}
       </div>
     )
   }
 
   return (
-    <ModalShell
-      title={`${t('achievementsTitle')} (${unlocked.length}/${achievements.length})`}
-      onClose={onClose}
-      className="max-h-[80vh] w-96"
-    >
-      <div className="flex flex-col gap-2 overflow-y-auto px-5 py-4">
+    <ScreenShell title={`${t('achievementsTitle')} (${unlocked.length}/${achievements.length})`}>
+      <div className="grid grid-cols-2 gap-3">
         {unlocked.map(renderCard)}
         {locked.map(renderCard)}
       </div>
-    </ModalShell>
+    </ScreenShell>
   )
 }

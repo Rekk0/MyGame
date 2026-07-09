@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { usePlayerStore } from './stores/playerStore'
 import { useQuestStore } from './stores/questStore'
 import { useAchievementStore } from './stores/achievementStore'
@@ -13,21 +14,13 @@ import { QuestInput } from './components/QuestBoard/QuestInput'
 import { QuestList } from './components/QuestBoard/QuestList'
 import { CreateCharacter } from './components/CharacterCard/CreateCharacter'
 import { Settings } from './components/shared/Settings'
-import { AchievementList } from './components/Achievement/AchievementList'
-import { MedalGallery } from './components/MedalGallery'
+import { AchievementsScreen } from './components/Achievement/AchievementList'
+import { MedalsScreen } from './components/MedalGallery'
 import { SkillTree } from './components/SkillTree'
-import { PlotScrollButton, PlotModal } from './components/PlotScroll'
+import { JournalScreen } from './components/Journal'
 import { ApiKeyWarningDialog } from './components/shared/ApiKeyWarningDialog'
-import { ModalShell } from './components/shared/Panel'
+import { ScreenShell } from './components/shared/ScreenShell'
 import { MenuDock, type ScreenId } from './components/shell/MenuDock'
-
-function getMondayISO(): string {
-  const d = new Date()
-  const day = d.getDay() || 7
-  const monday = new Date(d)
-  monday.setDate(d.getDate() - day + 1)
-  return monday.toISOString().slice(0, 10)
-}
 
 function App(): JSX.Element {
   const { player, fetchPlayer, fetchAllPlayers } = usePlayerStore()
@@ -46,27 +39,14 @@ function App(): JSX.Element {
   const { medals, fetchMedals } = useMedalStore()
   const { skills, fetchSkills } = useSkillStore()
   const { setLanguage } = useLanguageStore()
-  const { setTheme } = useUIStore()
+  const { setTheme, reducedMotion } = useUIStore()
   const t = useT()
   const [initialized, setInitialized] = useState(false)
   const [showManager, setShowManager] = useState(false)
   const [showCreate, setShowCreate] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
-  const [showAchievements, setShowAchievements] = useState(false)
-  const [showMedals, setShowMedals] = useState(false)
-  const [showSkillTree, setShowSkillTree] = useState(false)
   const [activeScreen, setActiveScreen] = useState<ScreenId>('board')
-
   const [showApiKeyWarning, setShowApiKeyWarning] = useState(false)
-
-  const [showDailyPlot, setShowDailyPlot] = useState(false)
-  const [showWeeklyPlot, setShowWeeklyPlot] = useState(false)
-  const [dailyPlotSummary, setDailyPlotSummary] = useState<string | undefined>()
-  const [weeklyPlotSummary, setWeeklyPlotSummary] = useState<string | undefined>()
-  const [loadingDailyPlot, setLoadingDailyPlot] = useState(false)
-  const [loadingWeeklyPlot, setLoadingWeeklyPlot] = useState(false)
-  const [dailyPlotError, setDailyPlotError] = useState<string | undefined>()
-  const [weeklyPlotError, setWeeklyPlotError] = useState<string | undefined>()
 
   useEffect(() => {
     window.settingsAPI
@@ -112,13 +92,21 @@ function App(): JSX.Element {
   useEffect(() => {
     return window.companionAPI.onNavigate((target: unknown) => {
       const t = target as { target?: string }
-      if (t?.target === 'plot') setShowDailyPlot(true)
+      if (t?.target === 'plot') setActiveScreen('journal')
     })
   }, [])
 
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && activeScreen !== 'board') {
+        setActiveScreen('board')
+      }
+    }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [activeScreen])
+
   const handleSwitched = async (): Promise<void> => {
-    setDailyPlotSummary(undefined)
-    setWeeklyPlotSummary(undefined)
     setActiveScreen('board')
     await Promise.all([
       fetchPlayer(),
@@ -130,38 +118,38 @@ function App(): JSX.Element {
     ])
   }
 
-  const handleOpenDailyPlot = async (): Promise<void> => {
-    setDailyPlotError(undefined)
-    setShowDailyPlot(true)
-    if (dailyPlotSummary) return
-    setLoadingDailyPlot(true)
-    try {
-      const summary = await window.plotAPI.generateDaily()
-      setDailyPlotSummary(summary)
-      fetchAchievements()
-      fetchMedals()
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e)
-      setDailyPlotError(msg.includes('configured') ? t('configureAI') : msg)
+  function renderScreen(): JSX.Element {
+    switch (activeScreen) {
+      case 'achievements':
+        return <AchievementsScreen achievements={achievements} />
+      case 'skills':
+        return (
+          <ScreenShell title={t('skillTreeTitle')} fullBleed>
+            <SkillTree skills={skills} />
+          </ScreenShell>
+        )
+      case 'medals':
+        return <MedalsScreen medals={medals} />
+      case 'journal':
+        return <JournalScreen />
+      case 'board':
+      default:
+        return (
+          <>
+            <QuestInput onSubmit={createQuest} />
+            <div className="flex-1 overflow-y-auto min-h-0 pr-1">
+              <QuestList
+                quests={quests}
+                autoTransform={autoTransform}
+                transformingIds={transformingIds}
+                onComplete={completeQuest}
+                onDelete={deleteQuest}
+                onTransform={transformQuest}
+              />
+            </div>
+          </>
+        )
     }
-    setLoadingDailyPlot(false)
-  }
-
-  const handleOpenWeeklyPlot = async (): Promise<void> => {
-    setWeeklyPlotError(undefined)
-    setShowWeeklyPlot(true)
-    if (weeklyPlotSummary) return
-    setLoadingWeeklyPlot(true)
-    try {
-      const summary = await window.plotAPI.generateWeekly()
-      setWeeklyPlotSummary(summary)
-      fetchAchievements()
-      fetchMedals()
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e)
-      setWeeklyPlotError(msg.includes('configured') ? t('configureAI') : msg)
-    }
-    setLoadingWeeklyPlot(false)
   }
 
   if (!initialized) {
@@ -187,99 +175,43 @@ function App(): JSX.Element {
 
   const unlockedCount = achievements.filter((a) => a.isUnlocked).length
 
-  const today = new Date().toISOString().slice(0, 10)
-  const todayCompletedCount = quests.filter(
-    (q) => q.status === 'completed' && q.completedAt?.startsWith(today)
-  ).length
-
-  const weekStart = getMondayISO()
-  const weekCompletedCount = quests.filter(
-    (q) => q.status === 'completed' && q.completedAt && q.completedAt >= weekStart
-  ).length
-
   return (
-    <div className="rpg-scene flex h-screen gap-4 overflow-hidden p-4">
-      {showApiKeyWarning && <ApiKeyWarningDialog onClose={() => setShowApiKeyWarning(false)} />}
-      {showManager && (
-        <CharacterManager
-          currentPlayer={player}
-          onClose={() => setShowManager(false)}
-          onCreateNew={() => setShowCreate(true)}
-          onSwitched={handleSwitched}
-        />
-      )}
-      {showSettings && <Settings onClose={() => setShowSettings(false)} />}
-      {showAchievements && (
-        <AchievementList achievements={achievements} onClose={() => setShowAchievements(false)} />
-      )}
-      {showMedals && <MedalGallery medals={medals} onClose={() => setShowMedals(false)} />}
-      {showSkillTree && (
-        <ModalShell
-          title={t('skillTreeTitle')}
-          onClose={() => setShowSkillTree(false)}
-          className="h-[540px] w-[720px]"
-        >
-          <div className="min-h-0 flex-1 p-4">
-            <SkillTree skills={skills} />
-          </div>
-        </ModalShell>
-      )}
-      {showDailyPlot && (
-        <PlotModal
-          type="daily"
-          onClose={() => setShowDailyPlot(false)}
-          summary={dailyPlotSummary}
-          loading={loadingDailyPlot}
-          error={dailyPlotError}
-        />
-      )}
-      {showWeeklyPlot && (
-        <PlotModal
-          type="weekly"
-          onClose={() => setShowWeeklyPlot(false)}
-          summary={weeklyPlotSummary}
-          loading={loadingWeeklyPlot}
-          error={weeklyPlotError}
-        />
-      )}
-      <CharacterCard key={player.id} player={player} onManage={() => setShowManager(true)} />
-      <div className="flex flex-1 flex-col gap-4 min-h-0">
-        <QuestInput onSubmit={createQuest} />
-        <div className="flex-1 overflow-y-auto min-h-0 pr-1">
-          <QuestList
-            quests={quests}
-            autoTransform={autoTransform}
-            transformingIds={transformingIds}
-            onComplete={completeQuest}
-            onDelete={deleteQuest}
-            onTransform={transformQuest}
+    <MotionConfig reducedMotion={reducedMotion ? 'always' : 'user'}>
+      <div className="rpg-scene flex h-screen gap-4 overflow-hidden p-4">
+        {showApiKeyWarning && <ApiKeyWarningDialog onClose={() => setShowApiKeyWarning(false)} />}
+        {showManager && (
+          <CharacterManager
+            currentPlayer={player}
+            onClose={() => setShowManager(false)}
+            onCreateNew={() => setShowCreate(true)}
+            onSwitched={handleSwitched}
           />
+        )}
+        {showSettings && <Settings onClose={() => setShowSettings(false)} />}
+        <CharacterCard key={player.id} player={player} onManage={() => setShowManager(true)} />
+        <div className="flex flex-1 flex-col gap-4 min-h-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeScreen}
+              className="flex flex-1 flex-col gap-4 min-h-0"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {renderScreen()}
+            </motion.div>
+          </AnimatePresence>
         </div>
+        <MenuDock
+          active={activeScreen}
+          onNavigate={(s) => setActiveScreen(s)}
+          onOpenSettings={() => setShowSettings(true)}
+          achievementCount={unlockedCount}
+          medalCount={medals.length}
+        />
       </div>
-      <MenuDock
-        active={activeScreen}
-        onNavigate={(s) => {
-          if (s === 'skills') setShowSkillTree(true)
-          else if (s === 'achievements') setShowAchievements(true)
-          else if (s === 'medals') setShowMedals(true)
-          // journal: no-op in P1, plot handled via plotSlot
-        }}
-        onOpenSettings={() => setShowSettings(true)}
-        achievementCount={unlockedCount}
-        medalCount={medals.length}
-        plotBadge={false}
-        plotSlot={
-          <>
-            {todayCompletedCount >= 3 && (
-              <PlotScrollButton type="daily" onOpen={handleOpenDailyPlot} />
-            )}
-            {weekCompletedCount >= 15 && (
-              <PlotScrollButton type="weekly" onOpen={handleOpenWeeklyPlot} />
-            )}
-          </>
-        }
-      />
-    </div>
+    </MotionConfig>
   )
 }
 
