@@ -197,7 +197,7 @@ function App(): JSX.Element {
         <div className="flex flex-1 flex-col gap-4 min-h-0">
           <AnimatePresence mode="wait">
             <motion.div
-              key={activeScreen}
+              key={`${activeScreen}-${player.id}`}
               className="flex flex-1 flex-col gap-4 min-h-0"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
