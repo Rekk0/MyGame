@@ -2,8 +2,9 @@
   "name": "my-game",
   "version": "1.0.0",
   "description": "A gamified personal management desktop app",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "main": "./out/main/main.js",
-  "author": "",
+  "author": "Rekk0",
   "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",
