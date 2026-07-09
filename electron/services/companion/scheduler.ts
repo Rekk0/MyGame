@@ -7,7 +7,7 @@ import { sendNotification } from '../notification'
 import { pushCompanionReply } from '../../windows/companionWindow'
 import { makeReply } from '../../ipc/companionHandlers'
 import { classifySignals, shouldTrigger, isThrottled, shouldNotify, topSignal } from './policy'
-import { C } from './constants'
+import { C, COMPANION_ENABLED } from './constants'
 import type { Snapshot, TriggerEvent } from './types'
 
 let lastFiredAt: number | null = null
@@ -27,6 +27,7 @@ function buildSnapshot(event: TriggerEvent, lastName?: string): Snapshot | null 
 }
 
 export async function evaluate(event: TriggerEvent, lastName?: string): Promise<void> {
+  if (!COMPANION_ENABLED) return
   const p = getPlayer(); if (!p) return
   const snap = buildSnapshot(event, lastName); if (!snap) return
   const signals = classifySignals(snap)
@@ -45,6 +46,7 @@ export async function evaluate(event: TriggerEvent, lastName?: string): Promise<
 }
 
 export function startCompanionScheduler(): void {
+  if (!COMPANION_ENABLED) return
   setInterval(() => {
     const idle = powerMonitor.getSystemIdleTime()
     void evaluate(idle >= C.idleSeconds ? 'idle' : 'threshold')

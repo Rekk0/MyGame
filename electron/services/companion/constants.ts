@@ -1,3 +1,7 @@
+// 功能开关：AI 陪伴尚在需求整理阶段，暂时对用户隐藏。
+// 需求确定、功能完成后改回 true 即可整体启用（阿凡达窗口 + 主动调度 + 完成推送/通知）。
+export const COMPANION_ENABLED = false
+
 export const C = {
   energyWarn: 15,   energyDanger: 8,
   willpowerWarn: 20, willpowerDanger: 8,

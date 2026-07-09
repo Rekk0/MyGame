@@ -20,6 +20,7 @@ import { registerQuickInputShortcut } from './services/shortcutManager'
 import { createTray } from './tray'
 import { startStreakWarningScheduler } from './services/notification'
 import { startCompanionScheduler, evaluate } from './services/companion/scheduler'
+import { COMPANION_ENABLED } from './services/companion/constants'
 import { migrateLegacyUserDataFile } from './services/legacyMigration'
 import { recomputeProfile } from './services/resources/profile'
 
@@ -60,7 +61,7 @@ app.whenReady().then(() => {
     createQuestHudWindow()
     createQuickInputWindow()
     createAchievementWindow()
-    createCompanionWindow()
+    if (COMPANION_ENABLED) createCompanionWindow()
     createTray(mainWindow)
     registerWindowHandlers(mainWindow)
     const aiCfg = readAiConfig()
