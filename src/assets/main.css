@@ -1,40 +1,204 @@
 @import "tailwindcss";
+@import "@fontsource/noto-serif-sc/600.css";
+@import "@fontsource/noto-serif-sc/700.css";
 
-/* Light theme overrides — applied when <html data-theme="light"> */
-[data-theme="light"] .bg-gray-900 { background-color: #f9fafb !important; }
-[data-theme="light"] .bg-gray-800 { background-color: #ffffff !important; }
-[data-theme="light"] .bg-gray-700 { background-color: #f3f4f6 !important; }
-[data-theme="light"] .bg-gray-600 { background-color: #e5e7eb !important; }
-[data-theme="light"] .bg-black\/60 { background-color: rgba(0, 0, 0, 0.4) !important; }
-[data-theme="light"] .bg-black\/70 { background-color: rgba(0, 0, 0, 0.3) !important; }
+/* ============================================================
+   暗金编年史 — RPG design tokens
+   Dark (default): 暗黑地牢 — warm near-black, brass edges, gold accents
+   Light:          羊皮纸手稿 — parchment, dark-ink text, deep gold
+   ============================================================ */
+:root {
+  --rpg-bg: #15100d;
+  --rpg-bg-deep: #0d0908;
+  --rpg-panel: #201811;
+  --rpg-panel-raised: #2a2016;
+  --rpg-edge: #453522;
+  --rpg-edge-strong: #8a6d3b;
+  --rpg-gold: #c9a24b;
+  --rpg-gold-bright: #e8c56b;
+  --rpg-crimson: #c23b3b;
+  --rpg-crimson-deep: #8f2626;
+  --rpg-ink-hi: #f0e6d2;
+  --rpg-ink: #cbbda0;
+  --rpg-ink-dim: #8f7f61;
+  --rpg-ink-faint: #5d5142;
+  --rpg-ep: #4fae6f;
+  --rpg-will: #d0662f;
+  --rpg-spirit: #8d6fc4;
+  --rpg-arcane: #4e7fb8;
+  --rpg-on-gold: #221708;
+  --rpg-scrim: rgba(8, 5, 3, 0.72);
+}
 
-[data-theme="light"] .text-white { color: #111827 !important; }
-[data-theme="light"] .text-gray-100 { color: #1f2937 !important; }
-[data-theme="light"] .text-gray-200 { color: #374151 !important; }
-[data-theme="light"] .text-gray-300 { color: #4b5563 !important; }
-[data-theme="light"] .text-gray-400 { color: #6b7280 !important; }
-[data-theme="light"] .text-gray-500 { color: #9ca3af !important; }
-[data-theme="light"] .text-gray-600 { color: #374151 !important; }
+[data-theme="light"] {
+  --rpg-bg: #e7dcc2;
+  --rpg-bg-deep: #d9cba9;
+  --rpg-panel: #f1e8d2;
+  --rpg-panel-raised: #f9f2e0;
+  --rpg-edge: #c3ac7c;
+  --rpg-edge-strong: #96762f;
+  --rpg-gold: #8a6210;
+  --rpg-gold-bright: #6e4d0a;
+  --rpg-crimson: #9c2b1e;
+  --rpg-crimson-deep: #7c2015;
+  --rpg-ink-hi: #2b2013;
+  --rpg-ink: #4a3b26;
+  --rpg-ink-dim: #7a684c;
+  --rpg-ink-faint: #a0906f;
+  --rpg-ep: #2e7d4c;
+  --rpg-will: #a84e1e;
+  --rpg-spirit: #6a4fa0;
+  --rpg-arcane: #3a648f;
+  --rpg-on-gold: #f7f0dc;
+  --rpg-scrim: rgba(43, 32, 19, 0.45);
+}
 
-[data-theme="light"] .border-gray-700 { border-color: #e5e7eb !important; }
-[data-theme="light"] .border-gray-600 { border-color: #d1d5db !important; }
+@theme inline {
+  --font-display: "Noto Serif SC", "SimSun", serif;
+  --color-abyss: var(--rpg-bg);
+  --color-abyss-deep: var(--rpg-bg-deep);
+  --color-panel: var(--rpg-panel);
+  --color-panel-raised: var(--rpg-panel-raised);
+  --color-edge: var(--rpg-edge);
+  --color-edge-strong: var(--rpg-edge-strong);
+  --color-gold: var(--rpg-gold);
+  --color-gold-bright: var(--rpg-gold-bright);
+  --color-crimson: var(--rpg-crimson);
+  --color-crimson-deep: var(--rpg-crimson-deep);
+  --color-ink-hi: var(--rpg-ink-hi);
+  --color-ink: var(--rpg-ink);
+  --color-ink-dim: var(--rpg-ink-dim);
+  --color-ink-faint: var(--rpg-ink-faint);
+  --color-ep: var(--rpg-ep);
+  --color-will: var(--rpg-will);
+  --color-spirit: var(--rpg-spirit);
+  --color-arcane: var(--rpg-arcane);
+  --color-on-gold: var(--rpg-on-gold);
+  --color-scrim: var(--rpg-scrim);
+}
 
-[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); }
-[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.25); }
+/* Scene backdrop: base + amber top glow + edge vignette (one paint, no overlay element) */
+@layer components {
+  .rpg-scene {
+    background:
+      radial-gradient(
+        120% 70% at 50% -10%,
+        color-mix(in oklab, var(--rpg-gold) 9%, transparent),
+        transparent 60%
+      ),
+      radial-gradient(
+        140% 120% at 50% 50%,
+        transparent 55%,
+        color-mix(in oklab, var(--rpg-bg-deep) 80%, black 20%) 130%
+      ),
+      var(--rpg-bg);
+  }
 
-/* Custom scrollbar */
+  /* Panel frame: brass hairline + dark recess + top inner highlight */
+  .rpg-frame {
+    border: 1px solid var(--rpg-edge);
+    background: var(--rpg-panel);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--rpg-ink-hi) 7%, transparent),
+      0 2px 10px color-mix(in oklab, var(--rpg-bg-deep) 55%, transparent);
+  }
+
+  /* Ornate variant: gold corner brackets painted with gradients (no extra DOM) */
+  .rpg-frame-ornate {
+    border: 1px solid var(--rpg-edge-strong);
+    background-image:
+      linear-gradient(var(--rpg-edge-strong), var(--rpg-edge-strong)),
+      linear-gradient(var(--rpg-edge-strong), var(--rpg-edge-strong)),
+      linear-gradient(var(--rpg-edge-strong), var(--rpg-edge-strong)),
+      linear-gradient(var(--rpg-edge-strong), var(--rpg-edge-strong)),
+      linear-gradient(var(--rpg-edge-strong), var(--rpg-edge-strong)),
+      linear-gradient(var(--rpg-edge-strong), var(--rpg-edge-strong)),
+      linear-gradient(var(--rpg-edge-strong), var(--rpg-edge-strong)),
+      linear-gradient(var(--rpg-edge-strong), var(--rpg-edge-strong));
+    background-repeat: no-repeat;
+    background-size:
+      14px 2px,
+      2px 14px,
+      14px 2px,
+      2px 14px,
+      14px 2px,
+      2px 14px,
+      14px 2px,
+      2px 14px;
+    background-position:
+      4px 4px,
+      4px 4px,
+      calc(100% - 4px) 4px,
+      calc(100% - 4px) 4px,
+      4px calc(100% - 4px),
+      4px calc(100% - 4px),
+      calc(100% - 4px) calc(100% - 4px),
+      calc(100% - 4px) calc(100% - 4px);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--rpg-ink-hi) 8%, transparent),
+      0 8px 32px color-mix(in oklab, var(--rpg-bg-deep) 70%, transparent);
+  }
+
+  /* Resource bar track + gradient fills (top highlight = glass) */
+  .rpg-bar-track {
+    background: var(--rpg-bg-deep);
+    border: 1px solid color-mix(in oklab, var(--rpg-edge) 80%, transparent);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+  .rpg-bar-fill {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .rpg-fill-xp {
+    background: linear-gradient(
+      180deg,
+      var(--rpg-gold-bright),
+      var(--rpg-gold)
+    );
+  }
+  .rpg-fill-ep {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--rpg-ep) 70%, white 30%),
+      var(--rpg-ep)
+    );
+  }
+  .rpg-fill-will {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--rpg-will) 70%, white 30%),
+      var(--rpg-will)
+    );
+  }
+  .rpg-fill-spirit {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--rpg-spirit) 70%, white 30%),
+      var(--rpg-spirit)
+    );
+  }
+  .rpg-fill-hp {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--rpg-crimson) 70%, white 30%),
+      var(--rpg-crimson)
+    );
+  }
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: color-mix(in oklab, var(--rpg-edge-strong) 45%, transparent);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: color-mix(in oklab, var(--rpg-edge-strong) 75%, transparent);
 }
 
 /* Stable grabbing cursor during HUD drag — prevents flicker between grab/pointer */

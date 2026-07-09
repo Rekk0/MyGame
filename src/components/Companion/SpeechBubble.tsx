@@ -17,14 +17,14 @@ const SpeechBubble: React.FC<Props> = ({ line, visible }) => (
         style={{
           maxWidth: 220,
           padding: '8px 12px',
-          borderRadius: 12,
-          background: 'rgba(15,15,25,0.88)',
-          color: '#e0e0e0',
+          borderRadius: 8,
+          background: 'rgba(21,16,13,0.92)',
+          color: '#f0e6d2',
           fontSize: 13,
           lineHeight: 1.5,
           marginBottom: 8,
           backdropFilter: 'blur(8px)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          border: '1px solid rgba(138,109,59,0.4)'
         }}
       >
         {line}

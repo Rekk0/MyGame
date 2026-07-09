@@ -11,24 +11,34 @@ export function SkillTooltip({ skill, x, y }: Props) {
 
   return (
     <foreignObject x={x + 36} y={y - 20} width={220} height={180} style={{ pointerEvents: 'none' }}>
-      <div className="bg-gray-900 border border-gray-600 rounded-lg p-3 text-xs text-white shadow-xl">
-        <div className="font-bold text-sm text-yellow-400">{skill.name}</div>
-        <div className="text-gray-400 mt-0.5">Lv.{skill.level} · {skill.category}</div>
-        <div className="mt-1 text-gray-300">{skill.description}</div>
+      <div className="rpg-frame rounded-lg p-3 text-xs text-ink">
+        <div className="font-display text-sm font-bold text-gold">{skill.name}</div>
+        <div className="mt-0.5 text-ink-dim">
+          Lv.{skill.level} · {skill.category}
+        </div>
+        <div className="mt-1 text-ink">{skill.description}</div>
         {skill.traits.length > 0 && (
           <div className="mt-1.5">
-            <div className="text-purple-400 font-medium">特质：</div>
+            <div className="font-medium text-spirit">特质：</div>
             {skill.traits.map((t, i) => (
-              <div key={i} className="text-purple-300">· {t}</div>
+              <div key={i} className="text-spirit/80">
+                · {t}
+              </div>
             ))}
           </div>
         )}
         <div className="mt-2">
-          <div className="flex justify-between text-gray-400 mb-0.5">
-            <span>XP</span><span>{skill.xp}/{skill.maxXp}</span>
+          <div className="mb-0.5 flex justify-between text-ink-dim">
+            <span>XP</span>
+            <span className="tabular-nums">
+              {skill.xp}/{skill.maxXp}
+            </span>
           </div>
-          <div className="h-1.5 bg-gray-700 rounded-full">
-            <div className="h-1.5 bg-blue-500 rounded-full" style={{ width: `${pct}%` }} />
+          <div className="rpg-bar-track h-1.5 overflow-hidden rounded-sm">
+            <div
+              className="rpg-bar-fill rpg-fill-xp h-full rounded-sm"
+              style={{ width: `${pct}%` }}
+            />
           </div>
         </div>
       </div>

@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { Scroll } from '@phosphor-icons/react'
+import { ModalShell } from '../shared/Panel'
 import { useT } from '../../utils/i18n'
 
 interface PlotScrollButtonProps {
@@ -9,18 +11,22 @@ interface PlotScrollButtonProps {
 export function PlotScrollButton({ type, onOpen }: PlotScrollButtonProps): JSX.Element {
   const t = useT()
   const isDaily = type === 'daily'
-  const colorClass = isDaily ? 'text-purple-300 border-purple-400 hover:border-purple-300' : 'text-yellow-300 border-yellow-400 hover:border-yellow-300'
+  const colorClass = isDaily
+    ? 'text-spirit border-spirit/60 hover:border-spirit'
+    : 'text-gold border-gold/60 hover:border-gold'
   const title = isDaily ? t('dailyPlotTitle') : t('weeklyPlotTitle')
 
   return (
     <div className="relative mt-2">
       <button
         onClick={onOpen}
-        className={`relative text-lg border rounded px-2 py-0.5 ${colorClass} transition-colors`}
+        className={`relative rounded border bg-panel-raised px-2 py-1.5 transition-colors ${colorClass}`}
         title={title}
       >
-        📜
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold leading-none">!</span>
+        <Scroll size={18} weight="duotone" />
+        <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-crimson text-xs font-bold leading-none text-ink-hi">
+          !
+        </span>
       </button>
     </div>
   )
@@ -38,15 +44,16 @@ export function PlotModal({ type, onClose, summary, loading, error }: PlotModalP
   const t = useT()
   const isDaily = type === 'daily'
   const titleText = isDaily ? t('dailyPlotTitle') : t('weeklyPlotTitle')
-  const titleColor = isDaily ? 'text-purple-300' : 'text-yellow-300'
-  const borderColor = isDaily ? 'border-purple-500' : 'border-yellow-500'
 
   const [displayed, setDisplayed] = useState('')
   const [typing, setTyping] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    if (!summary) { setDisplayed(''); return }
+    if (!summary) {
+      setDisplayed('')
+      return
+    }
     setDisplayed('')
     setTyping(true)
     let i = 0
@@ -60,7 +67,9 @@ export function PlotModal({ type, onClose, summary, loading, error }: PlotModalP
       }
     }
     timerRef.current = setTimeout(tick, 30)
-    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
   }, [summary])
 
   const handleSkip = () => {
@@ -72,31 +81,32 @@ export function PlotModal({ type, onClose, summary, loading, error }: PlotModalP
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75" onClick={onClose}>
-      <div
-        className={`bg-gray-900 border ${borderColor} rounded-xl p-6 max-w-lg w-full mx-4 max-h-[80vh] flex flex-col`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className={`font-bold text-lg ${titleColor}`}>📜 {titleText}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
-        </div>
-        <div className="flex-1 overflow-y-auto">
-          {loading ? (
-            <p className="text-gray-400 text-sm">{t('aiWritingStory')}</p>
-          ) : error ? (
-            <p className="text-red-400 text-sm">{error}</p>
-          ) : (
-            <p
-              className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap cursor-pointer"
-              onClick={handleSkip}
-              title={typing ? t('clickToSkip') : undefined}
-            >
-              {displayed}
-            </p>
-          )}
-        </div>
+    <ModalShell
+      title={
+        <span className="flex items-center gap-2">
+          <Scroll size={18} weight="duotone" />
+          {titleText}
+        </span>
+      }
+      titleClassName={isDaily ? 'text-spirit' : 'text-gold'}
+      onClose={onClose}
+      className="mx-4 max-h-[80vh] w-full max-w-lg"
+    >
+      <div className="flex-1 overflow-y-auto px-5 py-4">
+        {loading ? (
+          <p className="text-sm text-ink-dim">{t('aiWritingStory')}</p>
+        ) : error ? (
+          <p className="text-sm text-crimson">{error}</p>
+        ) : (
+          <p
+            className="cursor-pointer whitespace-pre-wrap font-display text-sm leading-relaxed text-ink"
+            onClick={handleSkip}
+            title={typing ? t('clickToSkip') : undefined}
+          >
+            {displayed}
+          </p>
+        )}
       </div>
-    </div>
+    </ModalShell>
   )
 }

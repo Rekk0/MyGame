@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { ListChecks, LockSimple, LockSimpleOpen, PushPin, X } from '@phosphor-icons/react'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useQuestStore } from '../../stores/questStore'
 import { useDraggableHud } from '../../hooks/useDraggableHud'
@@ -47,18 +48,23 @@ export default function QuestHudPanel() {
       if (cfg.hudBgOpacity !== undefined) setBgOpacity(cfg.hudBgOpacity)
       if (cfg.hudTextOpacity !== undefined) setTextOpacity(cfg.hudTextOpacity)
     })
-    return () => { unsubLang(); unsubConfig() }
+    return () => {
+      unsubLang()
+      unsubConfig()
+    }
   }, [])
 
   const pending = quests.filter((q) => q.status === 'pending')
 
   const { onMouseDown, toggleLock } = useDraggableHud(
-    (x, y) => { void window.windowAPI.setQuestHudPosition(x, y) },
+    (x, y) => {
+      void window.windowAPI.setQuestHudPosition(x, y)
+    },
     () => window.windowAPI.getQuestHudPosition(),
     locked,
     setLocked,
     'questHud',
-    'questHudLocked',
+    'questHudLocked'
   )
 
   function togglePinned() {
@@ -70,55 +76,64 @@ export default function QuestHudPanel() {
   if (!player) return null
 
   return (
-    <div style={{ width: WIN_W, height: WIN_H }} className="relative rounded-xl select-none overflow-hidden">
+    <div
+      style={{ width: WIN_W, height: WIN_H }}
+      className="relative select-none overflow-hidden rounded-lg"
+    >
       {/* Background layer — opacity controlled independently */}
-      <div style={{ opacity: bgOpacity }} className="absolute inset-0 bg-black rounded-xl pointer-events-none" />
+      <div
+        style={{ opacity: bgOpacity }}
+        className="pointer-events-none absolute inset-0 rounded-lg border border-edge-strong/50 bg-abyss-deep"
+      />
       {/* Content layer — text/UI opacity controlled independently */}
-      <div style={{ opacity: textOpacity }} className="relative text-white flex flex-col h-full">
+      <div style={{ opacity: textOpacity }} className="relative flex h-full flex-col text-ink-hi">
         {/* Drag handle / title bar */}
         <div
           onMouseDown={onMouseDown}
-          className={`flex items-center justify-between px-2 py-1 shrink-0 ${locked ? 'cursor-default' : 'cursor-grab'}`}
+          className={`flex shrink-0 items-center justify-between px-2 py-1 ${locked ? 'cursor-default' : 'cursor-grab'}`}
         >
-          <span className="text-xs font-semibold text-gray-400">📋 {t('pendingShort')}</span>
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-gray-500">{pending.length}</span>
+          <span className="flex items-center gap-1 font-display text-xs font-semibold text-gold">
+            <ListChecks size={12} weight="fill" />
+            {t('pendingShort')}
+          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs tabular-nums text-ink-dim">{pending.length}</span>
             <button
               onMouseDown={(e) => e.stopPropagation()}
               onClick={togglePinned}
-              className={`text-xs px-1 leading-none ${pinned ? 'text-yellow-400' : 'text-gray-500 hover:text-gray-200'}`}
+              className={`leading-none ${pinned ? 'text-gold' : 'text-ink-dim hover:text-ink'}`}
               title={pinned ? t('unpinFromTop') : t('pinToTop')}
             >
-              📌
+              <PushPin size={12} weight={pinned ? 'fill' : 'regular'} />
             </button>
             <button
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => void toggleLock()}
-              className="text-gray-500 hover:text-gray-200 text-xs px-1 leading-none"
+              className="leading-none text-ink-dim hover:text-ink"
               title={locked ? t('unlockPosition') : t('lockPosition')}
             >
-              {locked ? '🔒' : '🔓'}
+              {locked ? <LockSimple size={12} weight="fill" /> : <LockSimpleOpen size={12} />}
             </button>
             <button
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => void window.windowAPI.hideQuestHud()}
-              className="text-gray-500 hover:text-red-400 text-xs px-1 leading-none"
+              className="leading-none text-ink-dim hover:text-crimson"
               title={t('hideHud')}
             >
-              ×
+              <X size={12} weight="bold" />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto flex flex-col min-h-0 px-1.5 pb-1.5">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-1.5 pb-1.5">
           {pending.length === 0 && (
-            <div className="text-xs text-gray-500 text-center py-3">{t('noPendingQuests')}</div>
+            <div className="py-3 text-center text-xs text-ink-dim">{t('noPendingQuests')}</div>
           )}
           {pending.map((q) => (
             <div
               key={q.id}
               title={buildQuestTitle(q, t('originalPrefix'), t('duePrefix'), t('typePrefix'))}
-              className="py-1 px-1.5 rounded text-xs text-gray-200 truncate hover:bg-gray-700/60 hover:text-white transition-colors"
+              className="truncate rounded px-1.5 py-1 text-xs text-ink transition-colors hover:bg-panel-raised hover:text-ink-hi"
             >
               {q.gamifiedName ?? q.originalText}
             </div>

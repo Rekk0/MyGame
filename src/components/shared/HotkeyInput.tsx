@@ -17,8 +17,16 @@ function toElectronKey(e: KeyboardEvent): string | null {
   if (['Control', 'Alt', 'Shift', 'Meta'].includes(key)) return null
   // Map special keys to Electron names
   const MAP: Record<string, string> = {
-    ' ': 'Space', ArrowUp: 'Up', ArrowDown: 'Down', ArrowLeft: 'Left', ArrowRight: 'Right',
-    Escape: 'Escape', Enter: 'Return', Tab: 'Tab', Backspace: 'Backspace', Delete: 'Delete',
+    ' ': 'Space',
+    ArrowUp: 'Up',
+    ArrowDown: 'Down',
+    ArrowLeft: 'Left',
+    ArrowRight: 'Right',
+    Escape: 'Escape',
+    Enter: 'Return',
+    Tab: 'Tab',
+    Backspace: 'Backspace',
+    Delete: 'Delete'
   }
   parts.push(MAP[key] ?? key.toUpperCase())
   return parts.join('+')
@@ -45,16 +53,14 @@ export function HotkeyInput({ value, onChange }: HotkeyInputProps): JSX.Element 
 
   return (
     <div className="flex items-center gap-2">
-      <span className="flex-1 text-sm text-gray-200 bg-gray-700 rounded px-3 py-1.5 font-mono">
+      <span className="flex-1 rounded border border-edge bg-abyss-deep px-3 py-1.5 font-mono text-sm text-ink-hi">
         {recording ? t('hotkeyRecording') : value}
       </span>
       <button
         ref={ref}
         onClick={() => setRecording((r) => !r)}
         className={`text-xs px-3 py-1.5 rounded border transition-colors ${
-          recording
-            ? 'border-blue-500 text-blue-400'
-            : 'border-gray-600 text-gray-400 hover:text-white'
+          recording ? 'border-gold text-gold' : 'border-edge text-ink-dim hover:text-ink-hi'
         }`}
       >
         {t('hotkeyReset')}

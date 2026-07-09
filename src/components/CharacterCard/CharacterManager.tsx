@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
+import { ModalShell } from '../shared/Panel'
 import { useT } from '../../utils/i18n'
 import type { Player } from '../../types/player'
 
@@ -10,7 +11,12 @@ interface CharacterManagerProps {
   onSwitched: () => void
 }
 
-export function CharacterManager({ currentPlayer, onClose, onCreateNew, onSwitched }: CharacterManagerProps): JSX.Element {
+export function CharacterManager({
+  currentPlayer,
+  onClose,
+  onCreateNew,
+  onSwitched
+}: CharacterManagerProps): JSX.Element {
   const { allPlayers, switchPlayer, deletePlayer } = usePlayerStore()
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const t = useT()
@@ -29,33 +35,27 @@ export function CharacterManager({ currentPlayer, onClose, onCreateNew, onSwitch
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={onClose}>
-      <div
-        className="w-80 rounded-xl border border-gray-600 bg-gray-800 p-5 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-bold text-white">{t('characterManager')}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white text-lg leading-none">✕</button>
-        </div>
-
-        <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
+    <ModalShell title={t('characterManager')} onClose={onClose} className="w-80">
+      <div className="flex flex-col px-5 py-4">
+        <div className="flex max-h-64 flex-col gap-2 overflow-y-auto">
           {allPlayers.map((p) => (
             <div
               key={p.id}
               className={`flex items-center justify-between rounded-lg border p-3 ${
-                p.id === currentPlayer.id ? 'border-yellow-500 bg-yellow-500/10' : 'border-gray-600 bg-gray-700'
+                p.id === currentPlayer.id ? 'border-gold bg-gold/10' : 'border-edge bg-panel-raised'
               }`}
             >
               <div>
-                <p className="text-sm font-bold text-white">{p.name}</p>
-                <p className="text-xs text-gray-400">Lv.{p.level} · {p.worldStyle}</p>
+                <p className="font-display text-sm font-bold text-ink-hi">{p.name}</p>
+                <p className="text-xs text-ink-dim">
+                  Lv.{p.level} · {p.worldStyle}
+                </p>
               </div>
               <div className="flex gap-1">
                 {p.id !== currentPlayer.id && (
                   <button
                     onClick={() => handleSwitch(p.id)}
-                    className="rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-500"
+                    className="rounded border border-edge-strong bg-gradient-to-b from-gold-bright to-gold px-2 py-1 text-xs text-on-gold hover:brightness-110"
                   >
                     {t('switchBtn')}
                   </button>
@@ -64,13 +64,13 @@ export function CharacterManager({ currentPlayer, onClose, onCreateNew, onSwitch
                   <>
                     <button
                       onClick={() => handleDeleteConfirm(p.id)}
-                      className="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-500"
+                      className="rounded bg-gradient-to-b from-crimson to-crimson-deep px-2 py-1 text-xs text-ink-hi hover:brightness-110"
                     >
                       {t('confirm')}
                     </button>
                     <button
                       onClick={() => setConfirmId(null)}
-                      className="rounded bg-gray-600 px-2 py-1 text-xs text-white hover:bg-gray-500"
+                      className="rounded border border-edge bg-panel-raised px-2 py-1 text-xs text-ink hover:text-ink-hi"
                     >
                       {t('cancel')}
                     </button>
@@ -78,7 +78,7 @@ export function CharacterManager({ currentPlayer, onClose, onCreateNew, onSwitch
                 ) : (
                   <button
                     onClick={() => setConfirmId(p.id)}
-                    className="rounded bg-red-700 px-2 py-1 text-xs text-white hover:bg-red-600"
+                    className="rounded border border-crimson-deep px-2 py-1 text-xs text-crimson hover:bg-crimson/10"
                   >
                     {t('delete')}
                   </button>
@@ -89,12 +89,15 @@ export function CharacterManager({ currentPlayer, onClose, onCreateNew, onSwitch
         </div>
 
         <button
-          onClick={() => { onClose(); onCreateNew() }}
-          className="mt-4 w-full rounded-lg border border-dashed border-gray-500 py-2 text-sm text-gray-400 hover:border-gray-400 hover:text-gray-300"
+          onClick={() => {
+            onClose()
+            onCreateNew()
+          }}
+          className="mt-4 w-full rounded-lg border border-dashed border-edge py-2 text-sm text-ink-dim transition-colors hover:border-edge-strong hover:text-ink"
         >
           {t('createNew')}
         </button>
       </div>
-    </div>
+    </ModalShell>
   )
 }

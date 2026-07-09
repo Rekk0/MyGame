@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import { X } from '@phosphor-icons/react'
 import type { Skill } from '../../types/skill'
 import { SkillGraph } from './SkillGraph'
-import { SkillTooltip } from './SkillTooltip'
 import { useT } from '../../utils/i18n'
 
 interface Props {
@@ -13,30 +13,48 @@ export function SkillTree({ skills }: Props) {
   const t = useT()
 
   return (
-    <div className="relative w-full h-full bg-gray-950 rounded-lg overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden rounded-lg border border-edge bg-abyss-deep">
       <SkillGraph skills={skills} onSelect={setSelected} />
       {selected && (
-        <div className="absolute top-4 right-4 w-56">
-          <svg width={0} height={0}>
-            <SkillTooltip skill={selected} x={0} y={0} />
-          </svg>
-          <div className="bg-gray-900 border border-gray-600 rounded-lg p-3 text-xs text-white shadow-xl">
-            <div className="flex justify-between items-start">
-              <div className="font-bold text-sm text-yellow-400">{selected.name}</div>
-              <button onClick={() => setSelected(null)} className="text-gray-500 hover:text-white ml-2">✕</button>
+        <div className="absolute right-4 top-4 w-56">
+          <div className="rpg-frame rounded-lg p-3 text-xs text-ink">
+            <div className="flex items-start justify-between">
+              <div className="font-display text-sm font-bold text-gold">{selected.name}</div>
+              <button
+                onClick={() => setSelected(null)}
+                className="ml-2 text-ink-dim hover:text-ink-hi"
+              >
+                <X size={12} weight="bold" />
+              </button>
             </div>
-            <div className="text-gray-400 mt-0.5">Lv.{selected.level} · {selected.category}</div>
-            <div className="mt-1 text-gray-300">{selected.description}</div>
+            <div className="mt-0.5 text-ink-dim">
+              Lv.{selected.level} · {selected.category}
+            </div>
+            <div className="mt-1 text-ink">{selected.description}</div>
             {selected.traits.length > 0 && (
               <div className="mt-1.5">
-                <div className="text-purple-400 font-medium">{t('traits')}</div>
-                {selected.traits.map((trait, i) => <div key={i} className="text-purple-300">· {trait}</div>)}
+                <div className="font-medium text-spirit">{t('traits')}</div>
+                {selected.traits.map((trait, i) => (
+                  <div key={i} className="text-spirit/80">
+                    · {trait}
+                  </div>
+                ))}
               </div>
             )}
             <div className="mt-2">
-              <div className="flex justify-between text-gray-400 mb-0.5"><span>XP</span><span>{selected.xp}/{selected.maxXp}</span></div>
-              <div className="h-1.5 bg-gray-700 rounded-full">
-                <div className="h-1.5 bg-blue-500 rounded-full" style={{ width: `${Math.round(selected.xp / selected.maxXp * 100)}%` }} />
+              <div className="mb-0.5 flex justify-between text-ink-dim">
+                <span>XP</span>
+                <span className="tabular-nums">
+                  {selected.xp}/{selected.maxXp}
+                </span>
+              </div>
+              <div className="rpg-bar-track h-1.5 overflow-hidden rounded-sm">
+                <div
+                  className="rpg-bar-fill rpg-fill-xp h-full rounded-sm"
+                  style={{
+                    width: `${Math.round((selected.xp / selected.maxXp) * 100)}%`
+                  }}
+                />
               </div>
             </div>
           </div>

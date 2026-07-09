@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CaretDown, CaretRight } from '@phosphor-icons/react'
 
 interface Ratings {
   E?: number
@@ -28,46 +29,54 @@ export default function RatingSliders({ onChange }: Props) {
   }
 
   return (
-    <div className="text-xs text-gray-400">
+    <div className="text-xs text-ink-dim">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 hover:text-gray-200 transition-colors"
+        className="flex items-center gap-1 transition-colors hover:text-ink-hi"
       >
-        <span>{open ? '▼' : '▶'} 评分</span>
-        {touched && !open && <span className="text-yellow-400">*</span>}
+        {open ? <CaretDown size={10} weight="bold" /> : <CaretRight size={10} weight="bold" />}
+        <span>评分</span>
+        {touched && !open && <span className="text-gold">*</span>}
       </button>
       {open && (
         <div className="mt-1 flex flex-col gap-2 pl-2">
           <label className="flex items-center gap-2">
             <span className="w-16">精力 0-100</span>
             <input
-              type="range" min={0} max={100} step={5}
+              type="range"
+              min={0}
+              max={100}
+              step={5}
               value={E ?? 50}
               onChange={(e) => update('E', Number(e.target.value))}
-              className="flex-1 h-1 accent-green-400"
+              className="h-1 flex-1 accent-(--rpg-ep)"
             />
-            <span className="w-6 text-right">{E ?? 50}</span>
+            <span className="w-6 text-right tabular-nums">{E ?? 50}</span>
           </label>
           <label className="flex items-center gap-2">
             <span className="w-16">驱动力 0-10</span>
             <input
-              type="range" min={0} max={10}
+              type="range"
+              min={0}
+              max={10}
               value={D ?? 5}
               onChange={(e) => update('D', Number(e.target.value))}
-              className="flex-1 h-1 accent-orange-400"
+              className="h-1 flex-1 accent-(--rpg-will)"
             />
-            <span className="w-6 text-right">{D ?? 5}</span>
+            <span className="w-6 text-right tabular-nums">{D ?? 5}</span>
           </label>
           <label className="flex items-center gap-2">
             <span className="w-16">喜欢 0-10</span>
             <input
-              type="range" min={0} max={10}
+              type="range"
+              min={0}
+              max={10}
               value={L ?? 5}
               onChange={(e) => update('L', Number(e.target.value))}
-              className="flex-1 h-1 accent-violet-400"
+              className="h-1 flex-1 accent-(--rpg-spirit)"
             />
-            <span className="w-6 text-right">{L ?? 5}</span>
+            <span className="w-6 text-right tabular-nums">{L ?? 5}</span>
           </label>
         </div>
       )}

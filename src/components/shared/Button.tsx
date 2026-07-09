@@ -7,9 +7,11 @@ interface ButtonProps {
 }
 
 const variantClasses = {
-  primary: 'bg-blue-600 hover:bg-blue-700 text-white border-transparent',
-  secondary: 'bg-transparent hover:bg-gray-700 text-gray-200 border-gray-500',
-  danger: 'bg-red-600 hover:bg-red-700 text-white border-transparent',
+  primary:
+    'bg-gradient-to-b from-gold-bright to-gold text-on-gold border-edge-strong hover:brightness-110 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]',
+  secondary: 'bg-transparent hover:border-edge-strong hover:text-ink-hi text-ink border-edge',
+  danger:
+    'bg-gradient-to-b from-crimson to-crimson-deep text-ink-hi border-crimson-deep hover:brightness-110 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]'
 }
 
 export function Button({
@@ -17,17 +19,17 @@ export function Button({
   onClick,
   variant = 'primary',
   disabled = false,
-  className = '',
+  className = ''
 }: ButtonProps): JSX.Element {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       className={[
-        'px-3 py-1.5 rounded border text-sm font-medium transition-colors',
+        'px-3 py-1.5 rounded border text-sm font-medium transition-all active:translate-y-px',
         variantClasses[variant],
-        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
-        className,
+        disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
+        className
       ].join(' ')}
     >
       {children}

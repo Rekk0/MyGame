@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { MedalCard } from './MedalCard'
+import { ModalShell } from '../shared/Panel'
 import { useT } from '../../utils/i18n'
 import type { Medal } from '../../types/medal'
 
@@ -12,21 +13,25 @@ function MedalDetail({ medal, onClose }: { medal: Medal; onClose: () => void }):
   const t = useT()
   return (
     <div
-      className="fixed inset-0 z-60 flex items-center justify-center bg-black/80"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-scrim"
       onClick={onClose}
     >
       <div
-        className="flex flex-col items-center gap-4 p-8 bg-gray-900 rounded-2xl border border-yellow-500/40 shadow-2xl max-w-sm"
+        className="rpg-frame-ornate flex max-w-sm flex-col items-center gap-4 rounded-lg bg-panel p-8"
         onClick={(e) => e.stopPropagation()}
       >
         <div
-          className="w-48 h-48 [&>svg]:w-full [&>svg]:h-full"
+          className="h-48 w-48 [&>svg]:h-full [&>svg]:w-full"
           dangerouslySetInnerHTML={{ __html: medal.svgCode }}
         />
-        <p className="text-lg font-bold text-yellow-400">{medal.name}</p>
-        <p className="text-sm text-gray-400 text-center">{medal.description}</p>
-        <p className="text-xs text-gray-600">{t('medalObtainedOn')} {medal.unlockedAt.slice(0, 10)}</p>
-        <button onClick={onClose} className="text-gray-500 hover:text-white text-sm mt-1">{t('close')}</button>
+        <p className="font-display text-lg font-bold text-gold">{medal.name}</p>
+        <p className="text-center text-sm text-ink-dim">{medal.description}</p>
+        <p className="text-xs text-ink-faint">
+          {t('medalObtainedOn')} {medal.unlockedAt.slice(0, 10)}
+        </p>
+        <button onClick={onClose} className="mt-1 text-sm text-ink-dim hover:text-ink-hi">
+          {t('close')}
+        </button>
       </div>
     </div>
   )
@@ -37,23 +42,25 @@ export function MedalGallery({ medals, onClose }: Props): JSX.Element {
   const t = useT()
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+    <>
       {selected && <MedalDetail medal={selected} onClose={() => setSelected(null)} />}
-      <div className="bg-gray-900 rounded-xl p-6 w-[560px] max-h-[80vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-yellow-400">🎖 {t('medalGalleryTitle')}</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">✕</button>
+      <ModalShell
+        title={t('medalGalleryTitle')}
+        onClose={onClose}
+        className="max-h-[80vh] w-[560px]"
+      >
+        <div className="overflow-y-auto px-5 py-4">
+          {medals.length === 0 ? (
+            <p className="py-12 text-center text-ink-dim">{t('noMedals')}</p>
+          ) : (
+            <div className="grid grid-cols-4 gap-3">
+              {medals.map((m) => (
+                <MedalCard key={m.id} medal={m} onSelect={setSelected} />
+              ))}
+            </div>
+          )}
         </div>
-        {medals.length === 0 ? (
-          <p className="text-gray-500 text-center py-12">{t('noMedals')}</p>
-        ) : (
-          <div className="grid grid-cols-4 gap-3">
-            {medals.map((m) => (
-              <MedalCard key={m.id} medal={m} onSelect={setSelected} />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+      </ModalShell>
+    </>
   )
 }

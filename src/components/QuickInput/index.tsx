@@ -28,16 +28,20 @@ export default function QuickInput() {
   }
 
   return (
-    <div className="flex flex-col h-screen justify-center px-4 bg-gray-900 rounded-lg gap-3">
+    <div className="rpg-frame-ornate flex h-screen flex-col justify-center gap-3 rounded-lg bg-panel px-4">
       <input
         ref={inputRef}
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={t('quickInputPlaceholder')}
-        className="w-full bg-transparent text-white text-base outline-none placeholder-gray-500"
+        className="w-full bg-transparent text-base text-ink-hi outline-none placeholder:text-ink-faint"
       />
-      <RatingSliders onChange={(r) => { ratingsRef.current = r }} />
+      <RatingSliders
+        onChange={(r) => {
+          ratingsRef.current = r
+        }}
+      />
     </div>
   )
 }

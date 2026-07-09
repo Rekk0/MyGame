@@ -1,4 +1,5 @@
 import React from 'react'
+import { Coffee, MaskHappy, MoonStars, Plus, Scroll, Sun, Target } from '@phosphor-icons/react'
 import type { ActionId } from '../../../electron/services/companion/types'
 
 interface Props {
@@ -6,14 +7,14 @@ interface Props {
   onAction: (id: ActionId) => void
 }
 
-const LABEL: Record<ActionId, string> = {
-  rest: '☕ 休息',
-  sleep: '😴 小睡',
-  recommend_liked: '🎯 推荐想做',
-  recommend_task: '🌤️ 轻松任务',
-  add_task: '➕ 加任务',
-  view_plot: '📜 看故事',
-  record_mood: '🎭 记心情',
+const LABEL: Record<ActionId, { icon: JSX.Element; text: string }> = {
+  rest: { icon: <Coffee size={12} />, text: '休息' },
+  sleep: { icon: <MoonStars size={12} />, text: '小睡' },
+  recommend_liked: { icon: <Target size={12} />, text: '推荐想做' },
+  recommend_task: { icon: <Sun size={12} />, text: '轻松任务' },
+  add_task: { icon: <Plus size={12} />, text: '加任务' },
+  view_plot: { icon: <Scroll size={12} />, text: '看故事' },
+  record_mood: { icon: <MaskHappy size={12} />, text: '记心情' }
 }
 
 const ActionButtons: React.FC<Props> = ({ actions, onAction }) => {
@@ -24,19 +25,26 @@ const ActionButtons: React.FC<Props> = ({ actions, onAction }) => {
       {actions.map((a) => (
         <button
           key={a}
-          onClick={(e) => { e.stopPropagation(); onAction(a) }}
+          onClick={(e) => {
+            e.stopPropagation()
+            onAction(a)
+          }}
           style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
             padding: '4px 10px',
-            borderRadius: 8,
-            border: '1px solid rgba(255,255,255,0.15)',
-            background: 'rgba(30,30,50,0.7)',
-            color: '#ccc',
+            borderRadius: 6,
+            border: '1px solid rgba(138, 109, 59, 0.45)',
+            background: 'rgba(32, 24, 17, 0.85)',
+            color: '#cbbda0',
             fontSize: 11,
             cursor: 'pointer',
-            backdropFilter: 'blur(4px)',
+            backdropFilter: 'blur(4px)'
           }}
         >
-          {LABEL[a] ?? a}
+          {LABEL[a]?.icon}
+          {LABEL[a]?.text ?? a}
         </button>
       ))}
     </div>

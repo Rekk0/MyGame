@@ -1,4 +1,14 @@
 import { useEffect, useState } from 'react'
+import {
+  BatteryLow,
+  CloudLightning,
+  Flame,
+  GearSix,
+  Medal,
+  TreeStructure,
+  Trophy,
+  Waves
+} from '@phosphor-icons/react'
 import { usePlayerStore } from './stores/playerStore'
 import { useQuestStore } from './stores/questStore'
 import { useStreakStore } from './stores/streakStore'
@@ -19,14 +29,35 @@ import { MedalGallery } from './components/MedalGallery'
 import { SkillTree } from './components/SkillTree'
 import { PlotScrollButton, PlotModal } from './components/PlotScroll'
 import { ApiKeyWarningDialog } from './components/shared/ApiKeyWarningDialog'
+import { ModalShell } from './components/shared/Panel'
 
 type DdaState = 'anxious' | 'flow' | 'bored'
-interface DdaInfo { state: DdaState; xpMultiplier: number; suggestion: string }
-interface DdaSuggestion { mood: string; tips: string[]; suggestedQuestTypes: string[] }
+interface DdaInfo {
+  state: DdaState
+  xpMultiplier: number
+  suggestion: string
+}
+interface DdaSuggestion {
+  mood: string
+  tips: string[]
+  suggestedQuestTypes: string[]
+}
 
-const DDA_ICONS: Record<DdaState, string> = { anxious: '😰', flow: '🌊', bored: '😴' }
-const DDA_COLORS: Record<DdaState, string> = { anxious: 'text-red-400', flow: 'text-cyan-400', bored: 'text-yellow-400' }
-const DDA_LABEL_KEYS: Record<DdaState, 'ddaAnxious' | 'ddaFlow' | 'ddaBored'> = { anxious: 'ddaAnxious', flow: 'ddaFlow', bored: 'ddaBored' }
+const DDA_ICONS: Record<DdaState, JSX.Element> = {
+  anxious: <CloudLightning size={16} weight="fill" />,
+  flow: <Waves size={16} weight="fill" />,
+  bored: <BatteryLow size={16} weight="fill" />
+}
+const DDA_COLORS: Record<DdaState, string> = {
+  anxious: 'text-crimson',
+  flow: 'text-arcane',
+  bored: 'text-gold'
+}
+const DDA_LABEL_KEYS: Record<DdaState, 'ddaAnxious' | 'ddaFlow' | 'ddaBored'> = {
+  anxious: 'ddaAnxious',
+  flow: 'ddaFlow',
+  bored: 'ddaBored'
+}
 
 function getMondayISO(): string {
   const d = new Date()
@@ -38,7 +69,17 @@ function getMondayISO(): string {
 
 function App(): JSX.Element {
   const { player, fetchPlayer, fetchAllPlayers } = usePlayerStore()
-  const { quests, fetchQuests, createQuest, completeQuest, deleteQuest, transformQuest, autoTransform, transformingIds, loadSettings } = useQuestStore()
+  const {
+    quests,
+    fetchQuests,
+    createQuest,
+    completeQuest,
+    deleteQuest,
+    transformQuest,
+    autoTransform,
+    transformingIds,
+    loadSettings
+  } = useQuestStore()
   const { streak, fetchStreak } = useStreakStore()
   const { achievements, fetchAchievements } = useAchievementStore()
   const { medals, fetchMedals } = useMedalStore()
@@ -70,27 +111,52 @@ function App(): JSX.Element {
   const [weeklyPlotError, setWeeklyPlotError] = useState<string | undefined>()
 
   useEffect(() => {
-    window.settingsAPI.getAiConfig().then((cfg) => {
-      setLanguage(cfg?.language ?? 'zh')
-      if (cfg?.theme) setTheme(cfg.theme)
-    }).catch(() => {})
-    Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), loadSettings(), fetchAchievements(), fetchMedals(), fetchSkills()]).then(() => {
+    window.settingsAPI
+      .getAiConfig()
+      .then((cfg) => {
+        setLanguage(cfg?.language ?? 'zh')
+        if (cfg?.theme) setTheme(cfg.theme)
+      })
+      .catch(() => {})
+    Promise.all([
+      fetchPlayer(),
+      fetchAllPlayers(),
+      fetchQuests(),
+      fetchStreak(),
+      loadSettings(),
+      fetchAchievements(),
+      fetchMedals(),
+      fetchSkills()
+    ]).then(() => {
       setInitialized(true)
-      window.ddaAPI.getState().then(setDdaInfo).catch(() => {})
+      window.ddaAPI
+        .getState()
+        .then(setDdaInfo)
+        .catch(() => {})
       const currentPlayer = usePlayerStore.getState().player
       if (currentPlayer) {
-        window.settingsAPI.getAiConfig().then((cfg) => {
-          const hasKey = cfg?.provider === 'ollama' || (!!cfg?.apiKey && cfg.apiKey.trim().length > 0)
-          if (!hasKey) setShowApiKeyWarning(true)
-        }).catch(() => {})
+        window.settingsAPI
+          .getAiConfig()
+          .then((cfg) => {
+            const hasKey =
+              cfg?.provider === 'ollama' || (!!cfg?.apiKey && cfg.apiKey.trim().length > 0)
+            if (!hasKey) setShowApiKeyWarning(true)
+          })
+          .catch(() => {})
       }
     })
   }, [])
 
   useEffect(() => {
     return window.dataAPI.onUpdated(() => {
-      fetchQuests(); fetchAchievements(); fetchMedals(); fetchSkills()
-      window.ddaAPI.getState().then(setDdaInfo).catch(() => {})
+      fetchQuests()
+      fetchAchievements()
+      fetchMedals()
+      fetchSkills()
+      window.ddaAPI
+        .getState()
+        .then(setDdaInfo)
+        .catch(() => {})
     })
   }, [])
 
@@ -106,8 +172,19 @@ function App(): JSX.Element {
     setDdaSuggestion(null)
     setDailyPlotSummary(undefined)
     setWeeklyPlotSummary(undefined)
-    await Promise.all([fetchPlayer(), fetchAllPlayers(), fetchQuests(), fetchStreak(), fetchAchievements(), fetchMedals(), fetchSkills()])
-    window.ddaAPI.getState().then(setDdaInfo).catch(() => {})
+    await Promise.all([
+      fetchPlayer(),
+      fetchAllPlayers(),
+      fetchQuests(),
+      fetchStreak(),
+      fetchAchievements(),
+      fetchMedals(),
+      fetchSkills()
+    ])
+    window.ddaAPI
+      .getState()
+      .then(setDdaInfo)
+      .catch(() => {})
   }
 
   const handleShowSuggestion = async (): Promise<void> => {
@@ -117,7 +194,9 @@ function App(): JSX.Element {
       try {
         const s = await window.ddaAPI.getSuggestion()
         setDdaSuggestion(s)
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       setLoadingSuggestion(false)
     }
   }
@@ -130,7 +209,8 @@ function App(): JSX.Element {
     try {
       const summary = await window.plotAPI.generateDaily()
       setDailyPlotSummary(summary)
-      fetchAchievements(); fetchMedals()
+      fetchAchievements()
+      fetchMedals()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setDailyPlotError(msg.includes('configured') ? t('configureAI') : msg)
@@ -146,7 +226,8 @@ function App(): JSX.Element {
     try {
       const summary = await window.plotAPI.generateWeekly()
       setWeeklyPlotSummary(summary)
-      fetchAchievements(); fetchMedals()
+      fetchAchievements()
+      fetchMedals()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e)
       setWeeklyPlotError(msg.includes('configured') ? t('configureAI') : msg)
@@ -156,15 +237,15 @@ function App(): JSX.Element {
 
   if (!initialized) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-900">
-        <p className="text-gray-400">{t('loading')}</p>
+      <div className="rpg-scene flex min-h-screen items-center justify-center">
+        <p className="text-ink-dim">{t('loading')}</p>
       </div>
     )
   }
 
   if (!player || showCreate) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-900">
+      <div className="rpg-scene flex min-h-screen items-center justify-center">
         <CreateCharacter
           onCreated={async () => {
             await handleSwitched()
@@ -190,7 +271,7 @@ function App(): JSX.Element {
   ).length
 
   return (
-    <div className="flex h-screen bg-gray-900 p-4 gap-4 overflow-hidden">
+    <div className="rpg-scene flex h-screen gap-4 overflow-hidden p-4">
       {showApiKeyWarning && <ApiKeyWarningDialog onClose={() => setShowApiKeyWarning(false)} />}
       {showManager && (
         <CharacterManager
@@ -204,48 +285,52 @@ function App(): JSX.Element {
       {showAchievements && (
         <AchievementList achievements={achievements} onClose={() => setShowAchievements(false)} />
       )}
-      {showMedals && (
-        <MedalGallery medals={medals} onClose={() => setShowMedals(false)} />
-      )}
+      {showMedals && <MedalGallery medals={medals} onClose={() => setShowMedals(false)} />}
       {showSkillTree && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-          <div className="bg-gray-900 rounded-xl w-[700px] h-[500px] flex flex-col p-4">
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="text-white font-bold text-lg">{t('skillTreeTitle')}</h2>
-              <button onClick={() => setShowSkillTree(false)} className="text-gray-400 hover:text-white">✕</button>
-            </div>
-            <div className="flex-1">
-              <SkillTree skills={skills} />
-            </div>
+        <ModalShell
+          title={t('skillTreeTitle')}
+          onClose={() => setShowSkillTree(false)}
+          className="h-[540px] w-[720px]"
+        >
+          <div className="min-h-0 flex-1 p-4">
+            <SkillTree skills={skills} />
           </div>
-        </div>
+        </ModalShell>
       )}
       {showSuggestion && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setShowSuggestion(false)}>
-          <div className="bg-gray-800 rounded-xl p-5 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-white font-bold">{t('todaySuggestion')}</h3>
-              <button onClick={() => setShowSuggestion(false)} className="text-gray-400 hover:text-white">✕</button>
-            </div>
+        <ModalShell
+          title={t('todaySuggestion')}
+          onClose={() => setShowSuggestion(false)}
+          className="mx-4 w-full max-w-sm"
+        >
+          <div className="px-5 pb-5 pt-3">
             {loadingSuggestion ? (
-              <p className="text-gray-400 text-sm">{t('aiGenerating')}</p>
+              <p className="text-sm text-ink-dim">{t('aiGenerating')}</p>
             ) : ddaSuggestion ? (
               <>
-                <p className="text-cyan-300 text-sm mb-2">{t('status')}{ddaSuggestion.mood}</p>
+                <p className="mb-2 text-sm text-arcane">
+                  {t('status')}
+                  {ddaSuggestion.mood}
+                </p>
                 <ul className="space-y-1">
                   {ddaSuggestion.tips.map((tip, i) => (
-                    <li key={i} className="text-gray-300 text-sm">• {tip}</li>
+                    <li key={i} className="text-sm text-ink">
+                      • {tip}
+                    </li>
                   ))}
                 </ul>
                 {ddaSuggestion.suggestedQuestTypes.length > 0 && (
-                  <p className="text-gray-500 text-xs mt-3">{t('recommendedTypes')}{ddaSuggestion.suggestedQuestTypes.join('、')}</p>
+                  <p className="mt-3 text-xs text-ink-dim">
+                    {t('recommendedTypes')}
+                    {ddaSuggestion.suggestedQuestTypes.join('、')}
+                  </p>
                 )}
               </>
             ) : (
-              <p className="text-gray-400 text-sm">{t('noSuggestion')}</p>
+              <p className="text-sm text-ink-dim">{t('noSuggestion')}</p>
             )}
           </div>
-        </div>
+        </ModalShell>
       )}
       {showDailyPlot && (
         <PlotModal
@@ -269,23 +354,33 @@ function App(): JSX.Element {
       <div className="flex flex-1 flex-col gap-4 min-h-0">
         <QuestInput onSubmit={createQuest} />
         <div className="flex-1 overflow-y-auto min-h-0 pr-1">
-          <QuestList quests={quests} autoTransform={autoTransform} transformingIds={transformingIds}
-            onComplete={completeQuest} onDelete={deleteQuest} onTransform={transformQuest} />
+          <QuestList
+            quests={quests}
+            autoTransform={autoTransform}
+            transformingIds={transformingIds}
+            onComplete={completeQuest}
+            onDelete={deleteQuest}
+            onTransform={transformQuest}
+          />
         </div>
       </div>
       <div className="flex w-28 shrink-0 flex-col items-center pt-2">
-        <p className="text-2xl font-bold text-orange-400">🔥 {streakCount}</p>
-        <p className="mt-1 text-xs text-gray-500">{t('streakDays')}</p>
+        <p className="flex items-center gap-1 text-2xl font-bold tabular-nums text-will">
+          <Flame size={22} weight="fill" />
+          {streakCount}
+        </p>
+        <p className="mt-1 text-xs text-ink-dim">{t('streakDays')}</p>
         {streak && streak.bestCount > 0 && (
-          <p className="mt-1 text-xs text-gray-600">{t('streakBest')} {streak.bestCount}{t('streakBestSuffix')}</p>
+          <p className="mt-1 text-xs text-ink-faint">
+            {t('streakBest')} {streak.bestCount}
+            {t('streakBestSuffix')}
+          </p>
         )}
-        {streakBonus > 0 && (
-          <p className="mt-1 text-xs text-green-400">+{streakBonus}% XP</p>
-        )}
+        {streakBonus > 0 && <p className="mt-1 text-xs text-ep">+{streakBonus}% XP</p>}
         {ddaInfo && (
           <button
             onClick={handleShowSuggestion}
-            className={`mt-3 text-sm font-medium ${DDA_COLORS[ddaInfo.state]} hover:opacity-80`}
+            className={`mt-3 flex items-center gap-1 text-sm font-medium ${DDA_COLORS[ddaInfo.state]} hover:opacity-80`}
             title={ddaInfo.suggestion}
           >
             {DDA_ICONS[ddaInfo.state]} {t(DDA_LABEL_KEYS[ddaInfo.state])}
@@ -293,39 +388,39 @@ function App(): JSX.Element {
         )}
         <button
           onClick={() => setShowSkillTree(true)}
-          className="mt-4 flex items-center gap-1 text-gray-600 hover:text-green-400"
+          className="mt-4 flex items-center gap-1 text-ink-dim transition-colors hover:text-ep"
           title="技能树"
         >
-          <span className="text-lg">🌳</span>
+          <TreeStructure size={18} />
           <span className="text-xs">技能树</span>
         </button>
         <button
           onClick={() => setShowAchievements(true)}
-          className="mt-2 text-gray-600 hover:text-yellow-400 text-lg"
+          className="mt-2 flex items-center gap-1 text-ink-dim transition-colors hover:text-gold"
           title="成就"
         >
-          🏆 {unlockedCount}
+          <Trophy size={18} />
+          <span className="text-xs tabular-nums">{unlockedCount}</span>
         </button>
         <button
           onClick={() => setShowMedals(true)}
-          className="mt-2 text-gray-600 hover:text-yellow-300 text-lg"
+          className="mt-2 flex items-center gap-1 text-ink-dim transition-colors hover:text-gold-bright"
           title="勋章"
         >
-          🎖 {medals.length}
+          <Medal size={18} />
+          <span className="text-xs tabular-nums">{medals.length}</span>
         </button>
         <div className="flex-1" />
-        {todayCompletedCount >= 3 && (
-          <PlotScrollButton type="daily" onOpen={handleOpenDailyPlot} />
-        )}
+        {todayCompletedCount >= 3 && <PlotScrollButton type="daily" onOpen={handleOpenDailyPlot} />}
         {weekCompletedCount >= 15 && (
           <PlotScrollButton type="weekly" onOpen={handleOpenWeeklyPlot} />
         )}
         <button
           onClick={() => setShowSettings(true)}
-          className="mt-2 text-gray-600 hover:text-gray-400 text-lg"
+          className="mt-2 text-ink-dim transition-colors hover:text-ink-hi"
           title="AI 设置"
         >
-          ⚙
+          <GearSix size={18} />
         </button>
       </div>
     </div>

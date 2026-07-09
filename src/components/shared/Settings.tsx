@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react'
+import { Moon, Sun } from '@phosphor-icons/react'
 import { Button } from './Button'
 import { HotkeyInput } from './HotkeyInput'
+import { ModalShell } from './Panel'
 import { useQuestStore } from '../../stores/questStore'
 import { useLanguageStore, type Language } from '../../stores/languageStore'
 import { useUIStore, type Theme } from '../../stores/uiStore'
 import { useT } from '../../utils/i18n'
 
 const PROVIDERS = [
-  { value: 'claude', label: 'Claude (Anthropic)', defaultModel: 'claude-sonnet-4-5' },
+  {
+    value: 'claude',
+    label: 'Claude (Anthropic)',
+    defaultModel: 'claude-sonnet-4-5'
+  },
   { value: 'openai', label: 'OpenAI', defaultModel: 'gpt-4o-mini' },
   { value: 'deepseek', label: 'DeepSeek', defaultModel: 'deepseek-chat' },
   { value: 'kimi', label: 'Kimi (Moonshot)', defaultModel: 'moonshot-v1-8k' },
@@ -17,8 +23,15 @@ const PROVIDERS = [
   { value: 'qwen', label: '通义千问 (Qwen)', defaultModel: 'qwen-plus' },
   { value: 'zhipu', label: '智谱 GLM', defaultModel: 'glm-4-flash' },
   { value: 'grok', label: 'xAI Grok', defaultModel: 'grok-3-mini' },
-  { value: 'ollama', label: 'Ollama (本地)', defaultModel: 'llama3.2' },
+  { value: 'ollama', label: 'Ollama (本地)', defaultModel: 'llama3.2' }
 ]
+
+const fieldClass =
+  'rounded border border-edge bg-abyss-deep px-3 py-2 text-sm text-ink-hi outline-none focus:border-edge-strong'
+const pillClass = (active: boolean): string =>
+  `text-xs px-3 py-1 rounded-full border transition-colors ${
+    active ? 'border-gold text-gold' : 'border-edge text-ink-dim hover:text-ink-hi'
+  }`
 
 interface SettingsProps {
   onClose: () => void
@@ -68,136 +81,187 @@ export function Settings({ onClose }: SettingsProps): JSX.Element {
   }
 
   const handleHudOpacityChange = (bg: number, text: number): void => {
-    void window.windowAPI.saveHudConfig({ hudBgOpacity: bg / 100, hudTextOpacity: text / 100 })
-  }
-
-  const handleLanguageChange = (lang: Language): void => {
-    setLanguage(lang)
-  }
-
-  const handleThemeChange = (t: Theme): void => {
-    setTheme(t)
+    void window.windowAPI.saveHudConfig({
+      hudBgOpacity: bg / 100,
+      hudTextOpacity: text / 100
+    })
   }
 
   const handleSave = async (): Promise<void> => {
-    await window.settingsAPI.setAiConfig({ provider, apiKey, model, autoTransform, language, theme, quickInputHotkey })
+    await window.settingsAPI.setAiConfig({
+      provider,
+      apiKey,
+      model,
+      autoTransform,
+      language,
+      theme,
+      quickInputHotkey
+    })
     useQuestStore.getState().setAutoTransform(autoTransform)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
-      <div className="rounded-xl bg-gray-800 p-6 w-96 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">{t('aiSettings')}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white text-xl leading-none">×</button>
-        </div>
+    <ModalShell title={t('aiSettings')} onClose={onClose} className="max-h-[88vh] w-96">
+      <div className="flex flex-col gap-4 overflow-y-auto px-5 py-4">
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-400">{t('aiProvider')}</label>
-          <select value={provider} onChange={(e) => handleProviderChange(e.target.value)}
-            className="rounded bg-gray-700 text-white px-3 py-2 text-sm">
-            {PROVIDERS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+          <label className="text-xs text-ink-dim">{t('aiProvider')}</label>
+          <select
+            value={provider}
+            onChange={(e) => handleProviderChange(e.target.value)}
+            className={fieldClass}
+          >
+            {PROVIDERS.map((p) => (
+              <option key={p.value} value={p.value}>
+                {p.label}
+              </option>
+            ))}
           </select>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-400">{t('apiKey')}</label>
+          <label className="text-xs text-ink-dim">{t('apiKey')}</label>
           {provider === 'ollama' ? (
-            <p className="text-xs text-gray-500 px-3 py-2">Ollama 本地服务无需 API Key</p>
+            <p className="px-3 py-2 text-xs text-ink-dim">Ollama 本地服务无需 API Key</p>
           ) : (
-            <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)}
-              placeholder="API Key" className="rounded bg-gray-700 text-white px-3 py-2 text-sm outline-none" />
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="API Key"
+              className={fieldClass}
+            />
           )}
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-400">{t('modelName')}</label>
-          <input type="text" value={model} onChange={(e) => setModel(e.target.value)}
-            className="rounded bg-gray-700 text-white px-3 py-2 text-sm outline-none" />
+          <label className="text-xs text-ink-dim">{t('modelName')}</label>
+          <input
+            type="text"
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
+            className={fieldClass}
+          />
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-300">{t('autoGameify')}</span>
-          <button onClick={handleToggleClick}
-            className={`w-11 h-6 rounded-full transition-colors ${autoTransform ? 'bg-blue-500' : 'bg-gray-600'}`}>
-            <span className={`block w-5 h-5 m-0.5 rounded-full bg-white transition-transform ${autoTransform ? 'translate-x-5' : 'translate-x-0'}`} />
+          <span className="text-sm text-ink">{t('autoGameify')}</span>
+          <button
+            onClick={handleToggleClick}
+            className={`h-6 w-11 rounded-full border transition-colors ${autoTransform ? 'border-edge-strong bg-gold' : 'border-edge bg-panel-raised'}`}
+          >
+            <span
+              className={`m-0.5 block h-5 w-5 rounded-full bg-ink-hi transition-transform ${autoTransform ? 'translate-x-5' : 'translate-x-0'}`}
+            />
           </button>
         </div>
         {pendingToggle !== null && (
-          <div className="rounded-lg bg-gray-700 p-3 flex flex-col gap-2">
-            <p className="text-xs text-gray-300">
-              {pendingToggle ? t('autoOnHint') : t('autoOffHint')}
-            </p>
-            <div className="flex gap-2 justify-end">
-              <button onClick={() => setPendingToggle(null)} className="text-xs text-gray-400 hover:text-white px-2 py-1">{t('cancel')}</button>
-              <button onClick={handleConfirm} className="text-xs text-blue-400 hover:text-blue-300 px-2 py-1">{t('confirm')}</button>
+          <div className="flex flex-col gap-2 rounded-lg border border-edge bg-panel-raised p-3">
+            <p className="text-xs text-ink">{pendingToggle ? t('autoOnHint') : t('autoOffHint')}</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setPendingToggle(null)}
+                className="px-2 py-1 text-xs text-ink-dim hover:text-ink-hi"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="px-2 py-1 text-xs text-gold hover:brightness-125"
+              >
+                {t('confirm')}
+              </button>
             </div>
           </div>
         )}
-        <div className="border-t border-gray-700 pt-3 flex flex-col gap-2">
+        <div className="flex flex-col gap-2 border-t border-edge pt-3">
           <div className="flex items-center justify-between">
-            <label className="text-sm text-gray-300">{t('language')}</label>
+            <label className="text-sm text-ink">{t('language')}</label>
             <div className="flex gap-2">
               <button
-                onClick={() => handleLanguageChange('zh')}
-                className={`text-xs px-3 py-1 rounded-full border transition-colors ${language === 'zh' ? 'border-blue-500 text-blue-400' : 'border-gray-600 text-gray-400 hover:text-white'}`}
-              >中文</button>
+                onClick={() => setLanguage('zh' as Language)}
+                className={pillClass(language === 'zh')}
+              >
+                中文
+              </button>
               <button
-                onClick={() => handleLanguageChange('en')}
-                className={`text-xs px-3 py-1 rounded-full border transition-colors ${language === 'en' ? 'border-blue-500 text-blue-400' : 'border-gray-600 text-gray-400 hover:text-white'}`}
-              >English</button>
+                onClick={() => setLanguage('en' as Language)}
+                className={pillClass(language === 'en')}
+              >
+                English
+              </button>
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <label className="text-sm text-gray-300">{t('theme')}</label>
+            <label className="text-sm text-ink">{t('theme')}</label>
             <div className="flex gap-2">
               <button
-                onClick={() => handleThemeChange('dark')}
-                className={`text-xs px-3 py-1 rounded-full border transition-colors ${theme === 'dark' ? 'border-blue-500 text-blue-400' : 'border-gray-600 text-gray-400 hover:text-white'}`}
-              >🌙</button>
+                onClick={() => setTheme('dark' as Theme)}
+                className={pillClass(theme === 'dark')}
+                title="暗色"
+              >
+                <Moon size={14} weight={theme === 'dark' ? 'fill' : 'regular'} />
+              </button>
               <button
-                onClick={() => handleThemeChange('light')}
-                className={`text-xs px-3 py-1 rounded-full border transition-colors ${theme === 'light' ? 'border-blue-500 text-blue-400' : 'border-gray-600 text-gray-400 hover:text-white'}`}
-              >☀️</button>
+                onClick={() => setTheme('light' as Theme)}
+                className={pillClass(theme === 'light')}
+                title="羊皮纸"
+              >
+                <Sun size={14} weight={theme === 'light' ? 'fill' : 'regular'} />
+              </button>
             </div>
           </div>
         </div>
-        <div className="border-t border-gray-700 pt-3 flex flex-col gap-3">
-          <h3 className="text-sm font-semibold text-gray-300">{t('hudAppearance')}</h3>
+        <div className="flex flex-col gap-3 border-t border-edge pt-3">
+          <h3 className="text-sm font-semibold text-ink">{t('hudAppearance')}</h3>
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between">
-              <label className="text-xs text-gray-400">{t('bgOpacity')}</label>
-              <span className="text-xs text-gray-300 w-8 text-right">{hudBgOpacity}%</span>
+              <label className="text-xs text-ink-dim">{t('bgOpacity')}</label>
+              <span className="w-8 text-right text-xs tabular-nums text-ink">{hudBgOpacity}%</span>
             </div>
-            <input type="range" min={0} max={100} value={hudBgOpacity}
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={hudBgOpacity}
               onChange={(e) => {
                 const v = Number(e.target.value)
                 setHudBgOpacity(v)
                 handleHudOpacityChange(v, hudTextOpacity)
               }}
-              className="w-full accent-blue-500" />
+              className="w-full accent-(--rpg-gold)"
+            />
           </div>
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between">
-              <label className="text-xs text-gray-400">{t('textOpacity')}</label>
-              <span className="text-xs text-gray-300 w-8 text-right">{hudTextOpacity}%</span>
+              <label className="text-xs text-ink-dim">{t('textOpacity')}</label>
+              <span className="w-8 text-right text-xs tabular-nums text-ink">
+                {hudTextOpacity}%
+              </span>
             </div>
-            <input type="range" min={0} max={100} value={hudTextOpacity}
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={hudTextOpacity}
               onChange={(e) => {
                 const v = Number(e.target.value)
                 setHudTextOpacity(v)
                 handleHudOpacityChange(hudBgOpacity, v)
               }}
-              className="w-full accent-blue-500" />
+              className="w-full accent-(--rpg-gold)"
+            />
           </div>
         </div>
-        <div className="border-t border-gray-700 pt-3 flex flex-col gap-2">
-          <h3 className="text-sm font-semibold text-gray-300">{t('shortcuts')}</h3>
+        <div className="flex flex-col gap-2 border-t border-edge pt-3">
+          <h3 className="text-sm font-semibold text-ink">{t('shortcuts')}</h3>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-400">{t('quickInputShortcut')}</label>
+            <label className="text-xs text-ink-dim">{t('quickInputShortcut')}</label>
             <HotkeyInput value={quickInputHotkey} onChange={setQuickInputHotkey} />
           </div>
         </div>
-        <Button variant="primary" onClick={handleSave}>{saved ? t('saved') : t('save')}</Button>
+        <Button variant="primary" onClick={handleSave}>
+          {saved ? t('saved') : t('save')}
+        </Button>
       </div>
-    </div>
+    </ModalShell>
   )
 }

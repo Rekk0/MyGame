@@ -25,6 +25,8 @@
     "@anthropic-ai/sdk": "^0.78.0",
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
+    "@fontsource/noto-serif-sc": "^5.2.9",
+    "@phosphor-icons/react": "^2.1.10",
     "better-sqlite3": "^12.6.2",
     "d3": "^7.9.0",
     "drizzle-orm": "^0.45.1",

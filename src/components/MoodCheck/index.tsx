@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Smiley, SmileyMeh, SmileySad, SmileyWink, SmileyXEyes } from '@phosphor-icons/react'
 import { useT } from '../../utils/i18n'
 import { usePlayerStore } from '../../stores/playerStore'
 
@@ -6,12 +7,36 @@ interface MoodCheckProps {
   onClose: () => void
 }
 
-const MOODS: { score: number; key: 'moodVeryHappy' | 'moodHappy' | 'moodNeutral' | 'moodSad' | 'moodVerySad' }[] = [
-  { score: 5, key: 'moodVeryHappy' },
-  { score: 2, key: 'moodHappy' },
-  { score: 0, key: 'moodNeutral' },
-  { score: -2, key: 'moodSad' },
-  { score: -5, key: 'moodVerySad' },
+const MOODS: {
+  score: number
+  key: 'moodVeryHappy' | 'moodHappy' | 'moodNeutral' | 'moodSad' | 'moodVerySad'
+  icon: JSX.Element
+}[] = [
+  {
+    score: 5,
+    key: 'moodVeryHappy',
+    icon: <Smiley size={26} weight="fill" className="text-ep" />
+  },
+  {
+    score: 2,
+    key: 'moodHappy',
+    icon: <SmileyWink size={26} weight="fill" className="text-gold" />
+  },
+  {
+    score: 0,
+    key: 'moodNeutral',
+    icon: <SmileyMeh size={26} weight="fill" className="text-ink-dim" />
+  },
+  {
+    score: -2,
+    key: 'moodSad',
+    icon: <SmileySad size={26} weight="fill" className="text-spirit" />
+  },
+  {
+    score: -5,
+    key: 'moodVerySad',
+    icon: <SmileyXEyes size={26} weight="fill" className="text-crimson" />
+  }
 ]
 
 export function MoodCheck({ onClose }: MoodCheckProps): JSX.Element {
@@ -27,31 +52,28 @@ export function MoodCheck({ onClose }: MoodCheckProps): JSX.Element {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim" onClick={onClose}>
       <div
-        className="flex flex-col gap-4 rounded-xl border border-gray-600 bg-gray-800 p-6 shadow-2xl"
+        className="rpg-frame-ornate flex flex-col gap-4 rounded-lg bg-panel p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-lg font-bold text-white text-center">{t('moodTitle')}</h3>
-        <p className="text-sm text-gray-400 text-center">{t('moodHint')}</p>
-        <div className="flex gap-3 justify-center">
+        <h3 className="text-center font-display text-lg font-bold text-ink-hi">{t('moodTitle')}</h3>
+        <p className="text-center text-sm text-ink-dim">{t('moodHint')}</p>
+        <div className="flex justify-center gap-3">
           {MOODS.map((m) => (
             <button
               key={m.score}
               onClick={() => record(m.score)}
               disabled={feedback != null}
-              className="flex flex-col items-center gap-1 rounded-lg bg-gray-700 px-3 py-2 text-sm text-white hover:bg-gray-600 transition-colors disabled:opacity-50"
+              className="flex flex-col items-center gap-1 rounded-lg border border-edge bg-panel-raised px-3 py-2 text-sm text-ink transition-colors hover:border-edge-strong hover:text-ink-hi disabled:opacity-50"
             >
-              <span className="text-2xl">{t(m.key).split(' ')[0]}</span>
-              <span>{t(m.key).split(' ').slice(1).join(' ')}</span>
+              {m.icon}
+              <span>{t(m.key)}</span>
             </button>
           ))}
         </div>
-        {feedback && <p className="text-center text-green-400 text-sm">{feedback}</p>}
-        <button
-          onClick={onClose}
-          className="text-xs text-gray-500 hover:text-gray-300 self-center"
-        >
+        {feedback && <p className="text-center text-sm text-ep">{feedback}</p>}
+        <button onClick={onClose} className="self-center text-xs text-ink-dim hover:text-ink">
           {t('close')}
         </button>
       </div>

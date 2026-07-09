@@ -104,11 +104,11 @@ const STRINGS = {
     moodTitle: '记一笔心情',
     moodHint: '现在的感受如何？',
     moodRecorded: '记下了',
-    moodVeryHappy: '😄 超棒',
-    moodHappy: '🙂 不错',
-    moodNeutral: '😐 还行',
-    moodSad: '🙁 低落',
-    moodVerySad: '😞 很差',
+    moodVeryHappy: '超棒',
+    moodHappy: '不错',
+    moodNeutral: '还行',
+    moodSad: '低落',
+    moodVerySad: '很差'
   },
   en: {
     appName: 'MyGame',
@@ -200,12 +200,12 @@ const STRINGS = {
     moodTitle: 'Log Mood',
     moodHint: 'How are you feeling?',
     moodRecorded: 'Noted',
-    moodVeryHappy: '😄 Great',
-    moodHappy: '🙂 Good',
-    moodNeutral: '😐 Okay',
-    moodSad: '🙁 Low',
-    moodVerySad: '😞 Bad',
-  },
+    moodVeryHappy: 'Great',
+    moodHappy: 'Good',
+    moodNeutral: 'Okay',
+    moodSad: 'Low',
+    moodVerySad: 'Bad'
+  }
 } as const
 
 type StringKey = keyof typeof STRINGS.zh
@@ -229,7 +229,7 @@ export const WORLD_STYLE_DATA = {
     { value: 'xianxia', label: '仙侠', desc: '修仙问道，飞升成仙' },
     { value: 'fantasy', label: '奇幻', desc: '魔法大陆，龙与地下城' },
     { value: 'scifi', label: '科幻', desc: '星际文明，赛博朋克' },
-    { value: 'apocalypse', label: '末日', desc: '末世求生，荒野冒险' },
+    { value: 'apocalypse', label: '末日', desc: '末世求生，荒野冒险' }
   ],
   en: [
     { value: 'realistic', label: 'War', desc: 'Modern warfare, military ops' },
@@ -237,6 +237,6 @@ export const WORLD_STYLE_DATA = {
     { value: 'xianxia', label: 'Xianxia', desc: 'Cultivate immortality, ascend' },
     { value: 'fantasy', label: 'Fantasy', desc: 'Magic realm, dragons & dungeons' },
     { value: 'scifi', label: 'Sci-Fi', desc: 'Interstellar civilization, cyberpunk' },
-    { value: 'apocalypse', label: 'Apocalypse', desc: 'Post-apocalyptic survival' },
-  ],
+    { value: 'apocalypse', label: 'Apocalypse', desc: 'Post-apocalyptic survival' }
+  ]
 } as const

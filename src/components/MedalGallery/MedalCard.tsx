@@ -8,16 +8,16 @@ interface Props {
 export function MedalCard({ medal, onSelect }: Props): JSX.Element {
   return (
     <div
-      className="flex flex-col items-center gap-1 p-3 bg-gray-800 rounded-lg border border-gray-700 cursor-pointer hover:border-yellow-500 hover:bg-gray-750 transition-colors"
+      className="rpg-frame flex cursor-pointer flex-col items-center gap-1 rounded-lg p-3 transition-colors hover:border-gold"
       onClick={() => onSelect(medal)}
       title="点击放大查看"
     >
       <div
-        className="w-20 h-20 pointer-events-none [&>svg]:w-full [&>svg]:h-full"
+        className="pointer-events-none h-20 w-20 [&>svg]:h-full [&>svg]:w-full"
         dangerouslySetInnerHTML={{ __html: medal.svgCode }}
       />
-      <p className="text-xs font-medium text-gray-200 text-center leading-tight">{medal.name}</p>
-      <p className="text-xs text-gray-500">{medal.unlockedAt.slice(0, 10)}</p>
+      <p className="text-center text-xs font-medium leading-tight text-ink-hi">{medal.name}</p>
+      <p className="text-xs text-ink-faint">{medal.unlockedAt.slice(0, 10)}</p>
     </div>
   )
 }
