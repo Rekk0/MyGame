@@ -78,4 +78,11 @@ export const IPC = {
   WINDOW_HIDE_COMPANION: 'window:hide-companion',
 
   SHELL_OPEN_EXTERNAL: 'shell:open-external',
+
+  BG_GET_CONFIG: 'background:get-config',
+  BG_SET_CONFIG: 'background:set-config',
+  BG_GENERATE: 'background:generate',
+  BG_UPLOAD: 'background:upload',
+  BG_GET_IMAGE: 'background:get-image',
+  BG_CLEAR: 'background:clear',
 } as const

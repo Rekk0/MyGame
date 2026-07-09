@@ -103,6 +103,17 @@ declare global {
     resourceAPI: {
       recordMood: (score: number) => Promise<Player>
     }
+    backgroundAPI: {
+      getConfig: () => Promise<{
+        config: import('./background').ImageGenConfig | null
+        worlds: Record<WorldStyle, boolean>
+      }>
+      setConfig: (config: import('./background').ImageGenConfig) => Promise<void>
+      generate: (worldStyle: WorldStyle, prompt: string) => Promise<string | null>
+      upload: (worldStyle: WorldStyle) => Promise<string | null>
+      getImage: (worldStyle: WorldStyle) => Promise<string | null>
+      clear: (worldStyle: WorldStyle) => Promise<void>
+    }
     companionAPI: {
       runAction: (action: string, payload?: unknown) => Promise<void>
       getReply: (event?: string) => Promise<unknown>

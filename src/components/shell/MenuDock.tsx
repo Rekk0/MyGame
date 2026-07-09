@@ -73,7 +73,7 @@ export function MenuDock({
         className="mb-2 mt-2 flex w-full flex-col items-center gap-0.5 border-l-2 border-transparent py-1 text-ink-dim transition-colors hover:text-ink-hi"
       >
         <GearSix size={20} />
-        <span className="text-[11px] leading-tight">{t('aiSettings')}</span>
+        <span className="text-[11px] leading-tight">{t('settingsTitle')}</span>
       </button>
     </div>
   )

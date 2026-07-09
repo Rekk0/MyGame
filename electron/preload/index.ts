@@ -122,6 +122,17 @@ const shellAPI = {
   openExternal: (url: string) => ipcRenderer.invoke(IPC.SHELL_OPEN_EXTERNAL, url),
 }
 
+const backgroundAPI = {
+  getConfig: () => ipcRenderer.invoke(IPC.BG_GET_CONFIG),
+  setConfig: (config: { provider: string; apiKey: string; model: string; baseUrl?: string }) =>
+    ipcRenderer.invoke(IPC.BG_SET_CONFIG, config),
+  generate: (worldStyle: string, prompt: string) =>
+    ipcRenderer.invoke(IPC.BG_GENERATE, worldStyle, prompt),
+  upload: (worldStyle: string) => ipcRenderer.invoke(IPC.BG_UPLOAD, worldStyle),
+  getImage: (worldStyle: string) => ipcRenderer.invoke(IPC.BG_GET_IMAGE, worldStyle),
+  clear: (worldStyle: string) => ipcRenderer.invoke(IPC.BG_CLEAR, worldStyle),
+}
+
 const companionAPI = {
   runAction: (action: string, payload?: unknown) =>
     ipcRenderer.invoke(IPC.COMPANION_RUN_ACTION, action, payload),
@@ -155,6 +166,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('shellAPI', shellAPI)
     contextBridge.exposeInMainWorld('resourceAPI', resourceAPI)
     contextBridge.exposeInMainWorld('companionAPI', companionAPI)
+    contextBridge.exposeInMainWorld('backgroundAPI', backgroundAPI)
   } catch (error) {
     console.error(error)
   }
@@ -189,4 +201,6 @@ if (process.contextIsolated) {
   window.plotAPI = plotAPI
   // @ts-ignore
   window.shellAPI = shellAPI
+  // @ts-ignore
+  window.backgroundAPI = backgroundAPI
 }

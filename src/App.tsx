@@ -7,6 +7,7 @@ import { useMedalStore } from './stores/medalStore'
 import { useSkillStore } from './stores/skillStore'
 import { useLanguageStore } from './stores/languageStore'
 import { useUIStore } from './stores/uiStore'
+import { useBackgroundStore } from './stores/backgroundStore'
 import { useT } from './utils/i18n'
 import { CharacterCard } from './components/CharacterCard'
 import { CharacterManager } from './components/CharacterCard/CharacterManager'
@@ -47,6 +48,7 @@ function App(): JSX.Element {
   const [showSettings, setShowSettings] = useState(false)
   const [activeScreen, setActiveScreen] = useState<ScreenId>('board')
   const [showApiKeyWarning, setShowApiKeyWarning] = useState(false)
+  const bgUrl = useBackgroundStore((s) => s.bgUrl)
 
   useEffect(() => {
     window.settingsAPI
@@ -99,6 +101,7 @@ function App(): JSX.Element {
   useEffect(() => {
     if (player) document.documentElement.setAttribute('data-world', player.worldStyle)
     else document.documentElement.removeAttribute('data-world')
+    if (player) void useBackgroundStore.getState().fetchBackground(player.worldStyle)
   }, [player?.worldStyle])
 
   useEffect(() => {
@@ -182,7 +185,10 @@ function App(): JSX.Element {
 
   return (
     <MotionConfig reducedMotion={reducedMotion ? 'always' : 'user'}>
-      <div className="rpg-scene flex h-screen gap-4 overflow-hidden p-4">
+      <div
+        className={`${bgUrl ? 'rpg-scene-custom' : 'rpg-scene'} flex h-screen gap-4 overflow-hidden p-4`}
+        style={bgUrl ? ({ '--scene-bg-image': `url("${bgUrl}")` } as React.CSSProperties) : undefined}
+      >
         {showApiKeyWarning && <ApiKeyWarningDialog onClose={() => setShowApiKeyWarning(false)} />}
         {showManager && (
           <CharacterManager

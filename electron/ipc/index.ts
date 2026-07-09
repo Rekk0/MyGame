@@ -10,6 +10,7 @@ import { registerDdaHandlers } from './ddaHandlers'
 import { registerPlotHandlers } from './plotHandlers'
 import { registerResourceHandlers } from './resourceHandlers'
 import { registerCompanionHandlers } from './companionHandlers'
+import { registerBackgroundHandlers } from './backgroundHandlers'
 
 export function registerAllHandlers(): void {
   registerQuestHandlers()
@@ -24,4 +25,5 @@ export function registerAllHandlers(): void {
   registerPlotHandlers()
   registerResourceHandlers()
   registerCompanionHandlers()
+  registerBackgroundHandlers()
 }

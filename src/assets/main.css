@@ -105,6 +105,23 @@
       var(--rpg-bg);
   }
 
+  /* Custom background image variant: accent glow + readability scrim over user image.
+     --scene-bg-image is set inline (data URL) when the active world has a background. */
+  .rpg-scene-custom {
+    background:
+      radial-gradient(
+        200% 100% at 50% -10%,
+        color-mix(in oklab, var(--rpg-world-accent) 14%, transparent),
+        transparent 70%
+      ),
+      linear-gradient(
+        color-mix(in oklab, var(--rpg-bg) 55%, transparent),
+        color-mix(in oklab, var(--rpg-bg-deep) 72%, transparent)
+      ),
+      var(--scene-bg-image) center / cover no-repeat,
+      var(--rpg-bg);
+  }
+
   /* Panel frame: brass hairline + dark recess + top inner highlight */
   .rpg-frame {
     border: 1px solid var(--rpg-edge);
