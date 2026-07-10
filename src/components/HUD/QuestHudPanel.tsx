@@ -10,12 +10,18 @@ import type { Quest } from '../../types/quest'
 const WIN_W = 220
 const WIN_H = 200
 
-function buildQuestTitle(q: Quest, orig: string, due: string, type: string): string {
+function buildQuestTitle(
+  q: Quest,
+  orig: string,
+  due: string,
+  typePrefix: string,
+  typeLabel: string
+): string {
   const parts: string[] = [q.gamifiedName ?? q.originalText]
   if (q.narrative) parts.push(q.narrative)
   if (q.gamifiedName && q.originalText !== q.gamifiedName) parts.push(`${orig}${q.originalText}`)
   if (q.dueDate) parts.push(`${due}${new Date(q.dueDate).toLocaleDateString()}`)
-  parts.push(`${type}${q.type}  |  ${q.xp} XP`)
+  parts.push(`${typePrefix}${typeLabel}  |  ${q.xp} XP`)
   return parts.join('\n')
 }
 
@@ -132,7 +138,17 @@ export default function QuestHudPanel() {
           {pending.map((q) => (
             <div
               key={q.id}
-              title={buildQuestTitle(q, t('originalPrefix'), t('duePrefix'), t('typePrefix'))}
+              title={buildQuestTitle(
+                q,
+                t('originalPrefix'),
+                t('duePrefix'),
+                t('typePrefix'),
+                t(
+                  `questType${q.type.charAt(0).toUpperCase() + q.type.slice(1)}` as Parameters<
+                    typeof t
+                  >[0]
+                )
+              )}
               className="truncate rounded px-1.5 py-1 text-xs text-ink transition-colors hover:bg-panel-raised hover:text-ink-hi"
             >
               {q.gamifiedName ?? q.originalText}

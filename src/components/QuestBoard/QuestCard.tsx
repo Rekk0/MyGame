@@ -50,7 +50,13 @@ export function QuestCard({
             <p className="mt-1 text-xs italic leading-relaxed text-ink-dim">{quest.narrative}</p>
           )}
           <div className="mt-1 flex items-center gap-2 text-xs">
-            <span className={typeColors[quest.type] ?? 'text-ink-dim'}>{quest.type}</span>
+            <span className={typeColors[quest.type] ?? 'text-ink-dim'}>
+              {t(
+                `questType${quest.type.charAt(0).toUpperCase() + quest.type.slice(1)}` as Parameters<
+                  typeof t
+                >[0]
+              )}
+            </span>
             <span className="tabular-nums text-gold">+{quest.xp} XP</span>
             {quest.gamifiedName && (
               <button

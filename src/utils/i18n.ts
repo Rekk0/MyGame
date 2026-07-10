@@ -70,6 +70,7 @@ const STRINGS = {
     questTypeAdventure: '冒险',
     questTypeDaily: '日常',
     questTypeOther: '其他',
+    questTypeTest: '测试',
     // Plot scroll (kept for Journal screen)
     dailyPlotTitle: '今日剧情',
     weeklyPlotTitle: '本周史诗',
@@ -213,6 +214,7 @@ const STRINGS = {
     questTypeAdventure: 'Adventure',
     questTypeDaily: 'Daily',
     questTypeOther: 'Other',
+    questTypeTest: 'Test',
     dailyPlotTitle: "Today's Plot",
     weeklyPlotTitle: 'Weekly Epic',
     aiWritingStory: 'AI is writing your story...',
