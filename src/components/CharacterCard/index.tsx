@@ -1,18 +1,15 @@
 import { useEffect, useState } from 'react'
 import {
-  Coffee,
   Coins,
   Flame,
   HandFist,
   Lightning,
   MaskHappy,
-  MoonStars,
   Sparkle,
   Star,
   UserSwitch
 } from '@phosphor-icons/react'
 import type { Player } from '../../types/player'
-import { usePlayerStore } from '../../stores/playerStore'
 import { useStreakStore } from '../../stores/streakStore'
 import { ProgressBar } from '../shared/ProgressBar'
 import { ResourceOrb } from '../shared/ResourceOrb'
@@ -33,8 +30,6 @@ const divider = 'h-px bg-gradient-to-r from-transparent via-edge-strong to-trans
 
 export function CharacterCard({ player, onManage }: CharacterCardProps): JSX.Element {
   const t = useT()
-  const sleep = usePlayerStore((s) => s.sleep)
-  const rest = usePlayerStore((s) => s.rest)
   const { streak, fetchStreak } = useStreakStore()
   const [showMood, setShowMood] = useState(false)
 
@@ -135,18 +130,6 @@ export function CharacterCard({ player, onManage }: CharacterCardProps): JSX.Ele
       <DdaStatus />
 
       <div className={divider} />
-
-      {/* ---- 操作按钮 ---- */}
-      <div className="flex gap-2">
-        <button onClick={() => sleep()} className={`${actionBtn} flex-1`} title={t('sleepHint')}>
-          <MoonStars size={14} />
-          {t('sleepBtn')}
-        </button>
-        <button onClick={() => rest()} className={`${actionBtn} flex-1`} title={t('restHint')}>
-          <Coffee size={14} />
-          {t('restBtn')}
-        </button>
-      </div>
 
       <button onClick={() => setShowMood(true)} className={`${actionBtn} w-full`}>
         <MaskHappy size={14} />

@@ -5,7 +5,7 @@ import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { runMigrations } from './services/db/index'
 import { registerAllHandlers } from './ipc/index'
 import { registerWindowHandlers } from './ipc/windowHandlers'
-import { getAllPlayers, sleep } from './services/db/repositories/playerRepo'
+import { getAllPlayers } from './services/db/repositories/playerRepo'
 import { initAchievements } from './services/db/repositories/achievementRepo'
 import { initSkills } from './services/db/repositories/skillRepo'
 import { createMainWindow } from './windows/mainWindow'
@@ -14,7 +14,6 @@ import { createQuestHudWindow } from './windows/questHudWindow'
 import { createQuickInputWindow } from './windows/quickInput'
 import { createAchievementWindow } from './windows/achievementWindow'
 import { createCompanionWindow } from './windows/companionWindow'
-import { readHudConfig, writeHudConfig } from './services/hudConfig'
 import { readAiConfig } from './ipc/settingsHandlers'
 import { registerQuickInputShortcut } from './services/shortcutManager'
 import { createTray } from './tray'
@@ -22,7 +21,7 @@ import { startStreakWarningScheduler } from './services/notification'
 import { startCompanionScheduler, evaluate } from './services/companion/scheduler'
 import { COMPANION_ENABLED } from './services/companion/constants'
 import { migrateLegacyUserDataFile } from './services/legacyMigration'
-import { recomputeProfile } from './services/resources/profile'
+import { applyDailyResetIfNeeded, startDailyResetScheduler } from './services/dailyReset'
 
 let isQuitting = false
 
@@ -46,15 +45,7 @@ app.whenReady().then(() => {
     registerAllHandlers()
     getAllPlayers().forEach((p) => { initAchievements(p.id); initSkills(p.id) })
 
-    const config = readHudConfig()
-    const today = new Date().toISOString().slice(0, 10)
-    if (config.lastResetDate !== today) {
-      if (getAllPlayers().length > 0) {
-        sleep(8)
-        try { recomputeProfile() } catch { /* ignore */ }
-      }
-      writeHudConfig({ lastResetDate: today })
-    }
+    applyDailyResetIfNeeded()
 
     const mainWindow = createMainWindow()
     createHudWindow()
@@ -67,6 +58,7 @@ app.whenReady().then(() => {
     const aiCfg = readAiConfig()
     registerQuickInputShortcut(aiCfg?.quickInputHotkey)
     startStreakWarningScheduler()
+    startDailyResetScheduler()
     startCompanionScheduler()
     void evaluate('startup')
 
