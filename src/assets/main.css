@@ -29,9 +29,11 @@
   --rpg-on-gold: #221708;
   --rpg-scrim: rgba(8, 5, 3, 0.72);
   --rpg-world-accent: var(--rpg-gold);
+  color-scheme: dark;
 }
 
 [data-theme="light"] {
+  color-scheme: light;
   --rpg-bg: #e7dcc2;
   --rpg-bg-deep: #d9cba9;
   --rpg-panel: #f1e8d2;

@@ -13,7 +13,11 @@ interface QuestState {
   fetchQuests: () => Promise<void>
   loadSettings: () => Promise<void>
   setAutoTransform: (val: boolean) => void
-  createQuest: (originalText: string, ratings?: { E?: number; D?: number; L?: number }) => Promise<void>
+  createQuest: (
+    originalText: string,
+    ratings?: { E?: number; D?: number; L?: number },
+    dueDate?: string
+  ) => Promise<void>
   transformQuest: (id: string) => Promise<void>
   completeQuest: (id: string) => Promise<void>
   deleteQuest: (id: string) => Promise<void>
@@ -47,9 +51,14 @@ export const useQuestStore = create<QuestState>((set, get) => ({
 
   setAutoTransform: (val: boolean) => set({ autoTransform: val }),
 
-  createQuest: async (originalText: string, ratings?: { E?: number; D?: number; L?: number }) => {
+  createQuest: async (
+    originalText: string,
+    ratings?: { E?: number; D?: number; L?: number },
+    dueDate?: string
+  ) => {
     const quest = await window.questAPI.create({
       originalText,
+      dueDate: dueDate || null,
       userEnergyPct: ratings?.E,
       userDrive: ratings?.D,
       userLike: ratings?.L,

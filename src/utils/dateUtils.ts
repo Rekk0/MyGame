@@ -26,3 +26,16 @@ export function countWeekCompleted(quests: QuestForCount[]): number {
     (q) => q.status === 'completed' && q.completedAt && q.completedAt >= weekStart
   ).length
 }
+
+/** Local wall-clock date as YYYY-MM-DD (not UTC). */
+export function localToday(): string {
+  const d = new Date()
+  const off = d.getTimezoneOffset() * 60000
+  return new Date(d.getTime() - off).toISOString().slice(0, 10)
+}
+
+/** True if quest is not completed and its due date has passed (same day is not overdue). */
+export function isOverdue(dueDate: string | null | undefined, status: string): boolean {
+  if (!dueDate || status === 'completed') return false
+  return dueDate.slice(0, 10) < localToday()
+}

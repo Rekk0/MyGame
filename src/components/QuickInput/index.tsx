@@ -5,6 +5,7 @@ import RatingSliders from '../QuestBoard/RatingSliders'
 
 export default function QuickInput() {
   const [text, setText] = useState('')
+  const [dueDate, setDueDate] = useState('')
   const createQuest = useQuestStore((s) => s.createQuest)
   const inputRef = useRef<HTMLInputElement>(null)
   const ratingsRef = useRef<{ E?: number; D?: number; L?: number } | undefined>(undefined)
@@ -16,8 +17,9 @@ export default function QuickInput() {
 
   const handleSubmit = async () => {
     if (!text.trim()) return
-    await createQuest(text.trim(), ratingsRef.current)
+    await createQuest(text.trim(), ratingsRef.current, dueDate || undefined)
     setText('')
+    setDueDate('')
     ratingsRef.current = undefined
     window.windowAPI.hideQuickInput()
   }
@@ -37,11 +39,20 @@ export default function QuickInput() {
         placeholder={t('quickInputPlaceholder')}
         className="w-full bg-transparent text-base text-ink-hi outline-none placeholder:text-ink-faint"
       />
-      <RatingSliders
-        onChange={(r) => {
-          ratingsRef.current = r
-        }}
-      />
+      <div className="flex items-start justify-between gap-3">
+        <RatingSliders
+          onChange={(r) => {
+            ratingsRef.current = r
+          }}
+        />
+        <input
+          type="date"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          title={t('dueDateLabel')}
+          className="rounded border border-edge bg-transparent px-2 py-1 text-xs text-ink-dim outline-none focus:border-edge-strong"
+        />
+      </div>
     </div>
   )
 }

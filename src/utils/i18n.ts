@@ -63,6 +63,8 @@ const STRINGS = {
     originalBtn: '原文',
     transformingBtn: '转化中...',
     transformBtn: '转化',
+    dueDateLabel: '截止日期（可选）',
+    overdue: '已过期',
     // Quest type labels
     questTypeMain: '主线',
     questTypeTimed: '限时',
@@ -207,6 +209,8 @@ const STRINGS = {
     originalBtn: 'Original',
     transformingBtn: 'Processing...',
     transformBtn: 'Gamify',
+    dueDateLabel: 'Due date (optional)',
+    overdue: 'Overdue',
     // Quest type labels
     questTypeMain: 'Main',
     questTypeTimed: 'Timed',

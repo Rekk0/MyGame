@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Check, Trash } from '@phosphor-icons/react'
 import type { Quest } from '../../types/quest'
 import { useT } from '../../utils/i18n'
+import { isOverdue } from '../../utils/dateUtils'
 
 interface QuestCardProps {
   quest: Quest
@@ -34,6 +35,7 @@ export function QuestCard({
   const name = quest.gamifiedName ?? quest.originalText
   const isCompleted = quest.status === 'completed'
   const showTransformBtn = !quest.gamifiedName && !autoTransform
+  const overdue = isOverdue(quest.dueDate, quest.status)
 
   return (
     <div
@@ -58,6 +60,17 @@ export function QuestCard({
               )}
             </span>
             <span className="tabular-nums text-gold">+{quest.xp} XP</span>
+            {quest.dueDate && (
+              <span className="tabular-nums text-ink-dim">
+                {t('duePrefix')}
+                {quest.dueDate.slice(0, 10)}
+              </span>
+            )}
+            {overdue && (
+              <span className="rounded border border-crimson px-1 py-px text-[10px] font-medium text-crimson">
+                {t('overdue')}
+              </span>
+            )}
             {quest.gamifiedName && (
               <button
                 onClick={() => setShowOriginal(!showOriginal)}

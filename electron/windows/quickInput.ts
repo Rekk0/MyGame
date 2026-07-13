@@ -7,7 +7,7 @@ let quickInputWindow: BrowserWindow | null = null
 export function createQuickInputWindow(): BrowserWindow {
   quickInputWindow = new BrowserWindow({
     width: 500,
-    height: 80,
+    height: 120,
     center: true,
     frame: false,
     show: false,
