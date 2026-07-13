@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron'
 import { IPC } from '../../src/types/ipc'
-import { analyzePlayerState, getDdaAdjustment } from '../services/dda'
+import { analyzePlayerState, getDdaState } from '../services/dda'
+import { collectSignals } from '../services/dda/signals'
 import { getPlayer } from '../services/db/repositories/playerRepo'
 import { callAI } from '../services/ai/client'
 import { buildDailySuggestionSystemPrompt, buildDailySuggestionPrompt } from '../services/ai/prompts/dailySuggestion'
@@ -14,11 +15,7 @@ function todayStr(): string {
 }
 
 export function registerDdaHandlers(): void {
-  ipcMain.handle(IPC.DDA_GET_STATE, () => {
-    const state = analyzePlayerState()
-    const adjustment = getDdaAdjustment(state)
-    return { state, ...adjustment }
-  })
+  ipcMain.handle(IPC.DDA_GET_STATE, () => getDdaState())
 
   ipcMain.handle(IPC.DDA_GET_SUGGESTION, async () => {
     const player = getPlayer()
@@ -31,7 +28,12 @@ export function registerDdaHandlers(): void {
     const recentQuests = getAllQuests()
     try {
       const text = await callAI(
-        buildDailySuggestionPrompt({ ...player, worldStyle: player.worldStyle as WorldStyle }, state, recentQuests),
+        buildDailySuggestionPrompt(
+          { ...player, worldStyle: player.worldStyle as WorldStyle },
+          state,
+          recentQuests,
+          collectSignals()
+        ),
         buildDailySuggestionSystemPrompt(player.worldStyle as WorldStyle)
       )
       const jsonMatch = text.match(/\{[\s\S]*\}/)

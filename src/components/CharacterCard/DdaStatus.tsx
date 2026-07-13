@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { BatteryLow, CloudLightning, Waves } from '@phosphor-icons/react'
+import { BatteryFull, Sword, Waves } from '@phosphor-icons/react'
 import { ModalShell } from '../shared/Panel'
 import { useT } from '../../utils/i18n'
 
@@ -8,6 +8,8 @@ interface DdaInfo {
   state: DdaState
   xpMultiplier: number
   suggestion: string
+  challenge?: number
+  capacity?: number
 }
 interface DdaSuggestion {
   mood: string
@@ -16,9 +18,9 @@ interface DdaSuggestion {
 }
 
 const DDA_ICONS: Record<DdaState, JSX.Element> = {
-  anxious: <CloudLightning size={16} weight="fill" />,
+  anxious: <Sword size={16} weight="fill" />,
   flow: <Waves size={16} weight="fill" />,
-  bored: <BatteryLow size={16} weight="fill" />
+  bored: <BatteryFull size={16} weight="fill" />
 }
 const DDA_ACCENTS: Record<DdaState, string> = {
   anxious: 'var(--rpg-crimson)',
@@ -29,6 +31,18 @@ const DDA_LABEL_KEYS: Record<DdaState, 'ddaAnxious' | 'ddaFlow' | 'ddaBored'> = 
   anxious: 'ddaAnxious',
   flow: 'ddaFlow',
   bored: 'ddaBored'
+}
+
+function MiniBar({ label, value, color }: { label: string; value: number; color: string }): JSX.Element {
+  const pct = Math.round(Math.max(0, Math.min(1, value)) * 100)
+  return (
+    <span className="flex flex-1 items-center gap-1">
+      <span className="shrink-0">{label}</span>
+      <span className="h-1 flex-1 overflow-hidden rounded-full bg-edge">
+        <span className="block h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
+      </span>
+    </span>
+  )
 }
 
 /** 把子内容（三资源 / 金币 / 连胜）包进一个心流状态框：框色与辉光跟随当前 DDA 状态 */
@@ -82,22 +96,30 @@ export function DdaStatus({ children }: { children: ReactNode }): JSX.Element {
         }}
       >
         {ddaInfo && (
-          <div className="flex items-center justify-between">
-            <span
-              className="flex items-center gap-1.5 font-display text-sm font-bold tracking-wide"
-              style={{ color: accent }}
-            >
-              {DDA_ICONS[ddaInfo.state]}
-              {t(DDA_LABEL_KEYS[ddaInfo.state])}
-            </span>
-            <button
-              onClick={handleShowSuggestion}
-              className="text-[11px] font-medium hover:opacity-80"
-              style={{ color: accent }}
-              title={ddaInfo.suggestion}
-            >
-              {t('viewSuggestion')} ›
-            </button>
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between">
+              <span
+                className="flex items-center gap-1.5 font-display text-sm font-bold tracking-wide"
+                style={{ color: accent }}
+              >
+                {DDA_ICONS[ddaInfo.state]}
+                {t(DDA_LABEL_KEYS[ddaInfo.state])}
+              </span>
+              <button
+                onClick={handleShowSuggestion}
+                className="text-[11px] font-medium hover:opacity-80"
+                style={{ color: accent }}
+                title={ddaInfo.suggestion}
+              >
+                {t('viewSuggestion')} ›
+              </button>
+            </div>
+            {ddaInfo.challenge != null && ddaInfo.capacity != null && (
+              <div className="flex items-center gap-2 text-[9px] text-ink-faint">
+                <MiniBar label={t('ddaChallenge')} value={ddaInfo.challenge} color="var(--rpg-crimson)" />
+                <MiniBar label={t('ddaCapacity')} value={ddaInfo.capacity} color="var(--rpg-arcane)" />
+              </div>
+            )}
           </div>
         )}
         {children}
