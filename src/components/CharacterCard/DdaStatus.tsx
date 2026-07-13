@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { BatteryLow, CloudLightning, Waves } from '@phosphor-icons/react'
 import { ModalShell } from '../shared/Panel'
 import { useT } from '../../utils/i18n'
@@ -20,10 +20,10 @@ const DDA_ICONS: Record<DdaState, JSX.Element> = {
   flow: <Waves size={16} weight="fill" />,
   bored: <BatteryLow size={16} weight="fill" />
 }
-const DDA_COLORS: Record<DdaState, string> = {
-  anxious: 'text-crimson',
-  flow: 'text-arcane',
-  bored: 'text-gold'
+const DDA_ACCENTS: Record<DdaState, string> = {
+  anxious: 'var(--rpg-crimson)',
+  flow: 'var(--rpg-arcane)',
+  bored: 'var(--rpg-gold)'
 }
 const DDA_LABEL_KEYS: Record<DdaState, 'ddaAnxious' | 'ddaFlow' | 'ddaBored'> = {
   anxious: 'ddaAnxious',
@@ -31,7 +31,8 @@ const DDA_LABEL_KEYS: Record<DdaState, 'ddaAnxious' | 'ddaFlow' | 'ddaBored'> = 
   bored: 'ddaBored'
 }
 
-export function DdaStatus(): JSX.Element {
+/** 把子内容（三资源 / 金币 / 连胜）包进一个心流状态框：框色与辉光跟随当前 DDA 状态 */
+export function DdaStatus({ children }: { children: ReactNode }): JSX.Element {
   const t = useT()
   const [ddaInfo, setDdaInfo] = useState<DdaInfo | null>(null)
   const [ddaSuggestion, setDdaSuggestion] = useState<DdaSuggestion | null>(null)
@@ -68,17 +69,39 @@ export function DdaStatus(): JSX.Element {
     }
   }
 
+  const accent = ddaInfo ? DDA_ACCENTS[ddaInfo.state] : 'var(--rpg-edge-strong)'
+
   return (
     <>
-      {ddaInfo && (
-        <button
-          onClick={handleShowSuggestion}
-          className={`flex items-center justify-center gap-1 text-sm font-medium ${DDA_COLORS[ddaInfo.state]} hover:opacity-80`}
-          title={ddaInfo.suggestion}
-        >
-          {DDA_ICONS[ddaInfo.state]} {t(DDA_LABEL_KEYS[ddaInfo.state])}
-        </button>
-      )}
+      <div
+        className="rpg-frame flex flex-col gap-3 rounded-lg p-3"
+        style={{
+          borderColor: `color-mix(in oklab, ${accent} 55%, transparent)`,
+          background: `color-mix(in oklab, ${accent} 8%, var(--rpg-panel))`,
+          boxShadow: `inset 0 0 16px color-mix(in oklab, ${accent} 12%, transparent)`
+        }}
+      >
+        {ddaInfo && (
+          <div className="flex items-center justify-between">
+            <span
+              className="flex items-center gap-1.5 font-display text-sm font-bold tracking-wide"
+              style={{ color: accent }}
+            >
+              {DDA_ICONS[ddaInfo.state]}
+              {t(DDA_LABEL_KEYS[ddaInfo.state])}
+            </span>
+            <button
+              onClick={handleShowSuggestion}
+              className="text-[11px] font-medium hover:opacity-80"
+              style={{ color: accent }}
+              title={ddaInfo.suggestion}
+            >
+              {t('viewSuggestion')} ›
+            </button>
+          </div>
+        )}
+        {children}
+      </div>
       {showSuggestion && (
         <ModalShell
           title={t('todaySuggestion')}

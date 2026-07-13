@@ -77,57 +77,59 @@ export function CharacterCard({ player, onManage }: CharacterCardProps): JSX.Ele
 
       <div className={divider} />
 
-      {/* ---- 三资源蓄量球 ---- */}
-      <div className="flex justify-between px-2">
-        <ResourceOrb
-          value={player.ep}
-          max={player.maxEp}
-          color="ep"
-          icon={<Lightning size={16} weight="fill" className="text-ep" />}
-          label={t('ep')}
-        />
-        <ResourceOrb
-          value={player.willpower}
-          max={player.maxWillpower}
-          color="will"
-          icon={<HandFist size={16} weight="fill" className="text-will" />}
-          label={t('willpower')}
-        />
-        <ResourceOrb
-          value={player.spirit}
-          max={player.maxSpirit}
-          color="spirit"
-          icon={<Sparkle size={16} weight="fill" className="text-spirit" />}
-          label={t('spirit')}
-        />
-      </div>
+      {/* ---- 心流状态框：包裹三资源 / 金币 / 连胜，框色随 DDA 状态 ---- */}
+      <DdaStatus>
+        {/* 三资源蓄量球 */}
+        <div className="flex justify-between px-2">
+          <ResourceOrb
+            value={player.ep}
+            max={player.maxEp}
+            color="ep"
+            icon={<Lightning size={16} weight="fill" className="text-ep" />}
+            label={t('ep')}
+          />
+          <ResourceOrb
+            value={player.willpower}
+            max={player.maxWillpower}
+            color="will"
+            icon={<HandFist size={16} weight="fill" className="text-will" />}
+            label={t('willpower')}
+          />
+          <ResourceOrb
+            value={player.spirit}
+            max={player.maxSpirit}
+            color="spirit"
+            icon={<Sparkle size={16} weight="fill" className="text-spirit" />}
+            label={t('spirit')}
+          />
+        </div>
 
-      <div className={divider} />
+        <div className={divider} />
 
-      {/* ---- 金币 ---- */}
-      <div className="flex items-center justify-center gap-1.5 text-sm text-gold">
-        <Coins size={16} weight="duotone" />
-        <span className="tabular-nums">
-          {player.gold} {t('gold')}
-        </span>
-      </div>
+        {/* 金币 */}
+        <div className="flex items-center justify-center gap-1.5 text-sm text-gold">
+          <Coins size={16} weight="duotone" />
+          <span className="tabular-nums">
+            {player.gold} {t('gold')}
+          </span>
+        </div>
 
-      {/* ---- 连胜 + DDA ---- */}
-      <div className="flex flex-col items-center gap-0.5">
-        <p className="flex items-center gap-1 text-2xl font-bold tabular-nums text-will">
-          <Flame size={22} weight="fill" />
-          {streakCount}
-        </p>
-        <p className="text-xs text-ink-dim">{t('streakDays')}</p>
-        {streak && streak.bestCount > 0 && (
-          <p className="text-xs text-ink-faint">
-            {t('streakBest')} {streak.bestCount}
-            {t('streakBestSuffix')}
+        {/* 连胜 */}
+        <div className="flex flex-col items-center gap-0.5">
+          <p className="flex items-center gap-1 text-2xl font-bold tabular-nums text-will">
+            <Flame size={22} weight="fill" />
+            {streakCount}
           </p>
-        )}
-        {streakBonus > 0 && <p className="text-xs text-ep">+{streakBonus}% XP</p>}
-      </div>
-      <DdaStatus />
+          <p className="text-xs text-ink-dim">{t('streakDays')}</p>
+          {streak && streak.bestCount > 0 && (
+            <p className="text-xs text-ink-faint">
+              {t('streakBest')} {streak.bestCount}
+              {t('streakBestSuffix')}
+            </p>
+          )}
+          {streakBonus > 0 && <p className="text-xs text-ep">+{streakBonus}% XP</p>}
+        </div>
+      </DdaStatus>
 
       <div className={divider} />
 
