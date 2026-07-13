@@ -24,6 +24,9 @@ import { getScales, recomputeProfile } from '../services/resources/profile'
 import { previewQuestDeltas, resolveQuestRatings } from '../services/resources/preview'
 import type { RatingSource } from '../services/resources/preview'
 import { evaluate } from '../services/companion/scheduler'
+import { buildProfileIfDue } from '../services/profile/userProfile'
+import { getSkillByName } from '../services/db/repositories/skillRepo'
+import { grantSkillXp } from '../services/skill/grantXp'
 import type { Achievement } from '../../src/types/achievement'
 
 type Predictable = RatingSource & { status: string }
@@ -57,6 +60,7 @@ export function registerQuestHandlers(): void {
   }) => {
     const result = createQuest(data)
     notifyHudUpdate()
+    buildProfileIfDue() // 达阈值后台重建画像，fire-and-forget
     return attachPredicted(result)
   })
 
@@ -101,6 +105,12 @@ export function registerQuestHandlers(): void {
       energyDelta: deltas.energy, willpowerDelta: deltas.willpower, spiritDelta: deltas.spirit,
       e: ratings.E, d: ratings.D, l: ratings.L,
     })
+
+    // —— 任务 → 技能 XP 回路：skillHint 匹配到已解锁技能则涨经验（round(finalXp × 0.5)）——
+    if (quest.skillHint) {
+      const skill = getSkillByName(quest.skillHint)
+      if (skill && skill.isUnlocked) void grantSkillXp(skill.id, Math.round(xp * 0.5))
+    }
 
     // —— v2 反馈：本次是用户实填 → 重算个人系数 profile ——
     if (userRated) recomputeProfile()

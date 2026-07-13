@@ -59,6 +59,11 @@ export const IPC = {
   SKILL_GET_ALL: 'skill:get-all',
   SKILL_ADD_XP: 'skill:add-xp',
   SKILL_UNLOCK: 'skill:unlock',
+  SKILL_GET_DIVINATION_STATE: 'skill:get-divination-state',
+  SKILL_GENERATE: 'skill:generate',
+  SKILL_ACCEPT: 'skill:accept',
+  SKILL_REJECT: 'skill:reject',
+  SKILL_PROFILE_READY: 'skill:profile-ready',
 
   DDA_GET_STATE: 'dda:get-state',
   DDA_GET_SUGGESTION: 'dda:get-suggestion',

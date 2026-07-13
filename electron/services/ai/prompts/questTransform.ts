@@ -9,14 +9,16 @@ const WORLD_STYLE_CONTEXTS: Record<WorldStyle, string> = {
   fantasy: '西方奇幻世界。魔法、龙、骑士、公会是核心元素。任务使用奇幻术语，如委托、讨伐、探索地下城等。',
 }
 
-export function buildQuestTransformSystemPrompt(worldStyle: WorldStyle): string {
+export function buildQuestTransformSystemPrompt(worldStyle: WorldStyle, skillNames: string[] = []): string {
   const context = WORLD_STYLE_CONTEXTS[worldStyle]
+  const skillList = skillNames.length > 0 ? skillNames.join('、') : '无'
   return `你是一个游戏化任务设计师。世界背景：${context}
 将用户输入的普通任务转化为该世界风格的任务卡片，严格返回以下 JSON 格式（不要包含任何其他文字）：
-{"gamifiedName":"游戏化的任务名称","narrative":"1-2句任务叙事描述","type":"daily|dungeon|main|timed|adventure","xp":数字,"epCost":数字,"aiEnergyPct":0-100,"aiDrive":0-10,"aiLike":0-10}
+{"gamifiedName":"游戏化的任务名称","narrative":"1-2句任务叙事描述","type":"daily|dungeon|main|timed|adventure","xp":数字,"epCost":数字,"aiEnergyPct":0-100,"aiDrive":0-10,"aiLike":0-10,"skillHint":"技能名或null"}
 type 与 xp 范围：daily: 5-15，dungeon: 20-50，main: 100-500，timed: 30-80，adventure: 10-100
 epCost 根据任务复杂度判断：daily: 5-10，dungeon: 15-25，main: 30-50，timed: 15-25，adventure: 8-20
-aiEnergyPct 为该任务预估精力消耗百分比(0-100)，aiDrive 为驱动力预估(0-10,低于5为被动/硬啃任务)，aiLike 为喜欢程度预估(0-10)`
+aiEnergyPct 为该任务预估精力消耗百分比(0-100)，aiDrive 为驱动力预估(0-10,低于5为被动/硬啃任务)，aiLike 为喜欢程度预估(0-10)
+skillHint：从以下现有技能中选出与该任务最相关的一个（完成任务会为其增长经验），无相关则填 null。现有技能：${skillList}`
 }
 
 export function buildQuestTransformPrompt(originalText: string): string {

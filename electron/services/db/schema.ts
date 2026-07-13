@@ -18,6 +18,7 @@ export const quests = sqliteTable('quests', {
   userEnergyPct: integer('user_energy_pct'),
   userDrive: integer('user_drive'),
   userLike: integer('user_like'),
+  skillHint: text('skill_hint'),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString())
 })
 
@@ -91,6 +92,18 @@ export const plotLogs = sqliteTable('plot_logs', {
   periodKey: text('period_key').notNull(),
   summary: text('summary').notNull(),
   createdAt: text('created_at').notNull().$defaultFn(() => new Date().toISOString()),
+})
+
+export const userProfiles = sqliteTable('user_profiles', {
+  id: text('id').primaryKey(),
+  playerId: text('player_id').notNull().default(''),
+  summary: text('summary').notNull().default(''),
+  questCountAtBuild: integer('quest_count_at_build').notNull().default(0),
+  rejectedNames: text('rejected_names').notNull().default('[]'),
+  divinationDate: text('divination_date'),
+  divinationCount: integer('divination_count').notNull().default(0),
+  skillClaimed: integer('skill_claimed').notNull().default(0),
+  updatedAt: text('updated_at').notNull().$defaultFn(() => new Date().toISOString()),
 })
 
 export const resourceEvents = sqliteTable('resource_events', {

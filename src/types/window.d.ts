@@ -4,6 +4,7 @@ import type { Streak } from './streak'
 import type { Achievement } from './achievement'
 import type { Medal, MedalCategory } from './medal'
 import type { Skill } from './skill'
+import type { DivinationState, SkillPreview } from './profile'
 
 declare global {
   interface Window {
@@ -66,6 +67,7 @@ declare global {
         aiEnergyPct?: number
         aiDrive?: number
         aiLike?: number
+        skillHint?: string | null
       }>
     }
     settingsAPI: {
@@ -86,6 +88,11 @@ declare global {
       getAll: () => Promise<Skill[]>
       addXp: (id: string, amount: number) => Promise<{ skill: Skill; leveledUp: boolean; newTrait?: string }>
       unlock: (id: string) => Promise<Skill>
+      getDivinationState: () => Promise<DivinationState>
+      generate: () => Promise<{ error: string | null; previews: SkillPreview[] }>
+      accept: (preview: SkillPreview) => Promise<{ skill: Skill; divination: DivinationState }>
+      reject: (name: string) => Promise<DivinationState>
+      onProfileReady: (cb: () => void) => () => void
     }
     ddaAPI: {
       getState: () => Promise<{ state: 'anxious' | 'flow' | 'bored'; xpMultiplier: number; suggestion: string }>

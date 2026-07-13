@@ -100,6 +100,15 @@ const skillAPI = {
   getAll: () => ipcRenderer.invoke(IPC.SKILL_GET_ALL),
   addXp: (id: string, amount: number) => ipcRenderer.invoke(IPC.SKILL_ADD_XP, id, amount),
   unlock: (id: string) => ipcRenderer.invoke(IPC.SKILL_UNLOCK, id),
+  getDivinationState: () => ipcRenderer.invoke(IPC.SKILL_GET_DIVINATION_STATE),
+  generate: () => ipcRenderer.invoke(IPC.SKILL_GENERATE),
+  accept: (preview: unknown) => ipcRenderer.invoke(IPC.SKILL_ACCEPT, preview),
+  reject: (name: string) => ipcRenderer.invoke(IPC.SKILL_REJECT, name),
+  onProfileReady: (cb: () => void) => {
+    const h = (): void => cb()
+    ipcRenderer.on(IPC.SKILL_PROFILE_READY, h)
+    return () => ipcRenderer.removeListener(IPC.SKILL_PROFILE_READY, h)
+  },
 }
 
 const ddaAPI = {

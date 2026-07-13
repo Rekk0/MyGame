@@ -18,6 +18,7 @@ export interface Quest {
   userEnergyPct: number | null
   userDrive: number | null
   userLike: number | null
+  skillHint: string | null
   createdAt: string
   predictedDeltas?: { energy: number; willpower: number; spirit: number }
 }

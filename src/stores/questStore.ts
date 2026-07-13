@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { Quest, QuestType } from '../types/quest'
 import { usePlayerStore } from './playerStore'
 import { useStreakStore } from './streakStore'
+import { useSkillStore } from './skillStore'
 
 interface QuestState {
   quests: Quest[]
@@ -88,6 +89,7 @@ export const useQuestStore = create<QuestState>((set, get) => ({
         aiEnergyPct: result.aiEnergyPct,
         aiDrive: result.aiDrive,
         aiLike: result.aiLike,
+        skillHint: result.skillHint ?? null,
       })
       await get().fetchQuests()
     } catch {
@@ -98,28 +100,14 @@ export const useQuestStore = create<QuestState>((set, get) => ({
   },
 
   completeQuest: async (id: string) => {
-    const quest = get().quests.find((q) => q.id === id)
-    const type = quest?.type ?? 'daily'
-
+    // 技能 XP 回路已移入主进程 QUEST_COMPLETE（按 skillHint 路由，见 questHandlers）
     await window.questAPI.complete(id)
     await window.streakAPI.record()
-    // 技能 XP：根据任务类型给对应技能加经验
-    const SKILL_XP_MAP: Record<string, { skillKey: string; amount: number }> = {
-      daily: { skillKey: 'time-mgmt', amount: 5 },
-      dungeon: { skillKey: 'productivity', amount: 10 },
-      main: { skillKey: 'resilience', amount: 20 },
-      adventure: { skillKey: 'learning', amount: 8 },
-    }
-    const skillXp = SKILL_XP_MAP[type]
-    if (skillXp) {
-      const allSkills = await window.skillAPI.getAll()
-      const target = allSkills.find(s => s.id.endsWith(`-${skillXp.skillKey}`) && s.isUnlocked)
-      if (target) void window.skillAPI.addXp(target.id, skillXp.amount)
-    }
     await Promise.all([
       get().fetchQuests(),
       usePlayerStore.getState().fetchPlayer(),
       useStreakStore.getState().fetchStreak(),
+      useSkillStore.getState().fetchSkills(),
     ])
   },
 

@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto'
 import { and, eq } from 'drizzle-orm'
 import { db } from '../index'
 import { skills } from '../schema'
@@ -61,6 +62,38 @@ export function getAllSkills(): Skill[] {
 export function getSkillById(id: string): Skill | undefined {
   const row = db.select().from(skills).where(and(eq(skills.id, id), eq(skills.playerId, pid()))).get()
   return row ? rowToSkill(row) : undefined
+}
+
+export function getSkillByName(name: string): Skill | undefined {
+  const row = db.select().from(skills).where(and(eq(skills.name, name), eq(skills.playerId, pid()))).get()
+  return row ? rowToSkill(row) : undefined
+}
+
+/** AI 生成技能入库（默认已解锁）。parentSkillName 若匹配到现有技能则挂为父节点。 */
+export function createSkill(input: {
+  name: string
+  category: SkillCategory
+  description: string
+  maxXp: number
+  parentSkillName: string | null
+}): Skill {
+  const playerId = pid()
+  const parent = input.parentSkillName ? getSkillByName(input.parentSkillName) : undefined
+  const id = `${playerId}-ai-${randomUUID()}`
+  db.insert(skills).values({
+    id,
+    playerId,
+    name: input.name,
+    category: input.category,
+    description: input.description,
+    maxXp: input.maxXp,
+    parentSkillId: parent?.id ?? null,
+    isUnlocked: 1,
+    xp: 0,
+    level: 1,
+    traits: '[]',
+  }).run()
+  return getSkillById(id)!
 }
 
 export function addSkillXp(id: string, amount: number): { leveledUp: boolean; newLevel: number; newDescription: string } {

@@ -18,6 +18,7 @@ import { Settings } from './components/shared/Settings'
 import { AchievementsScreen } from './components/Achievement/AchievementList'
 import { MedalsScreen } from './components/MedalGallery'
 import { SkillTree } from './components/SkillTree'
+import { SkillRevealModal } from './components/SkillTree/SkillRevealModal'
 import { JournalScreen } from './components/Journal'
 import { ApiKeyWarningDialog } from './components/shared/ApiKeyWarningDialog'
 import { ScreenShell } from './components/shared/ScreenShell'
@@ -95,6 +96,13 @@ function App(): JSX.Element {
     return window.companionAPI.onNavigate((target: unknown) => {
       const t = target as { target?: string }
       if (t?.target === 'plot') setActiveScreen('journal')
+    })
+  }, [])
+
+  // 画像重建成功 → 自动占卜并弹「即将习得」（跨页面，SkillRevealModal 挂在 App 根）
+  useEffect(() => {
+    return window.skillAPI.onProfileReady(() => {
+      void useSkillStore.getState().divine()
     })
   }, [])
 
@@ -190,6 +198,7 @@ function App(): JSX.Element {
         style={bgUrl ? ({ '--scene-bg-image': `url("${bgUrl}")` } as React.CSSProperties) : undefined}
       >
         {showApiKeyWarning && <ApiKeyWarningDialog onClose={() => setShowApiKeyWarning(false)} />}
+        <SkillRevealModal />
         {showManager && (
           <CharacterManager
             currentPlayer={player}
