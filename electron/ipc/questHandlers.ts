@@ -18,13 +18,27 @@ import { unlockAchievement } from '../services/db/repositories/achievementRepo'
 import { buildAchievementSystemPrompt, buildAchievementPrompt } from '../services/ai/prompts/achievement'
 import { generateMedal } from './medalHandlers'
 import { analyzePlayerState, getDdaAdjustment, getStreakMultiplier } from '../services/dda'
-import { clamp, computeDeltas, finalXp } from '../services/resources/settlement'
-import { correctRatings, scaledCoeffs, selectHistory } from '../services/resources/calibration'
-import { historyForQuest } from '../services/db/repositories/calibrationRepo'
+import { computeDeltas, finalXp } from '../services/resources/settlement'
+import { scaledCoeffs } from '../services/resources/calibration'
 import { getScales, recomputeProfile } from '../services/resources/profile'
+import { previewQuestDeltas, resolveQuestRatings } from '../services/resources/preview'
+import type { RatingSource } from '../services/resources/preview'
 import { evaluate } from '../services/companion/scheduler'
-import type { Ratings } from '../../src/types/resource'
 import type { Achievement } from '../../src/types/achievement'
+
+type Predictable = RatingSource & { status: string }
+
+// pending 任务附加 predictedDeltas（主进程算，渲染层零公式）。scales 是玩家级常量，批量时提一次。
+function withPredicted<T extends Predictable>(list: T[]): T[] {
+  const coeffs = scaledCoeffs(getScales())
+  return list.map((q) =>
+    q.status === 'pending' ? { ...q, predictedDeltas: previewQuestDeltas(q, coeffs) } : q
+  )
+}
+
+function attachPredicted<T extends Predictable>(q: T): T {
+  return q.status === 'pending' ? { ...q, predictedDeltas: previewQuestDeltas(q) } : q
+}
 
 const MEDAL_TRIGGERS: Record<string, { name: string; category: 'streak' | 'mastery' | 'adventure' | 'oath'; description: string }> = {
   streak_7:  { name: '七日勋章',     category: 'streak',  description: '连续坚持七天的荣耀' },
@@ -43,17 +57,17 @@ export function registerQuestHandlers(): void {
   }) => {
     const result = createQuest(data)
     notifyHudUpdate()
-    return result
+    return attachPredicted(result)
   })
 
-  ipcMain.handle(IPC.QUEST_GET_ALL, () => getAllQuests())
+  ipcMain.handle(IPC.QUEST_GET_ALL, () => withPredicted(getAllQuests()))
 
   ipcMain.handle(IPC.QUEST_GET_BY_ID, (_e, id: string) => getQuestById(id))
 
   ipcMain.handle(IPC.QUEST_UPDATE, (_e, id: string, data: object) => {
     const result = updateQuest(id, data as never)
     notifyHudUpdate()
-    return result
+    return attachPredicted(result)
   })
 
   ipcMain.handle(IPC.QUEST_DELETE, (_e, id: string) => {
@@ -66,25 +80,9 @@ export function registerQuestHandlers(): void {
     const quest = completeQuest(id)
     const player = getPlayer()!
 
-    // —— v1：用户拖过滑杆 → 直接用用户值；跳过评分 → 历史修正 AI 隐藏预估 ——
+    // —— 评分解析与卡片预览共用同一路径（preview.ts），保证「显示=结算」——
     const userRated = quest.userDrive != null
-    let ratings: Ratings
-    if (userRated) {
-      ratings = {
-        E: quest.userEnergyPct ?? clamp(quest.epCost, 0, 100),
-        D: quest.userDrive!,
-        L: quest.userLike ?? 5,
-      }
-    } else {
-      const rawAi: Ratings = {
-        E: quest.aiEnergyPct ?? clamp(quest.epCost, 0, 100),
-        D: quest.aiDrive ?? 5,
-        L: quest.aiLike ?? 5,
-      }
-      const { byText, byType } = historyForQuest(quest.type, quest.originalText)
-      const hist = selectHistory(byText, byType)
-      ratings = correctRatings(rawAi, hist.mean, hist.n)
-    }
+    const ratings = resolveQuestRatings(quest)
 
     // —— v2：个人系数缩放（仅意志力/精神；XP 不缩放）——
     const deltas = computeDeltas(ratings, scaledCoeffs(getScales()))

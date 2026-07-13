@@ -1,8 +1,35 @@
 import { useState } from 'react'
-import { Check, Trash } from '@phosphor-icons/react'
+import { Check, HandFist, Lightning, Sparkle, Trash } from '@phosphor-icons/react'
 import type { Quest } from '../../types/quest'
 import { useT } from '../../utils/i18n'
 import { isOverdue } from '../../utils/dateUtils'
+
+function signed(n: number): string {
+  return n > 0 ? `+${n}` : `${n}`
+}
+
+function ResourcePreview({
+  deltas
+}: {
+  deltas: NonNullable<Quest['predictedDeltas']>
+}): JSX.Element | null {
+  const items = [
+    { key: 'e', v: deltas.energy, cls: 'text-ep', icon: <Lightning size={11} weight="fill" /> },
+    { key: 'w', v: deltas.willpower, cls: 'text-will', icon: <HandFist size={11} weight="fill" /> },
+    { key: 's', v: deltas.spirit, cls: 'text-spirit', icon: <Sparkle size={11} weight="fill" /> }
+  ].filter((i) => i.v !== 0)
+  if (items.length === 0) return null
+  return (
+    <>
+      {items.map((i) => (
+        <span key={i.key} className={`flex items-center gap-0.5 tabular-nums ${i.cls}`}>
+          {i.icon}
+          {signed(i.v)}
+        </span>
+      ))}
+    </>
+  )
+}
 
 interface QuestCardProps {
   quest: Quest
@@ -60,6 +87,9 @@ export function QuestCard({
               )}
             </span>
             <span className="tabular-nums text-gold">+{quest.xp} XP</span>
+            {!isCompleted && quest.predictedDeltas && (
+              <ResourcePreview deltas={quest.predictedDeltas} />
+            )}
             {quest.dueDate && (
               <span className="tabular-nums text-ink-dim">
                 {t('duePrefix')}
