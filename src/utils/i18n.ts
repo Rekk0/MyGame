@@ -65,6 +65,10 @@ const STRINGS = {
     transformBtn: '转化',
     dueDateLabel: '截止日期（可选）',
     overdue: '已过期',
+    ratingLabel: '评分',
+    ratingEnergy: '精力',
+    ratingDrive: '驱动力',
+    ratingLike: '喜欢',
     // Quest type labels
     questTypeMain: '主线',
     questTypeTimed: '限时',
@@ -211,6 +215,10 @@ const STRINGS = {
     transformBtn: 'Gamify',
     dueDateLabel: 'Due date (optional)',
     overdue: 'Overdue',
+    ratingLabel: 'Rating',
+    ratingEnergy: 'Energy',
+    ratingDrive: 'Drive',
+    ratingLike: 'Like',
     // Quest type labels
     questTypeMain: 'Main',
     questTypeTimed: 'Timed',
