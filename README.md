@@ -28,7 +28,6 @@
 从 [Releases](https://github.com/Rekk0/MyGame/releases) 下载最新版本：
 
 - **便携版（portable）**：免安装，下载 `.exe` 双击即可运行
-- **安装版（setup）**：常规 Windows 安装包
 
 请自行在右下角设置中配置AI服务；
 通用API key需要文生文模型；
