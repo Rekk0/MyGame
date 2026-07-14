@@ -1,9 +1,21 @@
+import type { WorldStyle } from '../../../../src/types/player'
 import type { SkillCategory } from '../../../../src/types/skill'
 
-/** 技能图标 world-agnostic：只表达技能语义，不随世界观变（与预置图标同一套视觉规范）。 */
-export function buildSkillIconSystemPrompt(): string {
+/** 各世界观的图标风味（同名技能在不同世界观出不同风格，与 medalSvg 体系一致）。 */
+const ICON_STYLE_HINTS: Record<WorldStyle, string> = {
+  wuxia: '融入刀剑、竹叶、太极等武侠意象，线条遒劲有力',
+  xianxia: '融入仙鹤、莲花、云纹、八卦等仙侠意象，线条飘逸空灵',
+  realistic: '采用简约几何与现代符号，线条利落克制',
+  apocalypse: '融入齿轮、裂纹、链条等废土意象，线条粗粝硬朗',
+  scifi: '融入六边形、电路、能量环等科技意象，线条锐利精密',
+  fantasy: '融入盾徽、魔法阵、龙纹等奇幻意象，线条华丽考究',
+}
+
+export function buildSkillIconSystemPrompt(worldStyle: WorldStyle): string {
+  const hint = ICON_STYLE_HINTS[worldStyle] ?? ICON_STYLE_HINTS.realistic
   return [
     '你是一位符文徽记设计师，为技能树节点设计极简的线性图标。',
+    `世界观风格：${hint}。`,
     '严格要求：',
     '- 生成自包含 SVG，使用 viewBox="0 0 24 24"。',
     '- 扁平线性风格：fill="none"、stroke="currentColor"、stroke-width 约 1.6、圆角端点。',

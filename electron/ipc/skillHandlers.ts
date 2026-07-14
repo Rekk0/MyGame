@@ -10,7 +10,7 @@ import {
 } from '../services/db/repositories/userProfileRepo'
 import { grantSkillXp } from '../services/skill/grantXp'
 import { generateSkillPreviews } from '../services/skill/generate'
-import { generateSkillIcon } from '../services/skill/icon'
+import { generateAndAttachIcon } from '../services/skill/icon'
 import type { DivinationState, SkillPreview } from '../../src/types/profile'
 
 function localDate(): string {
@@ -52,11 +52,11 @@ export function registerSkillHandlers(): void {
     return { error: null, previews }
   })
 
-  // 确认学习：生成图标（失败降级 null）→ 入库 + 消耗该画像版本配额。
-  ipcMain.handle(IPC.SKILL_ACCEPT, async (_e, preview: SkillPreview) => {
-    const iconSvg = await generateSkillIcon(preview)
-    const skill = createSkill({ ...preview, iconSvg })
+  // 确认学习：立即入库 + 消耗配额并返回（技能即刻出现）；图标后台异步生成回填。
+  ipcMain.handle(IPC.SKILL_ACCEPT, (_e, preview: SkillPreview) => {
+    const skill = createSkill(preview)
     markSkillClaimed()
+    void generateAndAttachIcon(skill.id, preview)
     return { skill, divination: divinationState() }
   })
 

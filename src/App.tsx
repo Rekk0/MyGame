@@ -115,6 +115,13 @@ function App(): JSX.Element {
     })
   }, [])
 
+  // AI 技能图标后台生成完成 → 刷新技能让图标显现
+  useEffect(() => {
+    return window.skillAPI.onUpdated(() => {
+      void useSkillStore.getState().fetchSkills()
+    })
+  }, [])
+
   useEffect(() => {
     if (player) document.documentElement.setAttribute('data-world', player.worldStyle)
     else document.documentElement.removeAttribute('data-world')

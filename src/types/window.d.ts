@@ -94,6 +94,7 @@ declare global {
       reject: (name: string) => Promise<DivinationState>
       onProfileReady: (cb: () => void) => () => void
       onLeveledUp: (cb: (e: SkillLevelUpEvent) => void) => () => void
+      onUpdated: (cb: () => void) => () => void
     }
     ddaAPI: {
       getState: () => Promise<{ state: 'anxious' | 'flow' | 'bored'; xpMultiplier: number; suggestion: string }>

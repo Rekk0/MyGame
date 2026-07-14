@@ -29,8 +29,8 @@ function loadSettings(): AISettings | null {
   try { return JSON.parse(readFileSync(p, 'utf-8')) } catch { return null }
 }
 
-async function callClaude(prompt: string, system: string, apiKey: string, model: string): Promise<string> {
-  const client = new Anthropic({ apiKey, timeout: 30000 })
+async function callClaude(prompt: string, system: string, apiKey: string, model: string, timeoutMs: number): Promise<string> {
+  const client = new Anthropic({ apiKey, timeout: timeoutMs })
   const msg = await client.messages.create({
     model,
     max_tokens: 1024,
@@ -42,9 +42,9 @@ async function callClaude(prompt: string, system: string, apiKey: string, model:
   return block.text
 }
 
-async function callOpenAICompatible(prompt: string, system: string, apiKey: string, model: string, provider: string): Promise<string> {
+async function callOpenAICompatible(prompt: string, system: string, apiKey: string, model: string, provider: string, timeoutMs: number): Promise<string> {
   const baseURL = BASE_URLS[provider]
-  const client = new OpenAI({ apiKey: apiKey || 'ollama', baseURL, timeout: 30000 })
+  const client = new OpenAI({ apiKey: apiKey || 'ollama', baseURL, timeout: timeoutMs })
   const resp = await client.chat.completions.create({
     model,
     messages: [
@@ -55,14 +55,19 @@ async function callOpenAICompatible(prompt: string, system: string, apiKey: stri
   return resp.choices[0]?.message?.content ?? ''
 }
 
-export async function callAI(prompt: string, systemPrompt: string): Promise<string> {
+export async function callAI(
+  prompt: string,
+  systemPrompt: string,
+  opts?: { timeoutMs?: number }
+): Promise<string> {
   const settings = loadSettings()
   if (!settings?.apiKey && settings?.provider !== 'ollama') throw new Error('AI service not configured')
   const system = settings.language === 'en'
     ? `${systemPrompt}\nPlease respond in English.`
     : systemPrompt
+  const timeoutMs = opts?.timeoutMs ?? 30000
   if (settings.provider === 'claude') {
-    return callClaude(prompt, system, settings.apiKey, settings.model)
+    return callClaude(prompt, system, settings.apiKey, settings.model, timeoutMs)
   }
-  return callOpenAICompatible(prompt, system, settings.apiKey, settings.model, settings.provider)
+  return callOpenAICompatible(prompt, system, settings.apiKey, settings.model, settings.provider, timeoutMs)
 }

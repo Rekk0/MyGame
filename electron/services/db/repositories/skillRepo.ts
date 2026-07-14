@@ -135,3 +135,7 @@ export function unlockSkill(id: string): void {
 export function updateSkillDescription(id: string, description: string, traits: string[]): void {
   db.update(skills).set({ description, traits: JSON.stringify(traits) }).where(eq(skills.id, id)).run()
 }
+
+export function updateSkillIcon(id: string, iconSvg: string): void {
+  db.update(skills).set({ iconSvg }).where(eq(skills.id, id)).run()
+}

@@ -114,6 +114,11 @@ const skillAPI = {
     ipcRenderer.on(IPC.SKILL_LEVELED_UP, h)
     return () => ipcRenderer.removeListener(IPC.SKILL_LEVELED_UP, h)
   },
+  onUpdated: (cb: () => void) => {
+    const h = (): void => cb()
+    ipcRenderer.on(IPC.SKILL_UPDATED, h)
+    return () => ipcRenderer.removeListener(IPC.SKILL_UPDATED, h)
+  },
 }
 
 const ddaAPI = {
