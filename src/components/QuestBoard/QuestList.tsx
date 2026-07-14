@@ -56,10 +56,6 @@ export function QuestList({
   const { questOrder, reorderQuests } = useQuestStore()
   const t = useT()
 
-  if (quests.length === 0) {
-    return <div className="py-12 text-center text-sm text-ink-dim">{t('emptyQuests')}</div>
-  }
-
   const incomplete = useMemo(() => quests.filter((q) => q.status !== 'completed'), [quests])
   const completed = useMemo(() => quests.filter((q) => q.status === 'completed'), [quests])
 
@@ -89,6 +85,10 @@ export function QuestList({
     },
     [groupOrders, reorderQuests]
   )
+
+  if (quests.length === 0) {
+    return <div className="py-12 text-center text-sm text-ink-dim">{t('emptyQuests')}</div>
+  }
 
   // Render groups in fixed order, skip empty
   const groupElements: JSX.Element[] = []
