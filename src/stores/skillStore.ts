@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Skill } from '../types/skill'
+import type { Skill, SkillLevelUpEvent } from '../types/skill'
 import type { DivinationState, SkillPreview } from '../types/profile'
 
 interface SkillState {
@@ -8,12 +8,15 @@ interface SkillState {
   previews: SkillPreview[]
   generating: boolean
   genError: string | null
+  levelUp: SkillLevelUpEvent | null
   fetchSkills: () => Promise<void>
   fetchDivination: () => Promise<void>
   divine: () => Promise<void>
   acceptHead: () => Promise<void>
   rejectHead: () => Promise<void>
   clearPreviews: () => void
+  showLevelUp: (e: SkillLevelUpEvent) => void
+  clearLevelUp: () => void
 }
 
 const EMPTY_DIVINATION: DivinationState = { hasProfile: false, claimed: false, divinationsLeft: 0 }
@@ -24,6 +27,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
   previews: [],
   generating: false,
   genError: null,
+  levelUp: null,
 
   fetchSkills: async () => {
     const skills = await window.skillAPI.getAll()
@@ -63,4 +67,7 @@ export const useSkillStore = create<SkillState>((set, get) => ({
   },
 
   clearPreviews: () => set({ previews: [], genError: null }),
+
+  showLevelUp: (e) => set({ levelUp: e }),
+  clearLevelUp: () => set({ levelUp: null }),
 }))

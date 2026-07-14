@@ -248,3 +248,20 @@ html.hud-dragging * {
     50% { opacity: 0.25; }
   }
 }
+
+/* Skill tree: flowing unlocked links + selected-node glow pulse */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-reduced-motion="true"]) .skill-flow {
+    animation: skill-flow 1.1s linear infinite;
+  }
+  html:not([data-reduced-motion="true"]) .skill-glow {
+    animation: skill-glow 1.8s ease-in-out infinite;
+  }
+  @keyframes skill-flow {
+    to { stroke-dashoffset: -24; }
+  }
+  @keyframes skill-glow {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 0.75; }
+  }
+}

@@ -7,7 +7,7 @@ import { registerAllHandlers } from './ipc/index'
 import { registerWindowHandlers } from './ipc/windowHandlers'
 import { getAllPlayers } from './services/db/repositories/playerRepo'
 import { initAchievements } from './services/db/repositories/achievementRepo'
-import { initSkills } from './services/db/repositories/skillRepo'
+import { initSkills, backfillPresetIcons } from './services/db/repositories/skillRepo'
 import { createMainWindow } from './windows/mainWindow'
 import { createHudWindow, showHud } from './windows/hudWindow'
 import { createQuestHudWindow } from './windows/questHudWindow'
@@ -44,6 +44,7 @@ app.whenReady().then(() => {
     runMigrations()
     registerAllHandlers()
     getAllPlayers().forEach((p) => { initAchievements(p.id); initSkills(p.id) })
+    backfillPresetIcons()
 
     applyDailyResetIfNeeded()
 

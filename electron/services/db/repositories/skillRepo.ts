@@ -1,8 +1,9 @@
 import { randomUUID } from 'crypto'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, isNull, like } from 'drizzle-orm'
 import { db } from '../index'
 import { skills } from '../schema'
 import { getActivePlayerId } from './playerRepo'
+import { PRESET_ICONS } from '../../skill/presetIcons'
 import type { Skill, SkillCategory } from '../../../../src/types/skill'
 
 const pid = () => getActivePlayerId() ?? ''
@@ -22,6 +23,7 @@ function rowToSkill(row: SkillRow): Skill {
     traits: JSON.parse(row.traits || '[]') as string[],
     parentSkillId: row.parentSkillId,
     isUnlocked: row.isUnlocked === 1,
+    iconSvg: row.iconSvg ?? null,
   }
 }
 
@@ -51,7 +53,18 @@ export function initSkills(playerId: string): void {
       xp: 0,
       level: 1,
       traits: '[]',
+      iconSvg: PRESET_ICONS[s.skillKey] ?? null,
     }).run()
+  }
+}
+
+/** 一次性回填：给早于本功能创建的预置技能补上图标（icon_svg 为空且 id 匹配预置 skillKey）。 */
+export function backfillPresetIcons(): void {
+  for (const key of Object.keys(PRESET_ICONS)) {
+    db.update(skills)
+      .set({ iconSvg: PRESET_ICONS[key] })
+      .where(and(isNull(skills.iconSvg), like(skills.id, `%-${key}`)))
+      .run()
   }
 }
 
@@ -76,6 +89,7 @@ export function createSkill(input: {
   description: string
   maxXp: number
   parentSkillName: string | null
+  iconSvg?: string | null
 }): Skill {
   const playerId = pid()
   const parent = input.parentSkillName ? getSkillByName(input.parentSkillName) : undefined
@@ -92,6 +106,7 @@ export function createSkill(input: {
     xp: 0,
     level: 1,
     traits: '[]',
+    iconSvg: input.iconSvg ?? null,
   }).run()
   return getSkillById(id)!
 }

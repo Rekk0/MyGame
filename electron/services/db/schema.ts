@@ -74,6 +74,7 @@ export const skills = sqliteTable('skills', {
   traits: text('traits').notNull().default('[]'),
   parentSkillId: text('parent_skill_id'),
   isUnlocked: integer('is_unlocked').notNull().default(0),
+  iconSvg: text('icon_svg'),
 })
 
 export const streaks = sqliteTable('streaks', {

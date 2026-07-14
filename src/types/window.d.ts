@@ -3,7 +3,7 @@ import type { Player, WorldStyle } from './player'
 import type { Streak } from './streak'
 import type { Achievement } from './achievement'
 import type { Medal, MedalCategory } from './medal'
-import type { Skill } from './skill'
+import type { Skill, SkillLevelUpEvent } from './skill'
 import type { DivinationState, SkillPreview } from './profile'
 
 declare global {
@@ -93,6 +93,7 @@ declare global {
       accept: (preview: SkillPreview) => Promise<{ skill: Skill; divination: DivinationState }>
       reject: (name: string) => Promise<DivinationState>
       onProfileReady: (cb: () => void) => () => void
+      onLeveledUp: (cb: (e: SkillLevelUpEvent) => void) => () => void
     }
     ddaAPI: {
       getState: () => Promise<{ state: 'anxious' | 'flow' | 'bored'; xpMultiplier: number; suggestion: string }>

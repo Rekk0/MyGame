@@ -34,7 +34,7 @@ export function SkillTree({ skills }: Props) {
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-lg border border-edge bg-abyss-deep">
-      <SkillGraph skills={skills} onSelect={setSelected} />
+      <SkillGraph skills={skills} selectedId={selected?.id ?? null} onSelect={setSelected} />
 
       <div className="absolute left-4 top-4 flex flex-col gap-1">
         <button

@@ -64,6 +64,7 @@ export const IPC = {
   SKILL_ACCEPT: 'skill:accept',
   SKILL_REJECT: 'skill:reject',
   SKILL_PROFILE_READY: 'skill:profile-ready',
+  SKILL_LEVELED_UP: 'skill:leveled-up',
 
   DDA_GET_STATE: 'dda:get-state',
   DDA_GET_SUGGESTION: 'dda:get-suggestion',

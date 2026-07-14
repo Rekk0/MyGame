@@ -19,6 +19,7 @@ import { AchievementsScreen } from './components/Achievement/AchievementList'
 import { MedalsScreen } from './components/MedalGallery'
 import { SkillTree } from './components/SkillTree'
 import { SkillRevealModal } from './components/SkillTree/SkillRevealModal'
+import { SkillLevelUpModal } from './components/SkillTree/SkillLevelUpModal'
 import { JournalScreen } from './components/Journal'
 import { ApiKeyWarningDialog } from './components/shared/ApiKeyWarningDialog'
 import { ScreenShell } from './components/shared/ScreenShell'
@@ -103,6 +104,14 @@ function App(): JSX.Element {
   useEffect(() => {
     return window.skillAPI.onProfileReady(() => {
       void useSkillStore.getState().divine()
+    })
+  }, [])
+
+  // 技能升级 → 弹「技能精进」并刷新技能（节点视觉随等级更新）
+  useEffect(() => {
+    return window.skillAPI.onLeveledUp((e) => {
+      useSkillStore.getState().showLevelUp(e)
+      void useSkillStore.getState().fetchSkills()
     })
   }, [])
 
@@ -199,6 +208,7 @@ function App(): JSX.Element {
       >
         {showApiKeyWarning && <ApiKeyWarningDialog onClose={() => setShowApiKeyWarning(false)} />}
         <SkillRevealModal />
+        <SkillLevelUpModal />
         {showManager && (
           <CharacterManager
             currentPlayer={player}

@@ -109,6 +109,11 @@ const skillAPI = {
     ipcRenderer.on(IPC.SKILL_PROFILE_READY, h)
     return () => ipcRenderer.removeListener(IPC.SKILL_PROFILE_READY, h)
   },
+  onLeveledUp: (cb: (e: unknown) => void) => {
+    const h = (_e: unknown, payload: unknown): void => cb(payload)
+    ipcRenderer.on(IPC.SKILL_LEVELED_UP, h)
+    return () => ipcRenderer.removeListener(IPC.SKILL_LEVELED_UP, h)
+  },
 }
 
 const ddaAPI = {
